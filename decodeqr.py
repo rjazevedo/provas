@@ -1,9 +1,13 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+""" Renomeia os arquivos baseado no QR-Code que existe dentro dele"""
 
 from PIL import Image
 from pyzbar.pyzbar import decode
 import sys
 import os
+import argparse
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -12,11 +16,15 @@ if __name__ == '__main__':
 
     for nome in sys.argv[1:]:
  #       print(nome)
-        qr = decode(Image.open(nome))
+        img = Image.open(nome)
+        qr = decode(img)
+        print(qr)
         if len(qr) == 1:
-            print(nome, ' -> ', qr[0].data) 
+            print(nome, ' -> ', qr[0].data).decode('utf-8') 
             os.rename(nome, str(qr[0].data)[2:-1] + '.png')
         else:
-            print('Encontrei {} QRCodes'.format(len(qr)))
+            qr = decode(img.rotate(90, expand=1))
+            print(qr)
+            print(nome, ' -> ' 'Encontrei {} QRCodes'.format(len(qr)))
 
 

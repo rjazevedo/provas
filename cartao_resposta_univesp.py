@@ -25,32 +25,22 @@ vspace = 17
 hspace = 17
 width, height = A4
 
-dados = {
-    'nome' : 'Camila Karine de Morais Redhed Camargo',
-    'ra': '1703404',
-    'polo': 'Cajati',
-    'data': '01/04/2019',
-    'curso': 'Pedagogia',
-    'turma': 'PED.2017.2.1',
-    'bimestre': '7',
-    'disciplina': 'EPA001 - Automação Industrial',
-    'codigo': '20190401-1234-SAM001-01'
-}
-
 class Aluno:
     def __init__(self, campos):
-        self.disciplina = campos[0]
-        self.prova = campos[1]
-        self.ra = campos[2]
-        self.nome = campos[3]
-        self.polo = campos[4]
-        self.curso = campos[5]
-        self.turma = campos[6]
-        self.bimestre = campos[7]
-        self.nomeDisciplina = ''
-        self.data = ''
+        self.nome = campos[0]
+        self.ra = campos[1]
+        self.nomePolo = campos[2]
+        self.data = campos[3]
+        self.curso = campos[4]
+        self.turma = campos[5]
+        self.bimestre = campos[6]
+        self.disciplina = campos[7]
+        self.nomeDisciplina = campos[8]
+        self.prova = campos[9]
+        self.questoesObjetivas = int(campos[10])
+        self.folhasDissertativas = int(campos[11])
+        self.polo = ''
         self.codigo = ''
-        self.nomePolo = ''
         return
 
     def GeraCodigo(self):
@@ -60,24 +50,6 @@ class Aluno:
 
         return self.codigo
                   
-
-class Prova:
-    def __init__(self, campos):
-        self.disciplina = campos[0]
-        self.nome = campos[1]
-        self.id = campos[2]
-        self.data = campos[3]
-        self.questoesObjetivas = int(campos[4])
-        self.folhasDissertativas = int(campos[5])
-        return
-
-class Polo:
-    def __init__(self, campos):
-        self.codigo = campos[0]
-        self.nome = campos[1]
-        self.volume = 0
-        self.paginas = 0
-
 
 def Grid(myCanvas):
     myCanvas.setStrokeColorRGB(0.9, 0.9, 0.9)
@@ -160,19 +132,22 @@ def FolhaRespostaBase(myCanvas, pagina, totalPaginas):
     offset = (width - 500) / 2
 
     # Coloca um grid quadriculado em cinza claro para ajudar o posicionamento.
-    #    Grid(myCanvas)
+    #Grid(myCanvas)
 
     # Coloca o logotipo no canto superior esquerdo
-    logo = rpImage('univesp.png', 959/6, 345/6)
-    logo.drawOn(myCanvas, marginleft, margintop - 34)
+    logo = rpImage('univesp.png', 956/8, 346/8)
+    logo.drawOn(myCanvas, marginleft, margintop - 18)
 
     # Textos
-    myCanvas.setFont('Helvetica-Bold', 16) 
-    myCanvas.drawString(9.8 * cm, margintop + 12, 'FOLHA DE RESPOSTA')
+    myCanvas.setFont('Helvetica', 16) 
+    myCanvas.drawString(8.3 * cm, margintop + 12, 'FOLHA DE RESPOSTA')
 
     myCanvas.setFont('Helvetica', 10)
-    myCanvas.drawString(13 * cm, 27 * cm, 'Ausente')
-    myCanvas.circle(15 * cm, 27.1 * cm, tradius, stroke=1)
+    myCanvas.circle(8.6 * cm, 27.1 * cm, tradius, stroke=1)
+    myCanvas.drawString(9.3 * cm, 27 * cm, 'Ausente')
+
+    myCanvas.circle(12.3 * cm, 27.1 * cm, tradius, stroke=1)
+    myCanvas.drawString(13 * cm, 27 * cm, 'Anulada')
 
     # Linha
     myCanvas.line(marginleft, 26 * cm, 15.8 * cm, 26 * cm)
@@ -323,33 +298,29 @@ def FolhaResposta(myCanvas, dados, objetivas, dissertativas):
 
     return pagina - 1
 
+
 if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print('Uso: {} polos.csv provas.csv alunos.csv'.format(sys.argv[0]), file=sys.stderr)
+    if len(sys.argv) != 2:
+        print('Uso: {} provas.csv'.format(sys.argv[0]), file=sys.stderr)
         sys.exit(1)
 
     paginas = 0
     volume = 0
 
-    polos = {}
-    for linha in csv.reader(open(sys.argv[1])):
-        polo = Polo(linha)
-        polos[polo.codigo] = polo
-
-    provas = {}
-    for linha in csv.reader(open(sys.argv[2])):
-        prova = Prova(linha)
-        provas[prova.disciplina + prova.id] = prova
-
-    mCanvas = canvas.Canvas('provas.pdf', pagesize=A4)
-    for linha in csv.reader(open(sys.argv[3])):
+    disciplina = ''
+    mCanvas = None
+    entrada = list(csv.reader(open(sys.argv[1])))
+    for linha in entrada[1:]:
         aluno = Aluno(linha)
-        prova = provas[aluno.disciplina + aluno.prova]
-        aluno.nomeDisciplina = prova.nome
-        aluno.data = prova.data
-        aluno.nomePolo = polos[aluno.polo].nome
+        nomeDisciplina = aluno.nomePolo + '-' + aluno.disciplina + '-'+ aluno.prova
+        if nomeDisciplina != disciplina:
+            print(nomeDisciplina)
+            disciplina = nomeDisciplina
+            if mCanvas != None:
+                mCanvas.save()
+            mCanvas = canvas.Canvas('folha_resposta_' + nomeDisciplina, pagesize = A4)
         aluno.GeraCodigo()
-        FolhaResposta(mCanvas, aluno, prova.questoesObjetivas, prova.folhasDissertativas)
+        FolhaResposta(mCanvas, aluno, aluno.questoesObjetivas, aluno.folhasDissertativas)
 
     mCanvas.save()
 
