@@ -40,8 +40,8 @@ class Aluno:
         self.prova = campos[10]
         self.questoesObjetivas = int(campos[11])
         self.folhasDissertativas = int(campos[12])
-        self.codigo = ''
         self.dataStr = self.data[6:10] + self.data[3:5] + self.data[0:2]
+        self.codigo = ''
         return
 
     def GeraCodigo(self):
@@ -50,7 +50,17 @@ class Aluno:
                       self.prova + '-' + self.ra
 
         return self.codigo
-                  
+
+    def Esvazia(self):
+        self.nome = '__________________________________________________'
+        self.curso = '_________________________'
+        self.turma = '_______________'
+        self.bimestre = '___'
+        self.ra = 'XXXXXXX'
+        self.GeraCodigo()
+        self.ra = '__________'
+        return
+
 
 def Grid(myCanvas):
     myCanvas.setStrokeColorRGB(0.9, 0.9, 0.9)
@@ -168,12 +178,12 @@ def FolhaRespostaBase(myCanvas, pagina, totalPaginas):
  
     # Rodapé
     myCanvas.setLineWidth(1)
-    myCanvas.rect(marginleft, 1 * cm, marginright - marginleft - 3 * cm, 1 * cm, stroke = 1, fill = 0)
+    #myCanvas.rect(marginleft, 1 * cm, marginright - marginleft - 3 * cm, 1 * cm, stroke = 1, fill = 0)
     myCanvas.setFont('Helvetica', 10)
     myCanvas.drawString(marginleft + 0.2 * cm, 1.2 * cm, 'Assinatura:')
     myCanvas.line(marginleft + 2 * cm, 1.2 * cm, marginright - 0.2 * cm - 3 * cm, 1.2 * cm)
 
-    myCanvas.rect(marginright - 2.8 * cm, 1 * cm, 2.8 * cm, 1 * cm, stroke = 1, fill = 0)
+    #myCanvas.rect(marginright - 2.8 * cm, 1 * cm, 2.8 * cm, 1 * cm, stroke = 1, fill = 0)
     myCanvas.setFont('Helvetica', 10)
     myCanvas.drawString(marginright - 2.6 * cm, 1.2 * cm, 'Página {} de {}'.format(pagina, totalPaginas))
     #    myCanvas.line(marginright - 2.5 * cm, 1.2 * cm, marginright - 0.2 * cm, 1.2 * cm)
@@ -311,17 +321,27 @@ if __name__ == '__main__':
     disciplina = ''
     mCanvas = None
     entrada = list(csv.reader(open(sys.argv[1])))
+    # Pula a primeira linha do arquivo e processa as demais
     for linha in entrada[1:]:
         aluno = Aluno(linha)
         nomeDisciplina = aluno.polo + '-' + aluno.nomePolo + '-' + aluno.dataStr + '-' + aluno.disciplina + '-'+ aluno.prova
+
+        # Sempre que trocar os dados da disciplina, fecha o arquivo e começa um novo
         if nomeDisciplina != disciplina:
             print(nomeDisciplina)
             disciplina = nomeDisciplina
+
+            # 
             if mCanvas != None:
+                oldAluno.Esvazia()
+                FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
+                FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
+                FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
                 mCanvas.save()
             mCanvas = canvas.Canvas('folha_resposta_' + nomeDisciplina + '.pdf', pagesize = A4)
         aluno.GeraCodigo()
         FolhaResposta(mCanvas, aluno, aluno.questoesObjetivas, aluno.folhasDissertativas)
+        oldAluno = aluno
 
     mCanvas.save()
 

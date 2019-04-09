@@ -25,7 +25,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 def MarcaDAgua(s):
     c = canvas.Canvas(s + '.pdf', pagesize = A4)
-    c.setFillColorRGB(0.9, 0.9, 0.9)
+    c.setFillColorRGB(0.95, 0.95, 0.95)
     c.setFont('Helvetica', 24)
     #c.rotate(45)
     for i in range(0, 21, 2):
