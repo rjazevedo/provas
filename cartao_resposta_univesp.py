@@ -25,6 +25,9 @@ vspace = 17
 hspace = 17
 width, height = A4
 
+def DataInvertida(dataStr):
+    return dataStr[6:10] + dataStr[3:5] + dataStr[0:2]
+
 class Aluno:
     def __init__(self, campos):
         self.nome = campos[0]
@@ -40,7 +43,7 @@ class Aluno:
         self.prova = campos[10]
         self.questoesObjetivas = int(campos[11])
         self.folhasDissertativas = int(campos[12])
-        self.dataStr = self.data[6:10] + self.data[3:5] + self.data[0:2]
+        self.dataStr = DataInvertida(self.data)
         self.codigo = ''
         return
 
@@ -51,12 +54,12 @@ class Aluno:
 
         return self.codigo
 
-    def Esvazia(self):
+    def Esvazia(self, ra):
         self.nome = '__________________________________________________'
         self.curso = '_________________________'
         self.turma = '_______________'
         self.bimestre = '___'
-        self.ra = 'XXXXXXX'
+        self.ra = ra
         self.GeraCodigo()
         self.ra = '__________'
         return
@@ -139,8 +142,6 @@ def FolhaRespostaBase(myCanvas, pagina, totalPaginas):
     marginleft = margin
     marginright = width - margin
     margintop = height - 1.1 * margin
-    marginbottom = margin
-    offset = (width - 500) / 2
 
     # Coloca um grid quadriculado em cinza claro para ajudar o posicionamento.
     #Grid(myCanvas)
@@ -193,10 +194,7 @@ def FolhaRespostaBase(myCanvas, pagina, totalPaginas):
 def Identificacao(myCanvas, dados, pagina):
     margin = 2 * cm
     marginleft = margin
-    marginright = width - margin
     margintop = height - 1.1 * margin
-    marginbottom = margin
-    offset = (width - 500) / 2
 
     myCanvas.setStrokeColorRGB(0, 0, 0)
     myCanvas.setFillColorRGB(0, 0, 0)
@@ -310,17 +308,120 @@ def FolhaResposta(myCanvas, dados, objetivas, dissertativas):
     return pagina - 1
 
 
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('Uso: {} provas.csv'.format(sys.argv[0]), file=sys.stderr)
-        sys.exit(1)
+def ListaPresencaBase(myCanvas, pagina, totalPaginas):
+    margin = 2 * cm
+    marginleft = margin
+    marginright = width - margin
+    margintop = height - 1.1 * margin
 
+    # Coloca um grid quadriculado em cinza claro para ajudar o posicionamento.
+    Grid(myCanvas)
+
+    # Coloca o logotipo no canto superior esquerdo
+    logo = rpImage('univesp.png', 956/8, 346/8)
+    logo.drawOn(myCanvas, marginleft, margintop - 18)
+
+    # Textos
+    myCanvas.setFont('Helvetica', 16) 
+    myCanvas.drawString(8.3 * cm, margintop + 12, 'LISTA DE PRESENÇA')
+
+    # Linha
+    myCanvas.line(marginleft, 26 * cm, 15.8 * cm, 26 * cm)
+
+    # Texto de identificação
+    # Disciplina
+    myCanvas.setFont('Helvetica', 9)
+    myCanvas.drawString(marginleft, 25.4 * cm, 'POLO:')
+    myCanvas.drawString(marginleft + 10.9 * cm, 25.4 * cm, 'DATA:')
+    myCanvas.drawString(marginleft, 24.8 * cm, 'DISCIPLINA:')
+
+    myCanvas.line(marginleft, 24.4 * cm, 15.8 * cm, 24.4 * cm)
+
+    myCanvas.drawString(marginleft, 23.3 * cm, 'APLICADOR: ___________________________________ ')
+    myCanvas.drawString(marginleft + 8.5 * cm, 23.3 * cm, 'ASSINATURA: ___________________________________ ')
+
+    myCanvas.rect(marginleft, 2 * cm, marginright - marginleft, (22.6 - 2) * cm, stroke = 1, fill = 0)
+
+    myCanvas.setFont('Helvetica', 9)
+    myCanvas.drawString(marginleft + 0.1 * cm, 22.2 * cm, 'Ausente')
+    myCanvas.line(marginleft + 1.4 * cm, 22.6 * cm, marginleft + 1.4 * cm, 2 * cm)
+
+    myCanvas.drawString(marginleft + 1.5 * cm, 22.2 * cm, 'Devolveu')
+    myCanvas.line(marginleft + 2.9 * cm, 22.6 * cm, marginleft + 2.9 * cm, 2 * cm)
+
+    myCanvas.drawString(marginleft + 3 * cm, 22.2 * cm, 'Nome')
+    myCanvas.line(marginleft + 10 * cm, 22.6 * cm, marginleft + 10 * cm, 2 * cm)
+
+    myCanvas.drawString(marginleft + 10.1 * cm, 22.2 * cm, 'RA')
+    myCanvas.line(marginleft + 11.5 * cm, 22.6 * cm, marginleft + 11.5 * cm, 2 * cm)
+
+    myCanvas.drawString(marginleft + 11.6 * cm, 22.2 * cm, 'Assinatura')
+
+    myCanvas.line(marginleft, 22 * cm, marginright, 22 * cm)
+
+    for i in range(3, 22):
+        myCanvas.line(marginleft, i * cm, marginright, i * cm)
+
+    myCanvas.setFont('Helvetica', 10)
+    myCanvas.drawString(marginright - 2.6 * cm, 1.2 * cm, 'Página {} de {}'.format(pagina, totalPaginas))
+
+    return
+
+
+def IdentificaListaPresenca(myCanvas, disciplina, pagina):
+    margin = 2 * cm
+    marginleft = margin
+    margintop = height - 1.1 * margin
+
+    # Dados do aluno e da prova
+    myCanvas.setFont('Helvetica-Bold', 12)
+    myCanvas.drawString(marginleft + 1.1 * cm, 25.4 * cm, disciplina['nomePolo'])
+    myCanvas.drawString(marginleft + 12 * cm, 25.4 * cm, disciplina['data'])
+    myCanvas.drawString(marginleft + 2 * cm, 24.8 * cm, disciplina['codigo'] + '-' + disciplina['nome'])
+
+    codigo = DataInvertida(disciplina['data']) + '-' + disciplina['polo'] + \
+             '-' + disciplina['codigo'] + '-' + disciplina['prova'] + '-' + \
+             'presenca' + format(pagina, '02d')
+
+    # Coloca QR-Code no canto superior direito
+    qrw = QrCodeWidget(codigo)
+    qrsize = 100.0
+    b = qrw.getBounds()
+    w = b[2] - b[0]
+    h = b[3] - b[1]
+    d = Drawing(qrsize, qrsize, transform=[qrsize/w, 0, 0, qrsize/h, 0, 0])
+    d.add(qrw)
+    renderPDF.draw(d, myCanvas, 16 * cm, margintop - h + 28)
+
+    return
+
+def PreencheListaPresenca(myCanvas, alunos):
+    margin = 2 * cm
+    marginleft = margin
+
+    i = 20
+
+    myCanvas.setFont('Helvetica-Bold', 10)
+
+    while len(alunos) > 0 and i > 0:
+        myCanvas.drawString(marginleft + 3 * cm, (i + 2.1) * cm, alunos[0].nome)
+        myCanvas.drawString(marginleft + 10.2 * cm, (i + 2.1) * cm, alunos[0].ra)
+        alunos.pop(0)
+    return
+
+
+def ListaPresenca(myCanvas, disciplina, alunos):
+    ListaPresencaBase(myCanvas, 1, 1)
+    return
+
+
+def GeraFolhasResposta(arquivo):
     paginas = 0
     volume = 0
 
     disciplina = ''
     mCanvas = None
-    entrada = list(csv.reader(open(sys.argv[1])))
+    entrada = list(csv.reader(open(arquivo)))
     # Pula a primeira linha do arquivo e processa as demais
     for linha in entrada[1:]:
         aluno = Aluno(linha)
@@ -331,17 +432,36 @@ if __name__ == '__main__':
             print(nomeDisciplina)
             disciplina = nomeDisciplina
 
-            # 
+            # Se não for a primeira fez
             if mCanvas != None:
-                oldAluno.Esvazia()
+                # Gera 3 conjuntos em branco no final, com códigos X, Y e Z
+                oldAluno.Esvazia('XXXXXXX')
                 FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
+                oldAluno.Esvazia('YYYYYYY')
                 FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
+                oldAluno.Esvazia('ZZZZZZZ')
                 FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
                 mCanvas.save()
+
+            # Cria um novo pacote de arquivos de provas
             mCanvas = canvas.Canvas('folha_resposta_' + nomeDisciplina + '.pdf', pagesize = A4)
+
         aluno.GeraCodigo()
         FolhaResposta(mCanvas, aluno, aluno.questoesObjetivas, aluno.folhasDissertativas)
         oldAluno = aluno
 
     mCanvas.save()
+    return
 
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print('Uso: {} provas.csv'.format(sys.argv[0]), file=sys.stderr)
+        sys.exit(1)
+
+    #c = canvas.Canvas('presenca.pdf', pagesize = A4)
+    #ListaPresenca(c, 0, 0)
+    #c.save()
+
+    sys.exit(0)
+    GeraFolhasResposta(sys.argv[1])
