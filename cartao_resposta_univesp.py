@@ -492,5 +492,5 @@ if __name__ == '__main__':
     #c.save()
 
     #sys.exit(0)
-    logoUnivesp = os.path.join(os.path.dirname(sys.argv[1]), logoUnivesp)
+    logoUnivesp = os.path.join(os.path.dirname(sys.argv[0]), logoUnivesp)
     GeraFolhasResposta(sys.argv[1])
