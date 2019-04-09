@@ -29,22 +29,23 @@ class Aluno:
     def __init__(self, campos):
         self.nome = campos[0]
         self.ra = campos[1]
-        self.nomePolo = campos[2]
-        self.data = campos[3]
-        self.curso = campos[4]
-        self.turma = campos[5]
-        self.bimestre = campos[6]
-        self.disciplina = campos[7]
-        self.nomeDisciplina = campos[8]
-        self.prova = campos[9]
-        self.questoesObjetivas = int(campos[10])
-        self.folhasDissertativas = int(campos[11])
-        self.polo = ''
+        self.polo = campos[2]
+        self.nomePolo = campos[3]
+        self.data = campos[4]
+        self.curso = campos[5]
+        self.turma = campos[6]
+        self.bimestre = campos[7]
+        self.disciplina = campos[8]
+        self.nomeDisciplina = campos[9]
+        self.prova = campos[10]
+        self.questoesObjetivas = int(campos[11])
+        self.folhasDissertativas = int(campos[12])
         self.codigo = ''
+        self.dataStr = self.data[6:10] + self.data[3:5] + self.data[0:2]
         return
 
     def GeraCodigo(self):
-        self.codigo = self.data[6:10] + self.data[3:5] + self.data[0:2] + '-' + \
+        self.codigo = self.dataStr + '-' + \
                       self.polo + '-' + self.disciplina + '-' + \
                       self.prova + '-' + self.ra
 
@@ -312,13 +313,13 @@ if __name__ == '__main__':
     entrada = list(csv.reader(open(sys.argv[1])))
     for linha in entrada[1:]:
         aluno = Aluno(linha)
-        nomeDisciplina = aluno.nomePolo + '-' + aluno.disciplina + '-'+ aluno.prova
+        nomeDisciplina = aluno.polo + '-' + aluno.nomePolo + '-' + aluno.dataStr + '-' + aluno.disciplina + '-'+ aluno.prova
         if nomeDisciplina != disciplina:
             print(nomeDisciplina)
             disciplina = nomeDisciplina
             if mCanvas != None:
                 mCanvas.save()
-            mCanvas = canvas.Canvas('folha_resposta_' + nomeDisciplina, pagesize = A4)
+            mCanvas = canvas.Canvas('folha_resposta_' + nomeDisciplina + '.pdf', pagesize = A4)
         aluno.GeraCodigo()
         FolhaResposta(mCanvas, aluno, aluno.questoesObjetivas, aluno.folhasDissertativas)
 
