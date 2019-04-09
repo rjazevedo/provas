@@ -1,4 +1,7 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+""" Gera os cartões de resposta da Univesp"""
 
 import csv
 import os
