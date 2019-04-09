@@ -463,5 +463,5 @@ if __name__ == '__main__':
     #ListaPresenca(c, 0, 0)
     #c.save()
 
-    sys.exit(0)
+    #sys.exit(0)
     GeraFolhasResposta(sys.argv[1])
