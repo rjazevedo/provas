@@ -67,7 +67,7 @@ class Aluno:
         self.bimestre = '___'
         self.ra = ra
         self.GeraCodigo()
-        self.ra = '__________'
+        self.ra = '________'
         return
 
 
@@ -175,7 +175,7 @@ def FolhaRespostaBase(myCanvas, pagina, totalPaginas):
     myCanvas.setFont('Helvetica', 9)
     myCanvas.drawString(marginleft, 25.4 * cm, 'NOME:')
     myCanvas.drawString(marginleft, 24.8 * cm, 'RA:')
-    myCanvas.drawString(marginleft + 5 * cm, 24.8 * cm, 'POLO:')
+    myCanvas.drawString(marginleft + 3 * cm, 24.8 * cm, 'POLO:')
     myCanvas.drawString(marginleft + 10.9 * cm, 24.8 * cm, 'DATA:')
     myCanvas.drawString(marginleft, 24.2 * cm, 'CURSO:')
     myCanvas.drawString(marginleft + 8 * cm, 24.2 * cm, 'TURMA:')
@@ -209,7 +209,7 @@ def Identificacao(myCanvas, dados, pagina):
     myCanvas.setFont('Helvetica-Bold', 12)
     myCanvas.drawString(marginleft + 1.1 * cm, 25.4 * cm, dados.nome)
     myCanvas.drawString(marginleft + 0.7 * cm, 24.8 * cm, dados.ra)
-    myCanvas.drawString(marginleft + 6.2 * cm, 24.8 * cm, dados.nomePolo)
+    myCanvas.drawString(marginleft + 4.2 * cm, 24.8 * cm, dados.nomePolo)
     myCanvas.drawString(marginleft + 12 * cm, 24.8 * cm, dados.data)
     myCanvas.drawString(marginleft + 1.3 * cm, 24.2 * cm, dados.curso)
     myCanvas.drawString(marginleft + 9.3 * cm, 24.2 * cm, dados.turma)
@@ -255,7 +255,6 @@ def MultiplaEscolha(myCanvas, nQuestoes):
     # Respostas
     myCanvas.setLineWidth(2)
     myCanvas.setFont("Helvetica", 10) 
-    bottom = marginbottom+65
     myCanvas.rect(marginleft + 2 * cm, 10 * cm, marginright - marginleft - 4 * cm, 8 * cm, stroke=1, fill=0)
     myCanvas.setLineWidth(1)
     option_letters = ['A', 'B', 'C', 'D', 'E']
@@ -268,9 +267,6 @@ def Dissertativa(myCanvas):
     margin = 2 * cm
     marginleft = margin
     marginright = width - margin
-    margintop = height - 1.1 * margin
-    marginbottom = margin
-    offset = (width - 500) / 2
 
     # Instruções
     myCanvas.line(marginleft, 22.6 * cm, marginright, 22.6 * cm)
@@ -284,10 +280,12 @@ def Dissertativa(myCanvas):
 
     myCanvas.rect(marginleft, 2.2 * cm, marginright - marginleft, (19.2 - 2.2) * cm, stroke = 1, fill = 0)
 
+    myCanvas.setStrokeColorRGB(0.4, 0.4, 0.4)
     i =  18.4 * cm
     while i > 2.2 * cm:   
         myCanvas.line(marginleft + 0.2 * cm, i, marginright - 0.2 * cm, i)
         i -= 0.8 * cm
+    myCanvas.setStrokeColorRGB(0, 0, 0)
 
     return
 
@@ -312,7 +310,6 @@ def FolhaResposta(myCanvas, dados, objetivas, dissertativas):
         pagina += 1
 
     return pagina - 1
-
 
 def ListaPresencaBase(myCanvas, pagina, totalPaginas):
     margin = 2 * cm
@@ -373,7 +370,6 @@ def ListaPresencaBase(myCanvas, pagina, totalPaginas):
 
     return
 
-
 def IdentificaListaPresenca(myCanvas, disciplina, pagina):
     margin = 2 * cm
     marginleft = margin
@@ -383,7 +379,7 @@ def IdentificaListaPresenca(myCanvas, disciplina, pagina):
     myCanvas.setFont('Helvetica-Bold', 12)
     myCanvas.drawString(marginleft + 1.1 * cm, 25.4 * cm, disciplina.nomePolo)
     myCanvas.drawString(marginleft + 11.6 * cm, 25.4 * cm, disciplina.data)
-    myCanvas.drawString(marginleft + 2 * cm, 24.8 * cm, disciplina.disciplina + '-' + disciplina.nomeDisciplina)
+    myCanvas.drawString(marginleft + 2 * cm, 24.8 * cm, disciplina.disciplina + ' - ' + disciplina.nomeDisciplina)
 
     codigo = DataInvertida(disciplina.data) + '-' + disciplina.polo + \
              '-' + disciplina.disciplina + '-' + disciplina.prova + '-' + \
@@ -423,7 +419,6 @@ def PreencheListaPresenca(myCanvas, alunos):
     myCanvas.showPage()
     return
 
-
 def ListaPresenca(alunos):
     disciplina = alunos[0]
     nomeArquivo = 'lista_presenca_' + disciplina.polo + '-' + disciplina.nomePolo + '-' + \
@@ -440,45 +435,183 @@ def ListaPresenca(alunos):
     c.save()
     return
 
+def FolhaOcorrenciaBase(myCanvas, pagina, totalPaginas):
+    margin = 2 * cm
+    marginleft = margin
+    marginright = width - margin
+    margintop = height - 1.1 * margin
+
+    # Coloca um grid quadriculado em cinza claro para ajudar o posicionamento.
+    #Grid(myCanvas)
+
+    # Coloca o logotipo no canto superior esquerdo
+    logo = rpImage(logoUnivesp, 956/8, 346/8)
+    logo.drawOn(myCanvas, marginleft, margintop - 18)
+
+    # Textos
+    myCanvas.setFont('Helvetica', 16) 
+    myCanvas.drawString(8.3 * cm, margintop + 12, 'FOLHA DE OCORRÊNCIAS')
+
+    # Linha
+    myCanvas.line(marginleft, 26 * cm, 15.8 * cm, 26 * cm)
+
+    # Texto de identificação
+    # Disciplina
+    myCanvas.setFont('Helvetica', 9)
+    myCanvas.drawString(marginleft, 25.4 * cm, 'POLO:')
+    myCanvas.drawString(marginleft + 10.5 * cm, 25.4 * cm, 'DATA:')
+
+    myCanvas.drawString(marginleft, 24.6 * cm, 'APLICADOR: ___________________________________ ')
+    myCanvas.drawString(marginleft + 8.5 * cm, 24.6 * cm, 'ASSINATURA: ___________________________________ ')
+
+    myCanvas.line(marginleft, 24.2 * cm, marginright, 24.2 * cm)
+
+    myCanvas.rect(marginleft, 6 * cm, marginright - marginleft, (23 - 6) * cm, stroke = 1, fill = 0)
+
+    myCanvas.setFont('Helvetica-Bold', 10)
+    myCanvas.drawString(marginleft, 23.2 * cm, 'DESCRIÇÃO:')
+
+    myCanvas.setStrokeColorRGB(0.4, 0.4, 0.4)
+    for i in range(7, 23):
+        myCanvas.line(marginleft + 0.2 * cm, i * cm, marginright - 0.2 * cm, i * cm)
+    myCanvas.setStrokeColorRGB(0, 0, 0)
+
+    myCanvas.rect(marginleft, 2 * cm, marginright - marginleft, 3 * cm, stroke = 1, fill = 0)
+    myCanvas.setFont('Helvetica', 10)
+    for i in [1, 2, 3]:
+        myCanvas.drawString(marginleft + 0.2 * cm, (i + 1.2) * cm, 'Aluno: ' + str(4 - i))
+        myCanvas.drawString(marginleft + 10 * cm, (i + 1.2) * cm, 'Assinatura:')
+        myCanvas.line(marginleft + 1.6 * cm, (i + 1.2) * cm, marginleft + 9.8 * cm, (i + 1.2) * cm)
+        myCanvas.line(marginleft + 12 * cm, (i + 1.2) * cm, marginright - 0.2 * cm, (i + 1.2) * cm)
+
+    myCanvas.setFont('Helvetica', 10)
+    myCanvas.drawString(marginright - 2.6 * cm, 1.2 * cm, 'Página {} de {}'.format(pagina, totalPaginas))
+
+    return
+
+def PreencheFolhaOcorrencia(myCanvas, disciplina):
+    margin = 2 * cm
+    marginleft = margin
+    margintop = height - 1.1 * margin
+
+    myCanvas.setFont('Helvetica-Bold', 12)
+    myCanvas.drawString(marginleft + 1.1 * cm, 25.4 * cm, disciplina.nomePolo)
+    myCanvas.drawString(marginleft + 11.6 * cm, 25.4 * cm, disciplina.data)
+
+    # Coloca QR-Code no canto superior direito
+    codigo = disciplina.dataStr + '-' + disciplina.polo + '-ocorrencia'
+    qrw = QrCodeWidget(codigo)
+    qrsize = 100.0
+    b = qrw.getBounds()
+    w = b[2] - b[0]
+    h = b[3] - b[1]
+    d = Drawing(qrsize, qrsize, transform=[qrsize/w, 0, 0, qrsize/h, 0, 0])
+    d.add(qrw)
+    renderPDF.draw(d, myCanvas, 16 * cm, margintop - h + 28)
+
+    return
+
+def FolhaOcorrencia(disciplina):
+    nomeArquivo = 'folha_ocorrencia_' + disciplina.polo + '-' + disciplina.nomePolo + '-' + \
+                  disciplina.dataStr + '.pdf'
+
+    c = canvas.Canvas(nomeArquivo, pagesize = A4)
+    pagina = 1
+    FolhaOcorrenciaBase(c, pagina, pagina)
+    PreencheFolhaOcorrencia(c, disciplina)
+
+    c.save()
+
+    return    
+
+def ProcessaPoloDisciplina(listaPresenca):
+    if len(listaPresenca) == 0:
+        return
+
+    aluno = listaPresenca[0]
+    nomeDisciplina = aluno.polo + '-' + aluno.nomePolo + '-' + aluno.dataStr + '-' + aluno.disciplina + '-'+ aluno.prova
+    alunoX = copy.copy(aluno)
+    alunoX.Esvazia('XXXXXXX')
+    alunoY = copy.copy(aluno)
+    alunoY.Esvazia('YYYYYYY')
+    alunoZ = copy.copy(aluno)
+    alunoZ.Esvazia('ZZZZZZZ')
+
+    print(nomeDisciplina)
+
+    c = canvas.Canvas('folha_resposta_' + nomeDisciplina + '.pdf', pagesize = A4)
+    for aluno in listaPresenca:
+        aluno.GeraCodigo()
+        FolhaResposta(c, aluno, aluno.questoesObjetivas, aluno.folhasDissertativas)
+
+    FolhaResposta(c, alunoX, alunoX.questoesObjetivas, alunoX.folhasDissertativas)
+    FolhaResposta(c, alunoY, alunoY.questoesObjetivas, alunoY.folhasDissertativas)
+    FolhaResposta(c, alunoZ, alunoZ.questoesObjetivas, alunoZ.folhasDissertativas)
+
+    ListaPresenca(listaPresenca)
+    FolhaOcorrencia(alunoX)
+
+    c.save()
+
+    return
+
 
 def GeraFolhasResposta(arquivo):
     listaPresenca = []
     disciplina = ''
-    mCanvas = None
-    entrada = list(csv.reader(open(arquivo)))
-    # Pula a primeira linha do arquivo e processa as demais
-    for linha in entrada[1:]:
+    entrada = csv.reader(open(arquivo))
+    next(entrada)
+
+    # Processa as linhas de entrada
+    for linha in entrada:
         aluno = Aluno(linha)
-        nomeDisciplina = aluno.polo + '-' + aluno.nomePolo + '-' + aluno.dataStr + '-' + aluno.disciplina + '-'+ aluno.prova
+        nomeDisciplina = aluno.polo + '-' + aluno.nomePolo + '-' + aluno.dataStr + '-' + \
+                         aluno.disciplina + '-'+ aluno.prova       
+        if disciplina != nomeDisciplina:
+            if len(listaPresenca) != 0:
+                ProcessaPoloDisciplina(listaPresenca)
+                listaPresenca = []
 
-        # Sempre que trocar os dados da disciplina, fecha o arquivo e começa um novo
-        if nomeDisciplina != disciplina:
-            print(nomeDisciplina)
             disciplina = nomeDisciplina
-
-            # Se não for a primeira fez
-            if mCanvas != None:
-                # Gera 3 conjuntos em branco no final, com códigos X, Y e Z
-                oldAluno.Esvazia('XXXXXXX')
-                FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
-                oldAluno.Esvazia('YYYYYYY')
-                FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
-                oldAluno.Esvazia('ZZZZZZZ')
-                FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
-                mCanvas.save()
-
-                # Gera Lista de presenca
-                ListaPresenca(listaPresenca)
-
-            # Cria um novo pacote de arquivos de provas
-            mCanvas = canvas.Canvas('folha_resposta_' + nomeDisciplina + '.pdf', pagesize = A4)
-
-        aluno.GeraCodigo()
+        
         listaPresenca.append(aluno)
-        FolhaResposta(mCanvas, aluno, aluno.questoesObjetivas, aluno.folhasDissertativas)
-        oldAluno = copy.copy(aluno)
 
-    mCanvas.save()
+    ProcessaPoloDisciplina(listaPresenca)
+
+    # Pula a primeira linha do arquivo e processa as demais
+    # for linha in entrada[1:]:
+    #     aluno = Aluno(linha)
+    #     nomeDisciplina = aluno.polo + '-' + aluno.nomePolo + '-' + aluno.dataStr + '-' + aluno.disciplina + '-'+ aluno.prova
+
+    #     # Sempre que trocar os dados da disciplina, fecha o arquivo e começa um novo
+    #     if nomeDisciplina != disciplina:
+    #         print(nomeDisciplina)
+    #         disciplina = nomeDisciplina
+
+    #         # Se não for a primeira vez
+    #         if mCanvas != None:
+    #             # Gera 3 conjuntos em branco no final, com códigos X, Y e Z
+    #             oldAluno.Esvazia('XXXXXXX')
+    #             FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
+    #             oldAluno.Esvazia('YYYYYYY')
+    #             FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
+    #             oldAluno.Esvazia('ZZZZZZZ')
+    #             FolhaResposta(mCanvas, oldAluno, oldAluno.questoesObjetivas, oldAluno.folhasDissertativas)
+    #             mCanvas.save()
+
+    #             # Gera Lista de presenca
+    #             ListaPresenca(listaPresenca)
+    #             FolhaOcorrencia(oldAluno)
+
+    #         # Cria um novo pacote de arquivos de provas
+    #         mCanvas = canvas.Canvas('folha_resposta_' + nomeDisciplina + '.pdf', pagesize = A4)
+
+    #     aluno.GeraCodigo()
+    #     listaPresenca.append(aluno)
+    #     FolhaResposta(mCanvas, aluno, aluno.questoesObjetivas, aluno.folhasDissertativas)
+    #     oldAluno = copy.copy(aluno)
+
+    # mCanvas.save()
     return
 
 
