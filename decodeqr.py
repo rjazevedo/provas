@@ -8,6 +8,7 @@ from pyzbar.pyzbar import decode
 import sys
 import os
 import argparse
+import shutil
 
 args = None
 contagem = 0
@@ -69,10 +70,10 @@ def IncrementaContagem(contagem = 0):
 def MoveRefugo(arquivo, contagem):
     contagem = IncrementaContagem()
     if arquivo.endswith('.png') or arquivo.endswith('.PNG'):
-        os.rename(arquivo, os.path.join(args.refugo, '{:010d}'.format(contagem) + '.png'))
+        shutil.move(arquivo, os.path.join(args.refugo, '{:010d}'.format(contagem) + '.png'))
         contagem += 1
     elif arquivo.endswith('.jpg') or arquivo.endswith('.JPG'):
-        os.rename(arquivo, os.path.join(args.refugo, '{:010d}'.format(contagem) + '.jpg'))
+        shutil.move(arquivo, os.path.join(args.refugo, '{:010d}'.format(contagem) + '.jpg'))
         contagem += 1
     return contagem
 
@@ -93,23 +94,35 @@ def QuebraPDF(arquivo):
     apagar = BuscaArquivos(args.trabalho)
     for a in apagar:
         contagem = MoveRefugo(a, contagem)
-    os.system('convert -density 150 "' + arquivo + '" ' + os.path.join(args.trabalho, 'a.png'))
+    print('==> Separando as folhas do PDF')
+    os.system('convert -density 150 -background white "' + arquivo + '" ' + os.path.join(args.trabalho, 'a.png'))
     lista = BuscaArquivos(args.trabalho)
     return lista
     
 
-def ProcessaArquivos(listaArquivos):
+def ProcessaArquivos(listaArquivos, copiar):
     contagem = 0
     for nome in listaArquivos:
-        print(nome)
-        if nome.endswith('.jpg') or nome.endswith('.JPG') or \
-           nome.endswith('.png') or nome.endswith('.PNG'):
-           if not DecodificaArquivo(nome, args.saida):
-               print('Refugo: ' + nome)
-               contagem = MoveRefugo(nome, contagem)
+        print('=>', nome)
+        if nome.endswith('.jpg') or nome.endswith('.JPG'):
+            destino = os.path.join(args.trabalho, 'tmp.jpg')
+            if copiar:
+                shutil.copyfile(nome, destino)
+                nome = destino
+            if not DecodificaArquivo(nome, args.saida):
+                print('==> Refugo: ' + nome)
+                contagem = MoveRefugo(nome, contagem)
+        elif nome.endswith('.png') or nome.endswith('.PNG'):
+            destino = os.path.join(args.trabalho, 'tmp.png')
+            if copiar:
+                shutil.copyfile(nome, destino)
+                nome = destino
+            if not DecodificaArquivo(nome, args.saida):
+                print('==> Refugo: ' + nome)
+                contagem = MoveRefugo(nome, contagem)
         elif nome.endswith('.pdf') or nome.endswith('.PDF'):
             lista = QuebraPDF(nome)
-            ProcessaArquivos(lista)
+            ProcessaArquivos(lista, copiar = False)
 
 
 if __name__ == '__main__':
@@ -122,7 +135,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     listaArquivos = BuscaArquivos(args.entrada)
-    ProcessaArquivos(listaArquivos)
+    ProcessaArquivos(listaArquivos, copiar = True)
     
 
     # for nome in sys.argv[1:]:
