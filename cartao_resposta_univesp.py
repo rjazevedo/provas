@@ -16,7 +16,7 @@ import copy
 from reportlab.graphics import renderPDF
 from reportlab.graphics.barcode import code128
 from reportlab.graphics.barcode.qr import QrCodeWidget
-from reportlab.graphics.shapes import Drawing
+from reportlab.graphics.shapes import Drawing, Polygon
 from reportlab.lib.pagesizes import A4, letter
 from reportlab.lib.units import cm, mm
 from reportlab.pdfgen import canvas
@@ -255,11 +255,11 @@ def MultiplaEscolha(myCanvas, nQuestoes):
     # Respostas
     myCanvas.setLineWidth(2)
     myCanvas.setFont("Helvetica", 10) 
-    myCanvas.rect(marginleft + 2 * cm, 10 * cm, marginright - marginleft - 4 * cm, 8 * cm, stroke=1, fill=0)
+    myCanvas.rect(marginleft + 2 * cm, 9 * cm, marginright - marginleft - 4 * cm, 8 * cm, stroke=1, fill=0)
     myCanvas.setLineWidth(1)
     option_letters = ['A', 'B', 'C', 'D', 'E']
     for i in range(1, nQuestoes + 1):
-        draw_option_list_hor(myCanvas, 9.5 * cm, 14.8 * cm, i-1, i, option_letters)
+        draw_option_list_hor(myCanvas, 9.5 * cm, 13.8 * cm, i-1, i, option_letters)
 
     return
 
@@ -289,6 +289,86 @@ def Dissertativa(myCanvas):
 
     return
 
+def ToBCD(numero):
+    digitosBCD = {'0': [0, 0, 0, 0], \
+                  '1': [0, 0, 0, 1], \
+                  '2': [0, 0, 1, 0], \
+                  '3': [0, 0, 1, 1], \
+                  '4': [0, 1, 0, 0], \
+                  '5': [0, 1, 0, 1], \
+                  '6': [0, 1, 1, 0], \
+                  '7': [0, 1, 1, 1], \
+                  '8': [1, 0, 0, 0], \
+                  '9': [1, 0, 0, 1]}
+
+    resposta = []
+    for i in numero:
+        if i in '0123456789':
+            resposta.extend(digitosBCD[i])
+
+    return resposta
+
+
+def BordaCodificada(myCanvas, xi, yi, xf, yf, ra):
+
+    padrao = [0, 1, 1, 1, 1, 1, 0]
+    padrao.extend(ToBCD(ra))
+
+    # Circulos
+    # myCanvas.setStrokeColorRGB(0.4, 0.4, 0.4)
+    # i = 0
+    # x = xi
+    # while x < xf:
+    #     if padrao[i] == 1:
+    #         myCanvas.setFillColorRGB(0.4, 0.4, 0.4)
+    #         myCanvas.circle(x, yi + 6, 6, stroke = 1, fill = 1)
+    #     else:
+    #         myCanvas.setFillColorRGB(1, 1, 1)
+    #         myCanvas.circle(x, yi + 6, 6, stroke = 1, fill = 1)
+    #     x += 9
+    #     i += 1
+    #     if i == len(padrao):
+    #         i = 0
+
+    # myCanvas.setStrokeColorRGB(1, 1, 1)
+    # myCanvas.setFillColorRGB(1, 1, 1)
+
+    # retas
+    myCanvas.setStrokeColorRGB(0.4, 0.4, 0.4)
+    i = 0
+    x = xi
+    while x < xf:
+        if padrao[i] == 1:
+            myCanvas.line(x, yf + 2, x + 6, yf + 8)
+            myCanvas.line(x, yi - 2, x + 6, yi - 8)
+        else:
+            myCanvas.line(x, yf + 8, x + 6, yf + 2)
+            myCanvas.line(x, yi - 8, x + 6, yi - 2)
+        
+        x += 4
+        i += 1
+        if i == len(padrao):
+            i = 0
+
+    y = yi
+    i = 0
+    while y < yf:
+        if padrao[i] == 1:
+            myCanvas.line(xi - 8, y, xi - 2, y + 6)
+            myCanvas.line(xf + 2, y, xf + 8, y + 6)
+        else:
+            myCanvas.line(xi - 2, y, xi - 8, y + 6)
+            myCanvas.line(xf + 8, y, xf + 2, y + 6)
+
+        y += 4
+        i += 1
+        if i == len(padrao):
+            i = 0
+
+    myCanvas.setStrokeColorRGB(1, 1, 1)
+
+
+
 def FolhaResposta(myCanvas, dados, objetivas, dissertativas):
 
     if objetivas != 0:
@@ -296,6 +376,7 @@ def FolhaResposta(myCanvas, dados, objetivas, dissertativas):
         FolhaRespostaBase(myCanvas, 1, totalPaginas)
         Identificacao(myCanvas, dados, 1)
         MultiplaEscolha(myCanvas, objetivas)
+        BordaCodificada(myCanvas, 4 * cm, 9 * cm, 17 * cm, 17 * cm, dados.ra)
         myCanvas.showPage()
         pagina = 2
     else:
@@ -306,6 +387,7 @@ def FolhaResposta(myCanvas, dados, objetivas, dissertativas):
         FolhaRespostaBase(myCanvas, pagina, totalPaginas)
         Identificacao(myCanvas, dados, pagina)
         Dissertativa(myCanvas)
+        BordaCodificada(myCanvas, 2 * cm, 2.2 * cm, 19 * cm, 19.2 * cm, dados.ra)
         myCanvas.showPage()
         pagina += 1
 

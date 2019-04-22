@@ -71,7 +71,7 @@ def BuscaArquivos(p):
 def DashboardProva(pasta, alunos, arquivos):
     nomeArquivo = alunos[0].LabelProva() + '.html'
     saida = open(os.path.join(pasta, nomeArquivo), 'wt')
-    saida.write('<html><style>td.red {background: #FF0000;}</style><body><h1>' + alunos[0].LabelProva() + '</h1><table>\n')
+    saida.write('<html><style>td.red {background: #FF0000;} td.green {background: #00FF00;}</style><body><h1>' + alunos[0].LabelProva() + '</h1><table>\n')
 
     totalAlunos = 0
     alunosCompletos = 0
