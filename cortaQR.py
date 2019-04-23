@@ -10,6 +10,6 @@ if __name__ == '__main__':
     for arquivo in sys.argv[1:]:
         img = Image.open(arquivo)
         w, h = img.size
-        img = img.crop((int(0.75 * w), 0, w, int(0.25 * h)))
+        img = img.crop((int(0.6 * w), 0, w, int(0.4* h)))
         img.save('crop-' + arquivo)
 

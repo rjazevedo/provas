@@ -15,7 +15,7 @@ contagem = 0
 
 def AchaQR(img):
     w, h = img.size
-    img = img.crop((int(0.75 * w), 0, w, int(0.25 * h)))
+    img = img.crop((int(0.6 * w), 0, w, int(0.4 * h)))
     qr = decode(img)
     if len(qr) == 1:
         return qr[0].data
@@ -123,6 +123,8 @@ def ProcessaArquivos(listaArquivos, copiar):
         elif nome.endswith('.pdf') or nome.endswith('.PDF'):
             lista = QuebraPDF(nome)
             ProcessaArquivos(lista, copiar = False)
+        else:
+            print('==> Arquivo descartado' + nome)
 
 
 if __name__ == '__main__':
