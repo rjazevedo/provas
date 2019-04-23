@@ -71,7 +71,11 @@ def BuscaArquivos(p):
 def DashboardProva(pasta, alunos, arquivos):
     nomeArquivo = alunos[0].LabelProva() + '.html'
     saida = open(os.path.join(pasta, nomeArquivo), 'wt')
-    saida.write('<html><style>td.red {background: #FF0000;} td.green {background: #00FF00;}</style><body><h1>' + alunos[0].LabelProva() + '</h1><table>\n')
+    header = open('header.html').read() 
+    footer = open('footer.html').read()
+    saida.write(header)
+
+    saida.write('<div class="row"><h2>' + alunos[0].LabelProva() + '</h2></div>')
 
     totalAlunos = 0
     alunosCompletos = 0
@@ -79,7 +83,7 @@ def DashboardProva(pasta, alunos, arquivos):
     alunosFaltantes = 0
     folhasFaltantes = 0
 
-    saida.write('<tr><th>RA</th><th>Nome</th><th>Folhas</th></tr>\n')
+    saida.write('<tr><th>RA</th><th>Nome</th><th colspan="5">Folhas</th></tr>\n')
     for aluno in alunos:
         totalAlunos += 1
         saida.write('<tr><td>' + aluno.ra + '</td><td>' + aluno.nome + '</td>')
@@ -102,7 +106,7 @@ def DashboardProva(pasta, alunos, arquivos):
         
         saida.write('</tr>\n')
 
-    saida.write('</table></body></html>\n')
+    saida.write(footer)
 
     return (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes)
 
@@ -110,7 +114,9 @@ def DashboardProva(pasta, alunos, arquivos):
 def GeraDashboard(pasta, provas, arquivos):
 
     saida = open(os.path.join(pasta, 'index.html'), 'wt')
-    saida.write('<html><style>td.red {background: #FF0000;}</style><body><h1>Dashboard de provas</h1><table>\n')
+    header = open('header.html').read() 
+    footer = open('footer.html').read()
+    saida.write(header)
     saida.write('<tr><th>Polo</th><th>Nome</th><th>Disciplina</th><th>Nome</th><th>Ocorrência</th><th>Presença</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr>\n')
     for p in provas.keys():
         prova = provas[p]
@@ -118,13 +124,18 @@ def GeraDashboard(pasta, provas, arquivos):
         folhas = math.ceil(len(prova) / 20)
         saida.write('<tr><td>' + prova[0].polo + '</td><td>' + prova[0].nomePolo + '</td><td><a href="' + nomeArquivo + '">' + prova[0].disciplina + '</a></td><td>' + prova[0].nomeDisciplina + '</td>')
 
-        if prova[0].LabelProva() + '-ocorrencia.png' in arquivos:
+        if prova[0].dataStr + '-' + prova[0].polo + '-ocorrencia.png' in arquivos:
             saida.write('<td>OK</td>')
         else:
             saida.write('<td class="red">Ausente</td>')
 
-        # Falta checar lista de presenca
-        saida.write('<td></td>')
+        saida.write('<td>')
+        for f in range(1, folhas + 1):
+            n = prova[0].LabelProva() + '-presenca-' + format(f, '02d') + '.png'
+            if n in arquivos:
+                saida.write(format(f, '02d') + ' ')
+
+        saida.write('</td>')
 
         saida.write('<td>' + str(totalAlunos) + '</td>')
         saida.write('<td>' + str(alunosCompletos) + '</td>')
@@ -144,7 +155,7 @@ def GeraDashboard(pasta, provas, arquivos):
             saida.write('<td class="red">' + str(folhasFaltantes) + '</td></tr>\n')
 
 
-    saida.write('</table></body></html>\n')
+    saida.write(footer)
     saida.close()
     return
 
