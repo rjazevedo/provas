@@ -124,7 +124,7 @@ def ProcessaArquivos(listaArquivos, copiar):
             lista = QuebraPDF(nome)
             ProcessaArquivos(lista, copiar = False)
         else:
-            print('==> Arquivo descartado' + nome)
+            print('==> Arquivo descartado ' + nome)
 
 
 if __name__ == '__main__':

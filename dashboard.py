@@ -44,6 +44,9 @@ class Aluno:
     def LabelProva(self):
         return self.dataStr + '-' + self.polo + '-' + self.disciplina + '-' + self.prova
 
+    def OrdemProva(self):
+        return self.nomePolo + '-'+ self.data + '-' + self.disciplina + '-' + self.prova
+
     def Esvazia(self, ra):
         self.nome = '__________________________________________________'
         self.curso = '_________________________'
@@ -117,15 +120,15 @@ def GeraDashboard(pasta, provas, arquivos):
     header = open('header.html').read() 
     footer = open('footer.html').read()
     saida.write(header)
-    saida.write('<tr><th>Polo</th><th>Nome</th><th>Disciplina</th><th>Nome</th><th>Ocorrência</th><th>Presença</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr>\n')
+    saida.write('<tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>Ocorrência</th><th>Presença</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr>\n')
     for p in provas.keys():
         prova = provas[p]
         (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos)
         folhas = math.ceil(len(prova) / 20)
-        saida.write('<tr><td>' + prova[0].polo + '</td><td>' + prova[0].nomePolo + '</td><td><a href="' + nomeArquivo + '">' + prova[0].disciplina + '</a></td><td>' + prova[0].nomeDisciplina + '</td>')
+        saida.write('<tr><td>' + prova[0].polo + '</td><td>' + prova[0].nomePolo + '</td><td>' + prova[0].data + '</td><td><a href="' + nomeArquivo + '">' + prova[0].disciplina + '</a></td><td>' + prova[0].nomeDisciplina + '</td>')
 
         if prova[0].dataStr + '-' + prova[0].polo + '-ocorrencia.png' in arquivos:
-            saida.write('<td>OK</td>')
+            saida.write('<td>Presente</td>')
         else:
             saida.write('<td class="red">Ausente</td>')
 
@@ -177,9 +180,9 @@ if __name__ == '__main__':
     provas = {}
     for aluno in alunos:
         aluno.GeraCodigo()
-        if aluno.LabelProva() in provas:
-            provas[aluno.LabelProva()].append(aluno)
+        if aluno.OrdemProva() in provas:
+            provas[aluno.OrdemProva()].append(aluno)
         else:
-            provas[aluno.LabelProva()] = [aluno]
+            provas[aluno.OrdemProva()] = [aluno]
 
     GeraDashboard(args.saida, provas, listaArquivos)

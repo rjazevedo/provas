@@ -13,3 +13,4 @@ if __name__ == '__main__':
         qr = decode(img)
         if len(qr) == 1:
             print(arquivo, qr[0].data)
+
