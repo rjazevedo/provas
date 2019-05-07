@@ -98,10 +98,13 @@ if __name__ == '__main__':
         p = provas[prova]
         saida.append([p.disciplina, p.prova, p.folhasDissertativas + 1])
         for q in range(1, p.questoesObjetivas + 1):
-            questoes.append([p.disciplina, p.prova, q, 'Objetiva', 0.0])
+            if q < 5:
+                questoes.append([p.disciplina, p.prova, q, 'Objetiva', 1.5])
+            else:
+                questoes.append([p.disciplina, p.prova, q, 'Objetiva', 2.0])
         if p.folhasDissertativas != 0:
-            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 1, 'Dissertativa', 0.0])
-            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 2, 'Dissertativa', 0.0])
+            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 1, 'Dissertativa', 2.0])
+            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
 
         guia = os.path.join(args.guias, p.idProva() + '.pdf')
         if os.path.isfile(guia):
