@@ -75,6 +75,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Le arquivo de provas para popular o DB')
     parser.add_argument('-e', '--entrada', type=str, required=True, help='Arquivo de entrada com a descrição das provas.csv')
     parser.add_argument('-a', '--arquivos', type=str, required=True, help='Pasta dos arquivos de provas')
+    parser.add_argument('-g', '--guias', type=str, required=True, help='Pasta dos arquivos dos guias de correção')
     parser.add_argument('-s', '--saida', type=str, required=True, help='Pasta de saida')
     
 
@@ -102,7 +103,7 @@ if __name__ == '__main__':
             questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 1, 'Dissertativa', 0.0])
             questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 2, 'Dissertativa', 0.0])
 
-        guias.append([p.disciplina, p.prova, os.path.join('guiasCorrecao', p.idProva() + '.pdf')])
+        guias.append([p.disciplina, p.prova, os.path.join(args.guias, p.idProva() + '.pdf')])
 
     folhas = []
     for f in linhasProvas:
