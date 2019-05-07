@@ -64,7 +64,7 @@ class LinhaProva:
         for i in range(1, nFolhas + 1):
             a = arquivo + '-' + format(i, '02d') + '.png'
             if os.path.isfile(a):
-                retorno.append(self.disciplina, self.prova, self.ra, i, a)
+                retorno.append([self.disciplina, self.prova, self.ra, i, a])
         if len(retorno) == nFolhas:
             return retorno
         else: 
