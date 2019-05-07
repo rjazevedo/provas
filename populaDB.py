@@ -58,7 +58,7 @@ class LinhaProva:
         return self.disciplina + '-' + self.prova
 
     def EncontraArquivo(self, prefixo):
-        arquivo = os.path.join(prefixo, self.codigo)
+        arquivo = os.path.join(prefixo, self.polo, self.codigo)
         nFolhas = self.folhasDissertativas + 1
         retorno = []
         for i in range(1, nFolhas + 1):
@@ -111,11 +111,10 @@ if __name__ == '__main__':
 
     print('Gerando saída...')
 
-    csv.writer(open(os.path.join(args.saida, 'folhas.csv'), 'wt')).writerows(folhas)
-
     csv.writer(open(os.path.join(args.saida, 'provas.csv'), 'wt')).writerows(saida)
     csv.writer(open(os.path.join(args.saida, 'questoes.csv'), 'wt')).writerows(questoes)
     csv.writer(open(os.path.join(args.saida, 'guiasCorrecao.csv'), 'wt')).writerows(guias)
+    csv.writer(open(os.path.join(args.saida, 'folhas.csv'), 'wt')).writerows(folhas)
 
     sys.exit(0)
 
