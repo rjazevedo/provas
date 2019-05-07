@@ -103,7 +103,11 @@ if __name__ == '__main__':
             questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 1, 'Dissertativa', 0.0])
             questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 2, 'Dissertativa', 0.0])
 
-        guias.append([p.disciplina, p.prova, os.path.join(args.guias, p.idProva() + '.pdf')])
+        guia = os.path.join(args.guias, p.idProva() + '.pdf')
+        if os.path.isfile(guia):
+            guias.append([p.disciplina, p.prova, guia])
+        else:
+            print('Arquivo não encontrado:', guia)
 
     folhas = []
     for f in linhasProvas:
