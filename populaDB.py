@@ -121,7 +121,7 @@ if __name__ == '__main__':
 
     csv.writer(open(os.path.join(args.saida, 'provas.csv'), 'wt')).writerows(saida)
     csv.writer(open(os.path.join(args.saida, 'questoes.csv'), 'wt')).writerows(questoes)
-    csv.writer(open(os.path.join(args.saida, 'guiasCorrecao.csv'), 'wt')).writerows(guias)
+    csv.writer(open(os.path.join(args.saida, 'guias.csv'), 'wt')).writerows(guias)
     csv.writer(open(os.path.join(args.saida, 'folhas.csv'), 'wt')).writerows(folhas)
 
     sys.exit(0)
