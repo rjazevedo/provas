@@ -12,6 +12,7 @@ import numpy as np
 import argparse
 import imutils
 import cv2
+import csv
  
 # Arquivo de teste: 20190417-0002-AAG001-P001-1401883-01.png
 # construct the argument parse and parse the arguments
@@ -65,10 +66,11 @@ if len(cnts) > 0:
 paper = four_point_transform(image, docCnt.reshape(4, 2))
 warped = four_point_transform(gray, docCnt.reshape(4, 2))
 
-#help(paper)
-print(paper.ndim)
-(w, h) = warped.shape
 
+# Crop paper border to easily find the bubles inside
+#help(paper)
+
+(w, h) = warped.shape
 xi = int(0 + 0.1 * w)
 yi = int(0 + 0.1 * h)
 xf = int(w * 0.9)
@@ -76,7 +78,6 @@ yf = int(h * 0.9)
 warped = warped[xi:xf, yi:yf]
 
 (w, h, j) = paper.shape
-
 xi = int(0 + 0.1 * w)
 yi = int(0 + 0.1 * h)
 xf = int(w * 0.9)
@@ -110,6 +111,7 @@ for c in cnts:
 # the total number of correct answers
 questionCnts = contours.sort_contours(questionCnts, method="top-to-bottom")[0]
 correct = 0
+resposta = []
  
 # each question has 5 possible answers, to loop over the
 # question in batches of 5
@@ -119,6 +121,7 @@ for (q, i) in enumerate(np.arange(0, len(questionCnts), 5)):
 	# bubbled answer
 	cnts = contours.sort_contours(questionCnts[i:i + 5])[0]
 	bubbled = None
+	r = []
 
 	# loop over the sorted contours
 	for (j, c) in enumerate(cnts):
@@ -139,24 +142,38 @@ for (q, i) in enumerate(np.arange(0, len(questionCnts), 5)):
 		if bubbled is None or total > bubbled[0]:
 			bubbled = (total, j)
 
-	# initialize the contour color and the index of the
-	# *correct* answer
-	color = (0, 0, 255)
-	k = ANSWER_KEY[q]
+		if total > 200:
+			r.append(chr(ord('a') + j))
+
+	if len(r) == 1:
+		resposta.append(r[0])
+	elif len(r) > 1:
+		resposta.append('*')
+	else:
+		resposta.append('_')
+	
+	# # initialize the contour color and the index of the
+	# # *correct* answer
+	# color = (0, 0, 255)
+	# k = ANSWER_KEY[q]
  
-	# check to see if the bubbled answer is correct
-	if k == bubbled[1]:
-		color = (0, 255, 0)
-		correct += 1
+	# # check to see if the bubbled answer is correct
+	# if k == bubbled[1]:
+	# 	color = (0, 255, 0)
+	# 	correct += 1
  
-	# draw the outline of the correct answer on the test
-	cv2.drawContours(paper, [cnts[k]], -1, color, 3)
+	# # draw the outline of the correct answer on the test
+	# cv2.drawContours(paper, [cnts[k]], -1, color, 3)
+
+saida = csv.writer(open(args['image'][:-3] + 'csv', 'wt'))
+for i, r in enumerate(resposta):
+	saida.writerow([i + 1, r])
 
 # grab the test taker
-score = (correct / 5.0) * 100
-print("[INFO] score: {:.2f}%".format(score))
-cv2.putText(paper, "{:.2f}%".format(score), (10, 30),
-	cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
-cv2.imshow("Original", image)
-cv2.imshow("Exam", paper)
-cv2.waitKey(0)
+# score = (correct / 5.0) * 100
+# print("[INFO] score: {:.2f}%".format(score))
+# cv2.putText(paper, "{:.2f}%".format(score), (10, 30),
+# 	cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+# cv2.imshow("Original", image)
+#cv2.imshow("Exam", paper)
+#cv2.waitKey(0)
