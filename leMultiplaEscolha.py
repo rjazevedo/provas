@@ -15,19 +15,21 @@ import cv2
  
 # Arquivo de teste: 20190417-0002-AAG001-P001-1401883-01.png
 # construct the argument parse and parse the arguments
-# ap = argparse.ArgumentParser()
-# ap.add_argument("-i", "--image", required=True, help="path to the input image")
-# args = vars(ap.parse_args())
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--image", required=True, help="path to the input image")
+args = vars(ap.parse_args())
  
 # define the answer key which maps the question number
 # to the correct answer
-ANSWER_KEY = {0: 1, 1: 4, 2: 0, 3: 3}
+ANSWER_KEY = {0: 2, 1: 1, 2: 0, 3: 3}
 
 # load the image, convert it to grayscale, blur it
 # slightly, then find edges
 
-#image = cv2.imread(args["image"])
-image = cv2.imread('20190417-0002-AAG001-P001-1401883-01.png')
+print(args['image'])
+image = cv2.imread(args["image"])
+#image = cv2.imread('20190417-0002-AAG001-P001-1401883-01.png')
+# image = cv2.imread('20190427-0002-TAE501-P005-1400695-01.png')
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 edged = cv2.Canny(blurred, 75, 200)
@@ -35,8 +37,7 @@ edged = cv2.Canny(blurred, 75, 200)
 # find contours in the edge map, then initialize
 # the contour that corresponds to the document
 
-cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
-	cv2.CHAIN_APPROX_SIMPLE)
+cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 cnts = imutils.grab_contours(cnts)
 docCnt = None
  
@@ -64,15 +65,31 @@ if len(cnts) > 0:
 paper = four_point_transform(image, docCnt.reshape(4, 2))
 warped = four_point_transform(gray, docCnt.reshape(4, 2))
 
+#help(paper)
+print(paper.ndim)
+(w, h) = warped.shape
+
+xi = int(0 + 0.1 * w)
+yi = int(0 + 0.1 * h)
+xf = int(w * 0.9)
+yf = int(h * 0.9)
+warped = warped[xi:xf, yi:yf]
+
+(w, h, j) = paper.shape
+
+xi = int(0 + 0.1 * w)
+yi = int(0 + 0.1 * h)
+xf = int(w * 0.9)
+yf = int(h * 0.9)
+paper = paper[xi:xf, yi:yf]
+
 # apply Otsu's thresholding method to binarize the warped
 # piece of paper
-thresh = cv2.threshold(warped, 0, 255,
-	cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+thresh = cv2.threshold(warped, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
 # find contours in the thresholded image, then initialize
 # the list of contours that correspond to questions
-cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-	cv2.CHAIN_APPROX_SIMPLE)
+cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 cnts = imutils.grab_contours(cnts)
 questionCnts = []
  
@@ -91,8 +108,7 @@ for c in cnts:
 
 # sort the question contours top-to-bottom, then initialize
 # the total number of correct answers
-questionCnts = contours.sort_contours(questionCnts,
-	method="top-to-bottom")[0]
+questionCnts = contours.sort_contours(questionCnts, method="top-to-bottom")[0]
 correct = 0
  
 # each question has 5 possible answers, to loop over the
@@ -135,7 +151,8 @@ for (q, i) in enumerate(np.arange(0, len(questionCnts), 5)):
  
 	# draw the outline of the correct answer on the test
 	cv2.drawContours(paper, [cnts[k]], -1, color, 3)
-    # grab the test taker
+
+# grab the test taker
 score = (correct / 5.0) * 100
 print("[INFO] score: {:.2f}%".format(score))
 cv2.putText(paper, "{:.2f}%".format(score), (10, 30),

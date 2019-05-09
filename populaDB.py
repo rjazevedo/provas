@@ -70,27 +70,40 @@ class LinhaProva:
         else: 
             return []
 
+class CorretorDisciplina:
+    def __init__(self, nome, corretor):
+        self.proximo = -1
+        self.lista = [corretores]
+
+    def Inclui(self, corretor):
+        self.lista.append(corretor)
+
+    def Proximo(self):
+        self.proximo += 1
+        return self.lista[self.proximo % len(self.lista)]
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Le arquivo de provas para popular o DB')
     parser.add_argument('-e', '--entrada', type=str, required=True, help='Arquivo de entrada com a descrição das provas.csv')
+    parser.add_argument('-c', '--corretores', type=str, required=True, help='Arquivos com mapeamento de corretores por disciplinas')
     parser.add_argument('-a', '--arquivos', type=str, required=True, help='Pasta dos arquivos de provas')
     parser.add_argument('-g', '--guias', type=str, required=True, help='Pasta dos arquivos dos guias de correção')
     parser.add_argument('-s', '--saida', type=str, required=True, help='Pasta de saida')
-    
 
     args = parser.parse_args()
 
     print('Lendo entrada...')
     entrada = list(csv.reader(open(args.entrada)))
+    corretores = list(csv.reader(open(args.corretores)))
 
+    print('Processando dados...')
     linhasProvas = [LinhaProva(x) for x in entrada[1:]]
 
     provas = {}
     for l in linhasProvas:
         provas[l.idProva()] = l
 
-    print('Processando dados...')
     saida = []
     questoes = []
     guias = []
@@ -112,17 +125,31 @@ if __name__ == '__main__':
         else:
             print('Arquivo não encontrado:', guia)
 
+    disciplinas = {}
+    for c in corretores:
+        if c[0] in disciplinas:
+            disciplinas[c[0]].Inclui(c[1])
+        else:
+            disciplinas[c[0]] = CorretorDisciplina(c[0], [c[1]])
+
     folhas = []
+    correcoes = []
     for f in linhasProvas:
         a = f.EncontraArquivo(args.arquivos)
         folhas.extend(a)
+        if f.disciplina in disciplinas:
+            correcoes.append([f.disciplina, f.polo, f.ra, disciplinas[f.disciplina].Proximo()])
+        else:
+            print('Disciplina sem corretor:', f.disciplina)
 
-    print('Gerando saída...')
+
+    print('Gravando saída...')
 
     csv.writer(open(os.path.join(args.saida, 'provas.csv'), 'wt')).writerows(saida)
     csv.writer(open(os.path.join(args.saida, 'questoes.csv'), 'wt')).writerows(questoes)
     csv.writer(open(os.path.join(args.saida, 'guias.csv'), 'wt')).writerows(guias)
     csv.writer(open(os.path.join(args.saida, 'folhas.csv'), 'wt')).writerows(folhas)
+    csv.writer(open(os.path.join(args.saida, 'correcoes.csv'), 'wt')).writerows(correcoes)
 
     sys.exit(0)
 
