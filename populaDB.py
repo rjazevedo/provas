@@ -142,10 +142,11 @@ if __name__ == '__main__':
     for f in linhasProvas:
         a = f.EncontraArquivo(args.arquivos)
         folhas.extend(a)
-        if f.disciplina in disciplinas:
-            correcoes.append([f.disciplina, f.prova, f.ra, disciplinas[f.disciplina].Proximo()])
-        else:
-            print('Disciplina sem corretor:', f.disciplina)
+        if len(a) != 0:
+            if f.disciplina in disciplinas:
+                correcoes.append([f.disciplina, f.prova, f.ra, disciplinas[f.disciplina].Proximo()])
+            else:
+                print('Disciplina sem corretor:', f.disciplina)
 
 
     print('Gravando saída...')
