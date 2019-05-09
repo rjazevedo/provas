@@ -142,7 +142,7 @@ if __name__ == '__main__':
         a = f.EncontraArquivo(args.arquivos)
         folhas.extend(a)
         if f.disciplina in disciplinas:
-            correcoes.append([f.disciplina, f.polo, f.ra, disciplinas[f.disciplina].Proximo()])
+            correcoes.append([f.disciplina, f.prova, f.ra, disciplinas[f.disciplina].Proximo()])
         else:
             print('Disciplina sem corretor:', f.disciplina)
 
