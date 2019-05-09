@@ -114,6 +114,7 @@ if __name__ == '__main__':
     for prova in sorted(provas.keys()):
         p = provas[prova]
         saida.append([p.disciplina, p.prova, p.folhasDissertativas + 1])
+
         for q in range(1, p.questoesObjetivas + 1):
             if q < 5:
                 questoes.append([p.disciplina, p.prova, q, 'Objetiva', 1.5])
@@ -125,7 +126,7 @@ if __name__ == '__main__':
 
         guia = os.path.join(args.guias, p.idProva() + '.pdf')
         if os.path.isfile(guia):
-            guias.append([p.disciplina, p.prova, guia])
+            guias.append([p.disciplina, p.prova, p.folhasDissertativas + 1, guia])
         else:
             print('Arquivo não encontrado:', guia)
 
