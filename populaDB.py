@@ -72,8 +72,9 @@ class LinhaProva:
 
 class CorretorDisciplina:
     def __init__(self, nome, corretor):
+        self.nome = nome
         self.proximo = -1
-        self.lista = [corretores]
+        self.lista = [corretor]
 
     def Inclui(self, corretor):
         self.lista.append(corretor)
@@ -81,6 +82,9 @@ class CorretorDisciplina:
     def Proximo(self):
         self.proximo += 1
         return self.lista[self.proximo % len(self.lista)]
+
+    def __str__(self):
+        return self.nome + ': ' + str(self.lista)
 
 
 if __name__ == '__main__':
@@ -130,7 +134,7 @@ if __name__ == '__main__':
         if c[0] in disciplinas:
             disciplinas[c[0]].Inclui(c[1])
         else:
-            disciplinas[c[0]] = CorretorDisciplina(c[0], [c[1]])
+            disciplinas[c[0]] = CorretorDisciplina(c[0], c[1])
 
     folhas = []
     correcoes = []
