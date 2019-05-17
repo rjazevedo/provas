@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Lê as respostas das perguntas de múltipla escolha"""
+""" Lê a lista de presença da Univesp """
 
 # Based on https://www.pyimagesearch.com/2016/10/03/bubble-sheet-multiple-choice-scanner-and-test-grader-using-omr-python-and-opencv/
 
@@ -15,11 +15,6 @@ import cv2
 import csv
 import sys
  
-def get_contour_precedence(contour, cols):
-    tolerance_factor = 10
-    origin = cv2.boundingRect(contour)
-    return ((origin[1] // tolerance_factor) * tolerance_factor) * cols + origin[0]
-
 def ProcessaImagem(nome):
 	# load the image, convert it to grayscale, blur it
 	# slightly, then find edges
@@ -59,40 +54,37 @@ def ProcessaImagem(nome):
 	paper = four_point_transform(image, docCnt.reshape(4, 2))
 	warped = four_point_transform(gray, docCnt.reshape(4, 2))
 
-
 	# Crop paper border to easily find the bubles inside
 	#help(paper)
 
-	(w, h) = warped.shape
-	xi = int(0 + 0.1 * w)
-	yi = int(0 + 0.1 * h)
-	xf = int(w * 0.9)
-	yf = int(h * 0.9)
-	warped = warped[xi:xf, yi:yf]
+	(h, w) = warped.shape
+	xi = int(0)
+	yi = int(0.03 * h)
+	xf = int(w * 0.17)
+	yf = int(h)
+	warped = warped[yi:yf, xi:xf]
 
-	(w, h, j) = paper.shape
-	xi = int(0 + 0.1 * w)
-	yi = int(0 + 0.1 * h)
-	xf = int(w * 0.9)
-	yf = int(h * 0.9)
-	paper = paper[xi:xf, yi:yf]
+	(h, w, j) = paper.shape
+	xi = int(0)
+	yi = int(0.03 * h)
+	xf = int(w * 0.17)
+	yf = int(h)
+	paper = paper[yi:yf, xi:xf]
 
 	# apply Otsu's thresholding method to binarize the warped
 	# piece of paper
 	thresh = cv2.threshold(warped, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+
+	cv2.imshow('thresh', thresh)
+	cv2.waitKey(0)
+	sys.exit(0)
 
 	# find contours in the thresholded image, then initialize
 	# the list of contours that correspond to questions
 	cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 	cnts = imutils.grab_contours(cnts)
 	questionCnts = []
-	blue = (255, 0, 0)
-	red = (0, 0, 255)
-	green = (0, 255, 0)
-	maxX = maxY = minX = minY = None
-	bloco = 20
-	avgdY = 0
-
+	
 	# loop over the contours
 	for c in cnts:
 		# compute the bounding box of the contour, then use the
@@ -103,50 +95,13 @@ def ProcessaImagem(nome):
 		# in order to label the contour as a question, region
 		# should be sufficiently wide, sufficiently tall, and
 		# have an aspect ratio approximately equal to 1
-		if w >= bloco and h >= bloco and ar >= 0.8 and ar <= 1.2:
+		if w >= 20 and h >= 20 and ar >= 0.8 and ar <= 1.2:
 			questionCnts.append(c)
-			if maxX == None:
-				minX = x
-				minY = y
-				maxX = x + w
-				maxY = y + h
-				avgdY = h
-			else:
-				if x < minX:
-					minX = x
-				if y < minY:
-					minY = y
-				if x + w > maxX:
-					maxX = x + w
-				if y + h > maxY:
-					maxY = y + h
-				avgdY += h
-		# 	cv2.drawContours(paper, [c], -1, blue, 3)
-		# 	cv2.imshow('resultado', paper)
-		# 	cv2.waitKey(0)
-		# else:
-		# 	cv2.drawContours(paper, [c], -1, red, 3)
-		# 	cv2.imshow('resultado', paper)
-		# 	cv2.waitKey(0)
 
-	print(minX, minY, maxX, maxY)
-	print(avgdY / len(questionCnts))
 	print(len(questionCnts))
-	questionCnts.sort(key = lambda x : get_contour_precedence(x, paper.shape[1]))
-
 	# sort the question contours top-to-bottom, then initialize
 	# the total number of correct answers
-	#questionCnts = contours.sort_contours(questionCnts, method="top-to-bottom")[0]
-
-
-	for c in questionCnts:
-		cv2.drawContours(paper, [c], -1, green, 3)
-		cv2.imshow('resultado', paper)
-		
-	cv2.waitKey(0)
-
-	sys.exit(0)
-
+	questionCnts = contours.sort_contours(questionCnts, method="top-to-bottom")[0]
 	resposta = []
 	
 	# each question has 5 possible answers, to loop over the
@@ -185,6 +140,11 @@ def ProcessaImagem(nome):
 			else:
 				color = (255, 0, 0)
 
+			cv2.drawContours(paper, [c], -1, color, 3)
+			cv2.imshow('resultado', paper)
+			cv2.waitKey(0)
+
+
 		if len(r) == 1:
 			resposta.append(r[0])
 		elif len(r) > 1:
@@ -214,8 +174,7 @@ def ProcessaImagem(nome):
 if __name__ == '__main__':
 	# construct the argument parse and parse the arguments
 
-	ProcessaImagem('20190427-0002-TAE501-P005-1500137-01.png')
-	ProcessaImagem('20190418-0002-AAG001-P002-1705829-01.png')
+	ProcessaImagem('20190417-0032-ISI001-P001-presenca-01.png')
 	sys.exit(0)
 
 	ap = argparse.ArgumentParser()

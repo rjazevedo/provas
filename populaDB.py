@@ -43,6 +43,7 @@ class LinhaProva:
         self.questoesObjetivas = int(campos[11])
         self.folhasDissertativas = int(campos[12])
         self.dataStr = DataInvertida(self.data)
+        self.novo = False
         self.codigo = ''
         self.GeraCodigo()
         return
@@ -90,6 +91,7 @@ class CorretorDisciplina:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Le arquivo de provas para popular o DB')
     parser.add_argument('-e', '--entrada', type=str, required=True, help='Arquivo de entrada com a descrição das provas.csv')
+    parser.add_argument('-b', '--basecorrecoes', type=str, required=False, help='Arquivo base das correções já gerado anteriormente')
     parser.add_argument('-c', '--corretores', type=str, required=True, help='Arquivos com mapeamento de corretores por disciplinas')
     parser.add_argument('-a', '--arquivos', type=str, required=True, help='Pasta dos arquivos de provas')
     parser.add_argument('-g', '--guias', type=str, required=True, help='Pasta dos arquivos dos guias de correção')
@@ -100,6 +102,15 @@ if __name__ == '__main__':
     print('Lendo entrada...')
     entrada = list(csv.reader(open(args.entrada)))
     corretores = list(csv.reader(open(args.corretores)))
+
+    if args.basecorrecoes != None:
+        baseCorrecoes = list(csv.reader(open(args.basecorretores)))
+    else:
+        baseCorrecoes = []
+
+    temCorretor = {}
+    for base in baseCorrecoes:
+        temCorretor[base[0] + base[1] + base[2]] = True
 
     print('Processando dados...')
     linhasProvas = [LinhaProva(x) for x in entrada[1:]]

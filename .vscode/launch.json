@@ -8,7 +8,7 @@
         {"name":"Python: Arquivo Atual","type":"python","request":"launch","program":"${file}","console":"integratedTerminal"},
         {
             "name": "Python: Arquivo Atual",
-            "type": "python",
+            "type": "python3",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
