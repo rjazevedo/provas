@@ -104,7 +104,7 @@ if __name__ == '__main__':
     corretores = list(csv.reader(open(args.corretores)))
 
     if args.basecorrecoes != None:
-        baseCorrecoes = list(csv.reader(open(args.basecorretores)))
+        baseCorrecoes = list(csv.reader(open(args.basecorrecoes)))
     else:
         baseCorrecoes = []
 
@@ -155,7 +155,8 @@ if __name__ == '__main__':
         folhas.extend(a)
         if len(a) != 0:
             if f.disciplina in disciplinas:
-                correcoes.append([f.disciplina, f.prova, f.ra, disciplinas[f.disciplina].Proximo()])
+                if (f.disciplina + f.prova + f.ra) not in temCorretor:
+                    correcoes.append([f.disciplina, f.prova, f.ra, disciplinas[f.disciplina].Proximo()])
             else:
                 print('Disciplina sem corretor:', f.disciplina)
 
