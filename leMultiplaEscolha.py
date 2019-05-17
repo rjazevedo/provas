@@ -92,6 +92,8 @@ def ProcessaImagem(nome):
 	maxX = maxY = minX = minY = None
 	bloco = 20
 	avgdY = 0
+	avgdX = 0
+	boundrect = []
 
 	# loop over the contours
 	for c in cnts:
@@ -105,22 +107,7 @@ def ProcessaImagem(nome):
 		# have an aspect ratio approximately equal to 1
 		if w >= bloco and h >= bloco and ar >= 0.8 and ar <= 1.2:
 			questionCnts.append(c)
-			if maxX == None:
-				minX = x
-				minY = y
-				maxX = x + w
-				maxY = y + h
-				avgdY = h
-			else:
-				if x < minX:
-					minX = x
-				if y < minY:
-					minY = y
-				if x + w > maxX:
-					maxX = x + w
-				if y + h > maxY:
-					maxY = y + h
-				avgdY += h
+			boundrect.append((x, y, w, h))
 		# 	cv2.drawContours(paper, [c], -1, blue, 3)
 		# 	cv2.imshow('resultado', paper)
 		# 	cv2.waitKey(0)
@@ -129,8 +116,30 @@ def ProcessaImagem(nome):
 		# 	cv2.imshow('resultado', paper)
 		# 	cv2.waitKey(0)
 
+	for (x, y, w, h) in boundrect:
+		if maxX == None:
+			minX = x
+			minY = y
+			maxX = x + w
+			maxY = y + h
+			avgdY = h
+			avgdX = w
+		else:
+			if x < minX:
+				minX = x
+			if y < minY:
+				minY = y
+			if x + w > maxX:
+				maxX = x + w
+			if y + h > maxY:
+				maxY = y + h
+			avgdY += h
+			avgdX += w
+
+	avgdY //= len(questionCnts)
+	avgdX //= len(questionCnts)
 	print(minX, minY, maxX, maxY)
-	print(avgdY / len(questionCnts))
+	print(avgdY, avgdX)
 	print(len(questionCnts))
 	questionCnts.sort(key = lambda x : get_contour_precedence(x, paper.shape[1]))
 
@@ -139,11 +148,11 @@ def ProcessaImagem(nome):
 	#questionCnts = contours.sort_contours(questionCnts, method="top-to-bottom")[0]
 
 
-	for c in questionCnts:
-		cv2.drawContours(paper, [c], -1, green, 3)
-		cv2.imshow('resultado', paper)
+	# for c in questionCnts:
+	# 	cv2.drawContours(paper, [c], -1, green, 3)
+	# 	cv2.imshow('resultado', paper)
 		
-	cv2.waitKey(0)
+	# cv2.waitKey(0)
 
 	sys.exit(0)
 

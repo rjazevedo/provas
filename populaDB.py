@@ -152,11 +152,12 @@ if __name__ == '__main__':
     correcoes = []
     for f in linhasProvas:
         a = f.EncontraArquivo(args.arquivos)
-        folhas.extend(a)
         if len(a) != 0:
             if f.disciplina in disciplinas:
                 if (f.disciplina + f.prova + f.ra) not in temCorretor:
                     correcoes.append([f.disciplina, f.prova, f.ra, disciplinas[f.disciplina].Proximo()])
+                    folhas.extend(a)
+
             else:
                 print('Disciplina sem corretor:', f.disciplina)
 
