@@ -14,6 +14,8 @@ import imutils
 import cv2
 import csv
 import sys
+from sklearn.cluster import KMeans
+
  
 def get_contour_precedence(contour, cols):
     tolerance_factor = 10
@@ -27,6 +29,10 @@ def ProcessaImagem(nome):
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 	blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 	edged = cv2.Canny(blurred, 75, 200)
+
+	blue = (255, 0, 0)
+	red = (0, 0, 255)
+	green = (0, 255, 0)
 
 	# find contours in the edge map, then initialize
 	# the contour that corresponds to the document
@@ -46,6 +52,11 @@ def ProcessaImagem(nome):
 			# approximate the contour
 			peri = cv2.arcLength(c, True)
 			approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+
+			# cv2.drawContours(image, [c], -1, blue, 3)
+			# cv2.imshow('resultado', image)
+			# cv2.waitKey(0)
+
 	
 			# if our approximated contour has four points,
 			# then we can assume we have found the paper
@@ -86,9 +97,6 @@ def ProcessaImagem(nome):
 	cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 	cnts = imutils.grab_contours(cnts)
 	questionCnts = []
-	blue = (255, 0, 0)
-	red = (0, 0, 255)
-	green = (0, 255, 0)
 	maxX = maxY = minX = minY = None
 	bloco = 20
 	avgdY = 0
@@ -108,13 +116,17 @@ def ProcessaImagem(nome):
 		if w >= bloco and h >= bloco and ar >= 0.8 and ar <= 1.2:
 			questionCnts.append(c)
 			boundrect.append((x, y, w, h))
-		# 	cv2.drawContours(paper, [c], -1, blue, 3)
-		# 	cv2.imshow('resultado', paper)
-		# 	cv2.waitKey(0)
+			# cv2.drawContours(paper, [c], -1, blue, 3)
+			# cv2.imshow('resultado', paper)
+			# cv2.waitKey(0)
 		# else:
 		# 	cv2.drawContours(paper, [c], -1, red, 3)
 		# 	cv2.imshow('resultado', paper)
 		# 	cv2.waitKey(0)
+
+	if len(questionCnts) == 0:
+		print('Não encontrei marcas. Arquivo errado?')
+		return
 
 	for (x, y, w, h) in boundrect:
 		if maxX == None:
@@ -138,15 +150,31 @@ def ProcessaImagem(nome):
 
 	avgdY //= len(questionCnts)
 	avgdX //= len(questionCnts)
-	print(minX, minY, maxX, maxY)
-	print(avgdY, avgdX)
-	print(len(questionCnts))
-	questionCnts.sort(key = lambda x : get_contour_precedence(x, paper.shape[1]))
+	avgdY2 = avgdY // 2
+	avgdX2 = avgdX // 2
+
+	# Na horizontal, temos 5 bolinhas * avgdX largura + 4 * espacoX
+	espacoX = (maxX - minX - 5 * avgdX) // 4
+
+	# Na vertical, podemos ter 4 ou 6 questões * avgdY e 3 ou 5 espaços
+	espacoY4 = (maxY - minY - 4 * avgdY) // 3
+	espacoY6 = (maxY - minY - 6 * avgdY) // 5
+	if espacoY4 > avgdY:
+		espacoY = espacoY6
+		questoes = 6
+	else:
+		espacoY = espacoY4
+		questoes = 4
+
+	# print(minX, minY, maxX, maxY)
+	# print(avgdY, avgdX)
+	# print(len(questionCnts))
+	# print(espacoX, espacoY, espacoY4, espacoY6)
+	#questionCnts.sort(key = lambda x : get_contour_precedence(x, paper.shape[1]))
 
 	# sort the question contours top-to-bottom, then initialize
 	# the total number of correct answers
 	#questionCnts = contours.sort_contours(questionCnts, method="top-to-bottom")[0]
-
 
 	# for c in questionCnts:
 	# 	cv2.drawContours(paper, [c], -1, green, 3)
@@ -154,65 +182,117 @@ def ProcessaImagem(nome):
 		
 	# cv2.waitKey(0)
 
-	sys.exit(0)
+	# Monta matriz de respostas com o número de questões e 5 bolinhas para cada
+	matrizRespostas = np.zeros((questoes, 5), dtype=int)
+	# print(matrizRespostas)
+	centros = []
+	for i in range(0, questoes):
+		centros.append([])
+		for j in range(0, 5):
+			centros[i].append((minX + j * avgdX + j * espacoX + avgdX2, minY + i * avgdY + i * espacoY + avgdY2))
 
+	# print(centros)
+	# print(len(questionCnts))
+	# print(matrizRespostas)
+
+	for (i, c) in enumerate(questionCnts):
+		# construct a mask that reveals only the current
+		# "bubble" for the question
+		mask = np.zeros(thresh.shape, dtype="uint8")
+		cv2.drawContours(mask, [c], -1, 255, -1)
+
+		# apply the mask to the thresholded image, then
+		# count the number of non-zero pixels in the
+		# bubble area
+		mask = cv2.bitwise_and(thresh, thresh, mask=mask)
+		total = cv2.countNonZero(mask)
+		(x, y, w, h) = cv2.boundingRect(c)
+		for (a, l) in enumerate(centros):
+			for (b, (cx, cy)) in enumerate(l):
+				if abs(cx - (x + w // 2)) < avgdX2 and abs(cy - (y + h // 2)) < avgdY2:
+					matrizRespostas[a][b] = total
+
+	# print(matrizRespostas)
 	resposta = []
-	
-	# each question has 5 possible answers, to loop over the
-	# question in batches of 5
-	for (q, i) in enumerate(np.arange(0, len(questionCnts), 5)):
-		# sort the contours for the current question from
-		# left to right, then initialize the index of the
-		# bubbled answer
-		cnts = contours.sort_contours(questionCnts[i:i + 5])[0]
-		bubbled = None
-		r = []
+	for (i, l) in enumerate(matrizRespostas):
+		max = np.max(l)
+		min = np.min(l)
+		avg = np.average(l)
+		r = ''
+		if max - avg > 100: # Parece que temos um ou mais vencedores
+			for (j, n) in enumerate(l):
+				if n > avg + 100:
+					r += chr(j + 97)
+			if len(r) > 1:
+				r = '*'
+		elif avg > 300: # todos muito altos
+			r = '*'
+		else:           # nada preenchido
+			r = '_'
 
-		# loop over the sorted contours
-		for (j, c) in enumerate(cnts):
-			# construct a mask that reveals only the current
-			# "bubble" for the question
-			mask = np.zeros(thresh.shape, dtype="uint8")
-			cv2.drawContours(mask, [c], -1, 255, -1)
-	
-			# apply the mask to the thresholded image, then
-			# count the number of non-zero pixels in the
-			# bubble area
-			mask = cv2.bitwise_and(thresh, thresh, mask=mask)
-			total = cv2.countNonZero(mask)
-			print(total)
-	
-			# if the current total has a larger number of total
-			# non-zero pixels, then we are examining the currently
-			# bubbled-in answer
-			if bubbled is None or total > bubbled[0]:
-				bubbled = (total, j)
+		resposta.append(r)
 
-			if total > 200:
-				r.append(chr(ord('a') + j))
-				color = (0, 0, 255)
-			else:
-				color = (255, 0, 0)
+	print(resposta)
 
-		if len(r) == 1:
-			resposta.append(r[0])
-		elif len(r) > 1:
-			resposta.append('*')
-		else:
-			resposta.append('_')
+	# return
+
+	# resposta = []
+	
+	# # each question has 5 possible answers, to loop over the
+	# # question in batches of 5
+	# for (q, i) in enumerate(np.arange(0, len(questionCnts), 5)):
+	# 	# sort the contours for the current question from
+	# 	# left to right, then initialize the index of the
+	# 	# bubbled answer
+	# 	cnts = contours.sort_contours(questionCnts[i:i + 5])[0]
+	# 	bubbled = None
+	# 	r = []
+
+	# 	# loop over the sorted contours
+	# 	for (j, c) in enumerate(cnts):
+	# 		# construct a mask that reveals only the current
+	# 		# "bubble" for the question
+	# 		mask = np.zeros(thresh.shape, dtype="uint8")
+	# 		cv2.drawContours(mask, [c], -1, 255, -1)
+	
+	# 		# apply the mask to the thresholded image, then
+	# 		# count the number of non-zero pixels in the
+	# 		# bubble area
+	# 		mask = cv2.bitwise_and(thresh, thresh, mask=mask)
+	# 		total = cv2.countNonZero(mask)
+	# 		print(total)
+	
+	# 		# if the current total has a larger number of total
+	# 		# non-zero pixels, then we are examining the currently
+	# 		# bubbled-in answer
+	# 		if bubbled is None or total > bubbled[0]:
+	# 			bubbled = (total, j)
+
+	# 		if total > 200:
+	# 			r.append(chr(ord('a') + j))
+	# 			color = (0, 0, 255)
+	# 		else:
+	# 			color = (255, 0, 0)
+
+	# 	if len(r) == 1:
+	# 		resposta.append(r[0])
+	# 	elif len(r) > 1:
+	# 		resposta.append('*')
+	# 	else:
+	# 		resposta.append('_')
 		
-		# # initialize the contour color and the index of the
-		# # *correct* answer
-		# color = (0, 0, 255)
-		# k = ANSWER_KEY[q]
+	# 	# # initialize the contour color and the index of the
+	# 	# # *correct* answer
+	# 	# color = (0, 0, 255)
+	# 	# k = ANSWER_KEY[q]
 	
-		# # check to see if the bubbled answer is correct
-		# if k == bubbled[1]:
-		# 	color = (0, 255, 0)
-		# 	correct += 1
+	# 	# # check to see if the bubbled answer is correct
+	# 	# if k == bubbled[1]:
+	# 	# 	color = (0, 255, 0)
+	# 	# 	correct += 1
 	
-		# # draw the outline of the correct answer on the test
-		# cv2.drawContours(paper, [cnts[k]], -1, color, 3)
+	# 	# # draw the outline of the correct answer on the test
+	# 	# cv2.drawContours(paper, [cnts[k]], -1, color, 3)
 
 	saida = csv.writer(open(nome[:-3] + 'csv', 'wt'))
 	for i, r in enumerate(resposta):
@@ -223,9 +303,12 @@ def ProcessaImagem(nome):
 if __name__ == '__main__':
 	# construct the argument parse and parse the arguments
 
-	ProcessaImagem('20190427-0002-TAE501-P005-1500137-01.png')
-	ProcessaImagem('20190418-0002-AAG001-P002-1705829-01.png')
-	sys.exit(0)
+	# ProcessaImagem('20190427-0002-TAE501-P005-1500137-01.png')
+	# ProcessaImagem('20190426-0107-LIN031-P001-1800222-01.png')
+	# ProcessaImagem('p1-6.png')
+	# ProcessaImagem('p2-6.png')
+	# ProcessaImagem('p3-6.png')
+	# sys.exit(0)
 
 	ap = argparse.ArgumentParser()
 	ap.add_argument("-i", "--image", nargs='+', required=True, help="path to the input image")
