@@ -14,9 +14,20 @@ import imutils
 import cv2
 import csv
 import sys
-from sklearn.cluster import KMeans
+import math
+# from sklearn.cluster import KMeans
 
- 
+debug = False
+
+def Mostra(imagem):
+	 display = cv2.resize(imagem, (480, 640))
+	 cv2.imshow('imagem', display)
+	 cv2.waitKey(0)
+	 return
+
+def Distancia(p1, p2):
+	return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1])  ** 2)
+
 def get_contour_precedence(contour, cols):
     tolerance_factor = 10
     origin = cv2.boundingRect(contour)
@@ -40,36 +51,96 @@ def ProcessaImagem(nome):
 	cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 	cnts = imutils.grab_contours(cnts)
 	docCnt = None
+	cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
+
+	if len(cnts) > 0:
+		docCnt = cnts[0]
+
+		# define os extremos da imagem (cantos)
+		(w, h, j) = image.shape
+		topL = [0, h]
+		topR = [w, h]
+		bottomL = [0, 0]
+		bottomR = [w, 0]
+
+		# Coloca os pontos mais distantes possíveis
+		imgTopL = bottomR
+		imgTopR = bottomL
+		imgBottomL = topR
+		imgBottomR = topL
+
+		distTL = Distancia(topL, imgTopL)
+		distTR = Distancia(topR, imgTopR)
+		distBL = Distancia(bottomL, imgBottomL)
+		distBR = Distancia(bottomR, imgBottomR)
+
+		for ponto in docCnt:
+			p = ponto[0]
+			d = Distancia(p, topL)
+			if d < distTL:
+				distTL = d
+				imgTopL = p
+
+			d = Distancia(p, topR)
+			if d < distTR:
+				distTR = d
+				imgTopR = p
+
+			d = Distancia(p, bottomL)
+			if d < distBL:
+				distBL = d
+				imgBottomL = p
+
+			d = Distancia(p, bottomR)
+			if d < distBR:
+				distBR = d
+				imgBottomR = p
+
+		docCnt = np.ndarray((4, 1, 2), dtype=int)
+		docCnt[0][0] = imgTopL
+		docCnt[1][0] = imgTopR
+		docCnt[2][0] = imgBottomR
+		docCnt[3][0] = imgBottomL
+
 	
 	# ensure that at least one contour was found
-	if len(cnts) > 0:
-		# sort the contours according to their size in
-		# descending order
-		cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
-	
-		# loop over the sorted contours
-		for c in cnts:
-			# approximate the contour
-			peri = cv2.arcLength(c, True)
-			approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+	# if len(cnts) > 0:
+	# 	# sort the contours according to their size in
+	# 	# descending order
+	# 	cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
 
-			# cv2.drawContours(image, [c], -1, blue, 3)
-			# cv2.imshow('resultado', image)
-			# cv2.waitKey(0)
+	# 	# loop over the sorted contours
+	# 	for c in cnts:
+	# 		# approximate the contour
+	# 		peri = cv2.arcLength(c, True)
+	# 		approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+	# 		print(len(c), len(approx))
 
-	
-			# if our approximated contour has four points,
-			# then we can assume we have found the paper
-			if len(approx) == 4:
-				docCnt = approx
-				break
+	# 		if debug:
+	# 			cv2.drawContours(image, [c], -1, blue, 3)
+	# 			Mostra(image)
+
+	# 		# if our approximated contour has four points,
+	# 		# then we can assume we have found the paper
+	# 		if len(approx) == 4:
+	# 			docCnt = approx
+	# 			break
+
+	# print(type(docCnt), docCnt)
+	if len(docCnt) == 0: # Não encontrou pelo método convencional. Tente heurística do maior (primeiro)
+		c = cnts[0]
+		peri = cv2.arcLength(c, True)
+		approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+		cv2.drawContours(image, [c], -1, blue, 3)
+		Mostra(image)
+		for i in c:
+			print(i)
 
 	# apply a four point perspective transform to both the
 	# original image and grayscale image to obtain a top-down
 	# birds eye view of the paper
 	paper = four_point_transform(image, docCnt.reshape(4, 2))
 	warped = four_point_transform(gray, docCnt.reshape(4, 2))
-
 
 	# Crop paper border to easily find the bubles inside
 	#help(paper)
@@ -116,13 +187,15 @@ def ProcessaImagem(nome):
 		if w >= bloco and h >= bloco and ar >= 0.8 and ar <= 1.2:
 			questionCnts.append(c)
 			boundrect.append((x, y, w, h))
-			# cv2.drawContours(paper, [c], -1, blue, 3)
-			# cv2.imshow('resultado', paper)
-			# cv2.waitKey(0)
-		# else:
-		# 	cv2.drawContours(paper, [c], -1, red, 3)
-		# 	cv2.imshow('resultado', paper)
-		# 	cv2.waitKey(0)
+			if debug:
+				cv2.drawContours(paper, [c], -1, blue, 3)
+				cv2.imshow('resultado', paper)
+				cv2.waitKey(0)
+		else:
+			if debug:
+				cv2.drawContours(paper, [c], -1, red, 3)
+				cv2.imshow('resultado', paper)
+				cv2.waitKey(0)
 
 	if len(questionCnts) == 0:
 		print('Não encontrei marcas. Arquivo errado?')
@@ -212,7 +285,7 @@ def ProcessaImagem(nome):
 				if abs(cx - (x + w // 2)) < avgdX2 and abs(cy - (y + h // 2)) < avgdY2:
 					matrizRespostas[a][b] = total
 
-	# print(matrizRespostas)
+	print(matrizRespostas)
 	resposta = []
 	for (i, l) in enumerate(matrizRespostas):
 		max = np.max(l)
@@ -312,8 +385,12 @@ if __name__ == '__main__':
 
 	ap = argparse.ArgumentParser()
 	ap.add_argument("-i", "--image", nargs='+', required=True, help="path to the input image")
+	ap.add_argument("-d", "--debug", required=False, action='store_true', help="debug image algorithm")
 	args = vars(ap.parse_args())
 	
+	if args['debug']:
+		debug = True
+
 	quantidade = 0
 	for arquivo in args['image']:
 		print(arquivo)
