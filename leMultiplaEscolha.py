@@ -295,7 +295,7 @@ def ProcessaImagem(nome):
 		if max - avg > 100: # Parece que temos um ou mais vencedores
 			for (j, n) in enumerate(l):
 				if n > avg + 100:
-					r += chr(j + 97)
+					r += chr(j + 65)
 			if len(r) > 1:
 				r = '*'
 		elif avg > 300: # todos muito altos
