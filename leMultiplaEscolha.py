@@ -127,14 +127,14 @@ def ProcessaImagem(nome):
 	# 			break
 
 	# print(type(docCnt), docCnt)
-	if len(docCnt) == 0: # Não encontrou pelo método convencional. Tente heurística do maior (primeiro)
-		c = cnts[0]
-		peri = cv2.arcLength(c, True)
-		approx = cv2.approxPolyDP(c, 0.02 * peri, True)
-		cv2.drawContours(image, [c], -1, blue, 3)
-		Mostra(image)
-		for i in c:
-			print(i)
+	# if len(docCnt) == 0: # Não encontrou pelo método convencional. Tente heurística do maior (primeiro)
+	# 	c = cnts[0]
+	# 	peri = cv2.arcLength(c, True)
+	# 	approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+	# 	cv2.drawContours(image, [c], -1, blue, 3)
+	# 	Mostra(image)
+	# 	for i in c:
+	# 		print(i)
 
 	# apply a four point perspective transform to both the
 	# original image and grayscale image to obtain a top-down
@@ -285,7 +285,7 @@ def ProcessaImagem(nome):
 				if abs(cx - (x + w // 2)) < avgdX2 and abs(cy - (y + h // 2)) < avgdY2:
 					matrizRespostas[a][b] = total
 
-	print(matrizRespostas)
+	# print(matrizRespostas)
 	resposta = []
 	for (i, l) in enumerate(matrizRespostas):
 		max = np.max(l)
