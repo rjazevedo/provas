@@ -148,7 +148,7 @@ def ProcessaImagem(nome):
 		if len(r) == 1:
 			resposta.append(r[0])
 		elif len(r) > 1:
-			resposta.append('*')
+			resposta.append('+')
 		else:
 			resposta.append('_')
 		
