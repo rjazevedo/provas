@@ -62,6 +62,8 @@ class LinhaProva:
         arquivo = os.path.join(prefixo, self.polo, self.codigo + '-01.csv')
         if os.path.isfile(arquivo):
             notas = list(csv.reader(open(arquivo)))
+            if len(notas) < 4:
+                return []
             return notas
         return []
 
@@ -76,6 +78,9 @@ class Gabarito:
         return self.disciplina + self.prova
         
     def Comentario(self, questao, resposta):
+        if len(self.respostas) < questao:
+            print('Questão fora do intervalo de respostas:', self.disciplina, self.prova, questao)
+            sys.exit(1)
         if self.respostas[questao - 1] == resposta:
             return 'Resposta Correta (gabarito = ' + self.respostas[questao - 1] + ')'
         elif resposta == '_':
