@@ -79,6 +79,9 @@ class Gabarito:
 
     def Verifica(self, respostas):
         if len(respostas) == self.nQuestoes:
+            for linha in respostas:
+                if len(linha) != 2:
+                    return False
             return True
         else:
             return False
