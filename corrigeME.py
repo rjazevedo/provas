@@ -127,8 +127,9 @@ if __name__ == '__main__':
                 #print('Gabarito não encontrado:', p.disciplina, p.prova)
                 continue
             g = gabaritos[token]
-            for [q, r] in respostas:
-                q = int(q)
+            for i in range(0, g.nQuestoes):
+                q = int(respostas[i][0])
+                r = respostas[i][1]
                 notas.append([p.disciplina, p.prova, p.ra, q, g.Nota(q, r), g.Comentario(q, r)])
 
     print('Gravando saída...')
