@@ -132,20 +132,22 @@ if __name__ == '__main__':
     for p in linhasProvas:
         respostas = p.LeNotas(args.arquivos)
         if len(respostas) != 0:
+            token = p.disciplina + p.prova
+            if token not in gabaritos:
+                print('Gabarito não encontrado:', p.disciplina, p.prova)
+                continue
+            g = gabaritos[token]
             if g.Verifica(respostas):
-                token = p.disciplina + p.prova
-                if token not in gabaritos:
-                    print('Gabarito não encontrado:', p.disciplina, p.prova)
-                    continue
-                g = gabaritos[token]
                 for i in range(0, g.nQuestoes):
                     q = int(respostas[i][0])
                     r = respostas[i][1]
                     notas.append([p.disciplina, p.prova, p.ra, q, g.Nota(q, r), g.Comentario(q, r)])
                     quantidade += 1
             else:
-                print('Problema no arquivo com respostas:', p.codigo)
-            
+                print('Divergência de tamanho entre arquivo de respostas e gabarito:', p.codigo)
+        else:
+            print('Problema no arquivo com respostas:', p.codigo)
+
     print(quantidade, 'folhas corrigidas.')
     print('Gravando saída...')
 
