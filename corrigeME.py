@@ -76,6 +76,12 @@ class Gabarito:
 
     def Nome(self):
         return self.disciplina + self.prova
+
+    def Verifica(self, respostas):
+        if len(respostas) == self.nQuestoes:
+            return True
+        else:
+            return False
         
     def Comentario(self, questao, resposta):
         if self.respostas[questao - 1] == resposta:
@@ -119,19 +125,25 @@ if __name__ == '__main__':
         gabaritos[g.Nome()] = g
 
     notas = []
+    quantidade = 0
     for p in linhasProvas:
         respostas = p.LeNotas(args.arquivos)
         if len(respostas) != 0:
-            token = p.disciplina + p.prova
-            if token not in gabaritos:
-                #print('Gabarito não encontrado:', p.disciplina, p.prova)
-                continue
-            g = gabaritos[token]
-            for i in range(0, g.nQuestoes):
-                q = int(respostas[i][0])
-                r = respostas[i][1]
-                notas.append([p.disciplina, p.prova, p.ra, q, g.Nota(q, r), g.Comentario(q, r)])
-
+            if g.Verifica(respostas):
+                token = p.disciplina + p.prova
+                if token not in gabaritos:
+                    print('Gabarito não encontrado:', p.disciplina, p.prova)
+                    continue
+                g = gabaritos[token]
+                for i in range(0, g.nQuestoes):
+                    q = int(respostas[i][0])
+                    r = respostas[i][1]
+                    notas.append([p.disciplina, p.prova, p.ra, q, g.Nota(q, r), g.Comentario(q, r)])
+                    quantidade += 1
+            else:
+                print('Problema no arquivo com respostas:', p.codigo)
+            
+    print(quantidade, 'folhas corrigidas.')
     print('Gravando saída...')
 
     csv.writer(open(os.path.join(args.saida, 'notas.csv'), 'wt')).writerows(notas)
