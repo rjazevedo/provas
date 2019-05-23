@@ -78,9 +78,6 @@ class Gabarito:
         return self.disciplina + self.prova
         
     def Comentario(self, questao, resposta):
-        if len(self.respostas) < questao:
-            print('Questão fora do intervalo de respostas:', self.disciplina, self.prova, questao)
-            sys.exit(1)
         if self.respostas[questao - 1] == resposta:
             return 'Resposta Correta (gabarito = ' + self.respostas[questao - 1] + ')'
         elif resposta == '_':
@@ -91,6 +88,10 @@ class Gabarito:
             return 'Aluno respondeu errado (' + resposta + ') (gabarito = ' + self.respostas[questao - 1] + ')'
 
     def Nota(self, questao, resposta):
+        if self.nQuestoes < questao:
+            print('Questão fora do intervalo de respostas:', self.disciplina, self.prova, questao)
+            sys.exit(1)
+
         if self.respostas[questao - 1] == resposta:
             return 10
         else:
