@@ -15,15 +15,18 @@ import cv2
 import csv
 import sys
 import math
+import os
 # from sklearn.cluster import KMeans
 
 debug = False
 
 def Mostra(imagem):
-	 display = cv2.resize(imagem, (480, 640))
-	 cv2.imshow('imagem', display)
-	 cv2.waitKey(0)
-	 return
+	display = cv2.resize(imagem, (480, 640))
+	cv2.imshow('imagem', display)
+	tecla = cv2.waitKey(0)
+	if (chr(tecla) == 'q'):
+		sys.exit(1)
+	return
 
 def Distancia(p1, p2):
 	return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1])  ** 2)
@@ -83,13 +86,17 @@ def get_contour_precedence(contour, cols):
     origin = cv2.boundingRect(contour)
     return ((origin[1] // tolerance_factor) * tolerance_factor) * cols + origin[0]
 
-def ProcessaImagem(nome):
+def ProcessaImagem(nome, saida):
 	# load the image, convert it to grayscale, blur it
 	# slightly, then find edges
 	image = cv2.imread(nome)
+	# Mostra(image)
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	# Mostra(gray)
 	blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+	# Mostra(blurred)
 	edged = cv2.Canny(blurred, 75, 200)
+	# Mostra(edged)
 
 	blue = (255, 0, 0)
 	red = (0, 0, 255)
@@ -104,8 +111,13 @@ def ProcessaImagem(nome):
 	cnts = [EncontraRetangulo(image, x) for x in cnts]
 	cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
 
+	# if debug:
+	# 	for c in cnts:
+	# 		cv2.drawContours(image, [c], -1, green, 3)
+	# 		Mostra(image)
+
 	if len(cnts) > 0:
-		docCnt = EncontraRetangulo(image, cnts[0])
+		docCnt = cnts[0]
 		if debug:
 			cv2.drawContours(image, [docCnt], -1, blue, 3)
 			Mostra(image)
@@ -284,7 +296,8 @@ def ProcessaImagem(nome):
 				if abs(cx - (x + w // 2)) < avgdX2 and abs(cy - (y + h // 2)) < avgdY2:
 					matrizRespostas[a][b] = total
 
-	# print(matrizRespostas)
+	if debug:
+		print(matrizRespostas)
 	resposta = []
 	for (i, l) in enumerate(matrizRespostas):
 		max = np.max(l)
@@ -297,14 +310,11 @@ def ProcessaImagem(nome):
 					r += chr(j + 65)
 			if len(r) > 1:
 				r = '+'
-		elif avg > 300: # todos muito altos
-			r = '+'
 		else:           # nada preenchido
 			r = '_'
+		# TODO: Existe o caso de todas as questões marcadas com todas as opções que não é tratado.
 
 		resposta.append(r)
-
-	print(resposta)
 
 	# return
 
@@ -366,11 +376,11 @@ def ProcessaImagem(nome):
 	# 	# # draw the outline of the correct answer on the test
 	# 	# cv2.drawContours(paper, [cnts[k]], -1, color, 3)
 
-	saida = csv.writer(open(nome[:-3] + 'csv', 'wt'))
+	saida = csv.writer(open(saida, 'wt'))
 	for i, r in enumerate(resposta):
 		saida.writerow([i + 1, r])
 
-
+	return resposta
 
 if __name__ == '__main__':
 	# construct the argument parse and parse the arguments
@@ -384,6 +394,7 @@ if __name__ == '__main__':
 
 	ap = argparse.ArgumentParser()
 	ap.add_argument("-i", "--image", nargs='+', required=True, help="path to the input image")
+	ap.add_argument("-f", "--force", required=False, action='store_true', help="replace output file if it exists")
 	ap.add_argument("-d", "--debug", required=False, action='store_true', help="debug image algorithm")
 	args = vars(ap.parse_args())
 	
@@ -392,8 +403,9 @@ if __name__ == '__main__':
 
 	quantidade = 0
 	for arquivo in args['image']:
-		print(arquivo)
-		ProcessaImagem(arquivo)
-		quantidade += 1
+		saida = arquivo[:-3] + 'csv'
+		if args['force'] or not os.path.isfile(saida):
+			print(arquivo, ProcessaImagem(arquivo, saida))
+			quantidade += 1
 
 	print(quantidade, 'arquivos processados.')
