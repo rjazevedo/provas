@@ -146,7 +146,7 @@ if __name__ == '__main__':
             else:
                 print('Divergência de tamanho entre arquivo de respostas e gabarito:', p.codigo)
         else:
-            print('Problema no arquivo com respostas:', p.codigo)
+            print('Não achei o arquivo com respostas:', p.codigo)
 
     print(quantidade, 'folhas corrigidas.')
     print('Gravando saída...')
