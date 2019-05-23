@@ -59,7 +59,7 @@ class LinhaProva:
         return self.disciplina + '-' + self.prova
 
     def LeNotas(self, prefixo):
-        arquivo = os.path.join(prefixo, self.codigo + '-01.csv')
+        arquivo = os.path.join(prefixo, self.polo, self.codigo + '-01.csv')
         if os.path.isfile(arquivo):
             notas = list(csv.reader(open(arquivo)))
             return notas
