@@ -80,6 +80,36 @@ def EncontraRetangulo(imagem, docCnt):
 
 	return docCnt
 
+def image_generator(orig):
+    yield(orig)
+    blur_values = (True,False)
+    threshold_values = (False,True)
+    kernel_size_values = (3,5)
+    dilation_values = (0,2,1,0)
+    erosion_values = (0,1,2,3)
+    for z in product(blur_values,threshold_values,kernel_size_values,dilation_values,erosion_values):
+        blur = z[0]
+        threshold = z[1]
+        kernel_size = z[2]
+        dilation = z[3]
+        erosion = z[4]
+        debug("blur={}, threshold={},kernel_size={},dilation={},erosion={}".format(z[0],z[1],z[2],z[3],z[4]))
+        image = orig.copy()
+        if threshold:
+            #thresh_val, thresh_img = cv2.threshold(image, 0, 255, cv2.THRESH_OTSU)
+            #thresh_val, thresh_img = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+            image = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,37,2)
+
+        if blur:
+            image = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
+        if erosion > 0:
+            kernel = np.ones((kernel_size,kernel_size), np.uint8)
+            image = cv2.erode(image, kernel, iterations=erosion)
+        if dilation > 0:
+            kernel = np.ones((kernel_size,kernel_size), np.uint8)
+            image = cv2.dilate(image, kernel, iterations=dilation)
+        #show_image(image,'image.png',2)
+        yield(image)
 
 def get_contour_precedence(contour, cols):
     tolerance_factor = 10
