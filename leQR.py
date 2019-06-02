@@ -81,8 +81,8 @@ def GeraImagens(image):
 
 def Crop(image):
     x = image.shape
-    w = x[0]
-    h = x[1]
+    h = x[0]
+    w = x[1]
     xi = int(0.5 * w)
     yi = 0
     xf = w
@@ -109,6 +109,9 @@ if __name__ == '__main__':
         except RuntimeError:
             continue
         
+        if img is None:
+            continue
+
         achou = False
 
         for image in image_generator(Crop(img)):

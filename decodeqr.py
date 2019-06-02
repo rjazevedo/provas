@@ -85,11 +85,8 @@ def Mostra(imagem):
 
 def Crop(image):
     x = image.shape
-    w = x[0]
-    h = x[1]
-    # w, h = img.shape    
-    # img = img.crop((int(0.6 * w), 0, w, int(0.4 * h)))
-    # warped = warped[xi:xf, yi:yf]
+    h = x[0]
+    w = x[1]
     xi = int(0.5 * w)
     yi = 0
     xf = w
