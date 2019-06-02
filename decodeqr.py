@@ -6,13 +6,47 @@
 import cv2
 import imutils
 from pyzbar.pyzbar import decode
+from itertools import product
 import sys
 import os
 import argparse
 import shutil
+import numpy as np
 
 args = None
 contagem = 0
+
+def image_generator(orig):
+    orig = cv2.cvtColor(orig, cv2.COLOR_BGR2GRAY)
+    yield(orig)
+    blur_values = (True,False)
+    threshold_values = (False,True)
+    kernel_size_values = (3,5)
+    dilation_values = (0,2,1,0)
+    erosion_values = (0,1,2,3)
+    for z in product(blur_values,threshold_values,kernel_size_values,dilation_values,erosion_values):
+        blur = z[0]
+        threshold = z[1]
+        kernel_size = z[2]
+        dilation = z[3]
+        erosion = z[4]
+        # printDebug("blur={}, threshold={},kernel_size={},dilation={},erosion={}".format(z[0],z[1],z[2],z[3],z[4]))
+        image = orig.copy()
+        if threshold:
+            #thresh_val, thresh_img = cv2.threshold(image, 0, 255, cv2.THRESH_OTSU)
+            #thresh_val, thresh_img = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+            image = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,37,2)
+
+        if blur:
+            image = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
+        if erosion > 0:
+            kernel = np.ones((kernel_size,kernel_size), np.uint8)
+            image = cv2.erode(image, kernel, iterations=erosion)
+        if dilation > 0:
+            kernel = np.ones((kernel_size,kernel_size), np.uint8)
+            image = cv2.dilate(image, kernel, iterations=dilation)
+        #show_image(image,'image.png',2)
+        yield(image)
 
 def GeraImagens(image):
     # Tenta a imagem original
@@ -49,8 +83,8 @@ def Mostra(imagem):
         sys.exit(1)
     return
 
-def AchaQR(img):
-    x = img.shape
+def Crop(image):
+    x = image.shape
     w = x[0]
     h = x[1]
     # w, h = img.shape    
@@ -60,7 +94,10 @@ def AchaQR(img):
     yi = 0
     xf = w
     yf = int(0.5 * h)
-    img = img[yi:yf, xi:xf]
+    return image[yi:yf, xi:xf]
+
+
+def AchaQR(img):
     # Mostra(img)
     qr = decode(img)
     if len(qr) == 1:
@@ -77,20 +114,45 @@ def DecodificaArquivo(arquivo, destino):
     if not os.path.isfile(arquivo):
         return False
 
-    image = cv2.imread(arquivo)
+    try:
+        image = cv2.imread(arquivo)
+    except RuntimeError:
+        return False
+
     # i = 0
-    for img in GeraImagens(image):
-        # print(i)
-        # i += 1
+    if image is None:
+        return False
+
+    for img in image_generator(Crop(image)):
         qr = AchaQR(img)
-        if qr != '':
+        if len(qr) > 20:
             break
 
-    # Testa a imagem binarizada
-    # if qr == '': 
-    #     qr = AchaQR(Binariza(img))
-
     # Testa as 3 rotações possíveis caso não tenha achado ainda
+    if len(qr) < 20:
+        rotated = imutils.rotate_bound(image, 90)
+        for img in image_generator(Crop(rotated)):
+            qr = AchaQR(img)
+            if len(qr) > 20:
+                image = rotated
+                break
+
+    if len(qr) < 20:
+        rotated = imutils.rotate_bound(image, 180)
+        for img in image_generator(Crop(rotated)):
+            qr = AchaQR(img)
+            if len(qr) > 20:
+                image = rotated
+                break
+
+    if len(qr) < 20:
+        rotated = imutils.rotate_bound(image, 270)
+        for img in image_generator(Crop(rotated)):
+            qr = AchaQR(img)
+            if len(qr) > 20:
+                image = rotated
+                break
+
     # if qr == '':
     #     for _ in range(0, 3):
     #         img = img.rotate(90, expand = 1)
@@ -101,7 +163,7 @@ def DecodificaArquivo(arquivo, destino):
     if qr != '':
         nomeArquivo = os.path.join(destino, os.path.basename(str(qr)[2:-1]) + '.png')
         if nomeArquivo[0:4] != 'http':
-            cv2.imwrite(nomeArquivo, img)
+            cv2.imwrite(nomeArquivo, image)
         os.remove(arquivo)
         return True
 
