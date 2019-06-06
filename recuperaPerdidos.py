@@ -27,19 +27,20 @@ def Arquivos2Dict(lista):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Recupera os arquivos perdidos da pasta de snapshot que não foram lidos automaticamente e que estão nomeados com o padrão correto.')
     parser.add_argument('-e', '--entrada', type=str, required=True, help='Pasta de entrada (snapshot)')
-    parser.add_argument('-p', '--provas', type=str, required=True, help='Arquivo informações sobre as provas')
-    parser.add_argument('-s', '--saida', type=str, required=True, help='Pasta de saida (provas)')
+    parser.add_argument('-d', '--dados', type=str, required=True, help='Arquivo informações sobre as provas')
+    parser.add_argument('-s', '--saida', type=str, required=True, help='Pasta de provas (saida)')
     parser.add_argument('-t', '--teste', action='store_true', required=False, help='Testa a execução (não executa nada)')
 
     args = parser.parse_args()
 
     arquivos = BuscaArquivos(args.entrada, recursivo = True, tipo = '.png')
     entrada = Arquivos2Dict(arquivos)
+    print(len(arquivos), 'arquivos a processar')
 
-    arquivos = BuscaArquivos(args.entrada, recursivo = True, tipo = '.png')
+    arquivos = BuscaArquivos(args.saida, recursivo = True, tipo = '.png')
     saida = Arquivos2Dict(arquivos)
 
-    provas = csv.reader(open(args.provas))
+    provas = csv.reader(open(args.dados))
     next(provas)
     provas = [LinhaProva(a) for a in provas]
 
@@ -47,10 +48,10 @@ if __name__ == '__main__':
     for p in provas:
         for folha in p.idPaginas():
             # Folha não está na pasta de provas mas tem um arquivo com o nome correto na pasta de entrada
-            if not folha in provas and folha in entrada:
+            if folha in entrada and not folha in saida:
                 contagem += 1
-                print(entrada[folha], '==>', args.provas)
+                print(entrada[folha], '==>', args.saida)
                 if not args.teste:
-                    shutil.copyfile(entrada[folha], args.provas)
+                    shutil.copyfile(entrada[folha], args.saida)
 
     print(contagem, 'arquivos encontrados')
