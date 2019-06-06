@@ -52,6 +52,6 @@ if __name__ == '__main__':
                 contagem += 1
                 print(entrada[folha], '==>', args.saida)
                 if not args.teste:
-                    shutil.copyfile(entrada[folha], args.saida)
+                    shutil.copyfile(entrada[folha], os.path.join(args.saida, folha + '.png'))
 
     print(contagem, 'arquivos encontrados')
