@@ -7,17 +7,8 @@ import os
 import argparse
 import csv
 import sys
+from utils import BuscaArquivos
 
-def BuscaArquivos(p, recursivo = False, tipo = ''):
-    resposta = []
-    for arquivo in os.scandir(p):
-        if not arquivo.name.startswith('.') and arquivo.name.endswith(tipo):
-            if arquivo.is_file():
-                resposta.append(os.path.join(p, arquivo.name))
-        elif arquivo.is_dir() and recursivo:
-            resposta.extend(BuscaArquivos(os.path.join(p, arquivo.name), recursivo=recursivo, tipo=tipo))
-
-    return resposta
 
 def Compara(arquivoCSV, arquivoTXT):
     respostaCSV = list(csv.reader(open(arquivoCSV)))

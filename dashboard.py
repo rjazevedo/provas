@@ -7,68 +7,7 @@ import argparse
 import os
 import csv
 import math
-
-def DataInvertida(dataStr):
-    return dataStr[6:10] + dataStr[3:5] + dataStr[0:2]
-
-
-class Aluno:
-    def __init__(self, campos):
-        self.nome = campos[0]
-        self.ra = campos[1]
-        self.polo = campos[2]
-        self.nomePolo = campos[3]
-        self.data = campos[4]
-        self.curso = campos[5]
-        self.turma = campos[6]
-        self.bimestre = campos[7]
-        self.disciplina = campos[8]
-        self.nomeDisciplina = campos[9]
-        self.prova = campos[10]
-        self.questoesObjetivas = int(campos[11])
-        self.folhasDissertativas = int(campos[12])
-        self.dataStr = DataInvertida(self.data)
-        self.codigo = ''
-        self.totalFolhas = self.folhasDissertativas
-        if self.questoesObjetivas != 0:
-            self.totalFolhas += 1
-        return
-
-    def GeraCodigo(self):
-        self.codigo = self.dataStr + '-' + \
-                      self.polo + '-' + self.disciplina + '-' + \
-                      self.prova + '-' + self.ra
-
-        return self.codigo
-
-    def LabelProva(self):
-        return self.dataStr + '-' + self.polo + '-' + self.disciplina + '-' + self.prova
-
-    def OrdemProva(self):
-        return self.nomePolo + '-'+ self.data + '-' + self.disciplina + '-' + self.prova
-
-    def Esvazia(self, ra):
-        self.nome = '__________________________________________________'
-        self.curso = '_________________________'
-        self.turma = '_______________'
-        self.bimestre = '___'
-        self.ra = ra
-        self.GeraCodigo()
-        self.ra = '________'
-        return
-
-
-
-def BuscaArquivos(p):
-    resposta = []
-    for arquivo in os.scandir(p):
-        if not arquivo.name.startswith('.'):
-            if arquivo.is_file():
-                resposta.append(arquivo.name)
-            elif arquivo.is_dir():
-                resposta.extend(BuscaArquivos(os.path.join(p, arquivo.name)))
-
-    return resposta
+from utils import Aluno, BuscaArquivos
 
 
 def DashboardProva(pasta, alunos, arquivos):
