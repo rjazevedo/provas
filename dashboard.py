@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    listaArquivos = BuscaArquivos(args.entrada, recursivo=True, tipo='.png')
+    listaArquivos = BuscaArquivos(args.entrada, recursivo=True, tipo='.png', nomeCompleto=False)
     print(len(listaArquivos), 'arquivos considerados.')
 
     entrada = csv.reader(open(args.provas))
