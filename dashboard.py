@@ -7,7 +7,7 @@ import argparse
 import os
 import csv
 import math
-from utils import Aluno, BuscaArquivos
+from utils import LinhaProva, BuscaArquivos
 
 
 def DashboardProva(pasta, alunos, arquivos):
@@ -110,11 +110,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    listaArquivos = BuscaArquivos(args.entrada)
+    listaArquivos = BuscaArquivos(args.entrada, recursivo=True, tipo='.png')
+    print(len(listaArquivos), 'arquivos considerados.')
 
     entrada = csv.reader(open(args.provas))
     next(entrada)
-    alunos = [Aluno(a) for a in entrada]
+    alunos = [LinhaProva(a) for a in entrada]
+    print(len(alunos), ' alunos considerados.')
 
     provas = {}
     for aluno in alunos:
