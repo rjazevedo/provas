@@ -93,7 +93,7 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--entrada', type=str, required=True, help='Arquivo de entrada com a descrição das provas.csv')
     parser.add_argument('-b', '--basecorrecoes', type=str, required=False, help='Arquivo base das correções já gerado anteriormente')
     parser.add_argument('-c', '--corretores', type=str, required=True, help='Arquivos com mapeamento de corretores por disciplinas')
-    parser.add_argument('-a', '--arquivos', type=str, required=True, help='Pasta dos arquivos de provas')
+    parser.add_argument('-a', '--arquivos', type=str, required=True, help='Pasta dos arquivos de provas (comece com SGA)')
     parser.add_argument('-g', '--guias', type=str, required=True, help='Pasta dos arquivos dos guias de correção')
     parser.add_argument('-s', '--saida', type=str, required=True, help='Pasta de saida')
 

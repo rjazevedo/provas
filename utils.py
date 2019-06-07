@@ -19,6 +19,11 @@ def BuscaArquivos(p, recursivo = False, tipo = '', nomeCompleto = True):
 
     return resposta
 
+def Arquivos2Dict(lista):
+    d = {}
+    for arquivo in lista:
+        d[os.path.basename(arquivo)[:-4]] = arquivo
+    return d
 
 def DataInvertida(dataStr):
     return dataStr[6:10] + dataStr[3:5] + dataStr[0:2]

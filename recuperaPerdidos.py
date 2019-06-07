@@ -7,7 +7,7 @@ import os
 import argparse
 import csv
 import sys
-from utils import BuscaArquivos, LinhaProva
+from utils import BuscaArquivos, LinhaProva, Arquivos2Dict
 import shutil
 
 def QuebraNome(nome):
@@ -16,13 +16,6 @@ def QuebraNome(nome):
         return [campos[1], campos[2], campos[3], campos[4]]
     else:
         return ['', '', '', '']
-
-def Arquivos2Dict(lista):
-    d = {}
-    for arquivo in lista:
-        d[os.path.basename(arquivo)[:-4]] = arquivo
-
-    return d
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Recupera os arquivos perdidos da pasta de snapshot que não foram lidos automaticamente e que estão nomeados com o padrão correto.')
