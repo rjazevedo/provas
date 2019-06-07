@@ -13,7 +13,7 @@ from utils import BuscaArquivos
 def QuebraNome(nome):
     campos = os.path.basename(nome).split('-')
     if len(campos) == 6:
-        return [campos[1], campos[2], campos[3], campos[4]]
+        return campos
     else:
         return ['', '', '', '']
 
