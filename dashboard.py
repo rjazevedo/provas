@@ -29,7 +29,7 @@ def DashboardProva(pasta, alunos, arquivos):
     saida.write('<tr><th>RA</th><th>Nome</th><th colspan="5">Folhas</th></tr>\n')
     for aluno in alunos:
         totalAlunos += 1
-        saida.write('<tr><td>' + aluno.ra + '</td><td>' + aluno.nome + '</td>')
+        saida.write('<tr><td>' + aluno.ra + '</td><td>' + aluno.nomeAluno + '</td>')
         folhas = 0
         for i in range(1, aluno.totalFolhas + 1):
             arquivo = aluno.codigo + '-' + '{:02d}'.format(i) + '.png'
@@ -54,11 +54,11 @@ def DashboardProva(pasta, alunos, arquivos):
     return (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes)
 
 
-def GeraDashboard(pasta, provas, arquivos):
+def GeraDashboard(pasta, provas, arquivos, base):
 
     saida = open(os.path.join(pasta, 'index.html'), 'wt')
-    header = open('header.html').read() 
-    footer = open('footer.html').read()
+    header = open(os.path.join(base, 'header.html')).read() 
+    footer = open(os.path.join(base, 'footer.html')).read()
     saida.write(header)
     saida.write('<thead><tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>Ocorrência</th><th>Presença</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr></thead><tbody>\n')
     for p in sorted(provas.keys()):
@@ -129,4 +129,4 @@ if __name__ == '__main__':
         else:
             provas[aluno.OrdemProva()] = [aluno]
 
-    GeraDashboard(args.saida, provas, listaArquivos)
+    GeraDashboard(args.saida, provas, listaArquivos, base)
