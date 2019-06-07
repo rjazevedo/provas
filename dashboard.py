@@ -7,6 +7,7 @@ import argparse
 import os
 import csv
 import math
+import sys
 from utils import LinhaProva, BuscaArquivos
 
 
@@ -117,6 +118,8 @@ if __name__ == '__main__':
     next(entrada)
     alunos = [LinhaProva(a) for a in entrada]
     print(len(alunos), ' alunos considerados.')
+
+    base = os.path.dirname(sys.argv[0])
 
     provas = {}
     for aluno in alunos:

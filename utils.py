@@ -62,6 +62,23 @@ class LinhaProva:
 
         return resposta
 
+    def LabelProva(self):
+        return self.dataStr + '-' + self.polo + '-' + self.disciplina + '-' + self.prova
+
+    def OrdemProva(self):
+        return self.nomePolo + '-'+ self.data + '-' + self.disciplina + '-' + self.prova
+
+    def Esvazia(self, ra):
+        self.nome = '__________________________________________________'
+        self.curso = '_________________________'
+        self.turma = '_______________'
+        self.bimestre = '___'
+        self.ra = ra
+        self.GeraCodigo()
+        self.ra = '________'
+        return
+
+
 
 class Aluno:
     def __init__(self, campos):
