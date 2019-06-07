@@ -36,9 +36,11 @@ if __name__ == '__main__':
             else:
                 questoes = ' 4 '
             
-            print(CMD, questoes, entrada[folha])
-            contagem += 1
-            #os.system(CMD + questoes + entrada[folha])
-
+            if folha in entrada:
+                if args.teste:
+                    print(CMD, questoes, entrada[folha])
+                else:
+                    os.system(CMD + questoes + entrada[folha])
+                contagem += 1
 
     print(contagem, 'arquivos processados')
