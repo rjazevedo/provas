@@ -129,12 +129,16 @@ if __name__ == '__main__':
 
     notas = []
     quantidade = 0
+    semGabarito = 0
+    semResposta = 0
+    divergencia = 0
     for p in linhasProvas:
         respostas = p.LeNotas(args.arquivos)
         if len(respostas) != 0:
             token = p.disciplina + p.prova
             if token not in gabaritos:
                 print('Gabarito não encontrado:', p.disciplina, p.prova)
+                semGabarito += 1
                 continue
             g = gabaritos[token]
             if g.Verifica(respostas):
@@ -145,13 +149,18 @@ if __name__ == '__main__':
                     quantidade += 1
             else:
                 print('Divergência de tamanho entre arquivo de respostas e gabarito:', p.codigo)
+                divergencia += 1
         else:
             print('Não achei o arquivo com respostas:', p.codigo)
+            semResposta += 1
 
     print(quantidade, 'folhas corrigidas.')
+    print(semGabarito, 'provas sem gabarito.')
+    print(semResposta, 'sem arquivo de resposta.')
+    print(divergencia, 'divergências entre tamanho de arquivo.')
     print('Gravando saída...')
 
-    csv.writer(open(os.path.join(args.saida, 'notas.csv'), 'wt')).writerows(notas)
+    csv.writer(open('notas.csv', 'wt')).writerows(notas)
 
 
 
