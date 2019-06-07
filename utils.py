@@ -13,7 +13,7 @@ def BuscaArquivos(p, recursivo = False, tipo = '', nomeCompleto = True):
                 if nomeCompleto:
                     resposta.append(os.path.join(p, arquivo.name))
                 else:
-                    resposta.append(arquivo.nome)
+                    resposta.append(arquivo.name)
         elif arquivo.is_dir() and recursivo:
             resposta.extend(BuscaArquivos(os.path.join(p, arquivo.name), recursivo=recursivo, tipo=tipo, nomeCompleto=nomeCompleto))
 
