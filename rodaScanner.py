@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     arquivos = BuscaArquivos(args.provas, recursivo = True, tipo = '.png')
     entrada = Arquivos2Dict(arquivos)
-    print(len(arquivos), 'arquivos a processar')
+    print(len(arquivos), 'arquivos a verificar')
 
     provas = csv.reader(open(args.entrada))
     next(provas)
@@ -37,7 +37,7 @@ if __name__ == '__main__':
                 questoes = ' 4 '
             
             # A folha .png tem que existir na pasta de entrada mas o arquivo .csv não pode existir
-            if folha in entrada and not os.path.isfile(entrada[folha][:-1] + '.csv'):
+            if folha in entrada and not os.path.isfile(entrada[folha][:-4] + '.csv'):
                 if args.teste:
                     print(CMD, questoes, entrada[folha])
                 else:
