@@ -9,7 +9,7 @@ import sys
 from utils import BuscaArquivos, LinhaProva, Arquivos2Dict
 import shutil
 
-CMD='/home/provas/folhasProvas/scanner -c '
+CMD='/home/provas/folhasProvas/scanner/scanner -c '
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Roda o scanner nos arquivos de respostas de múltipla escolha.')
