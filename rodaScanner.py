@@ -36,7 +36,8 @@ if __name__ == '__main__':
             else:
                 questoes = ' 4 '
             
-            if folha in entrada:
+            # A folha .png tem que existir na pasta de entrada mas o arquivo .csv não pode existir
+            if folha in entrada and not os.path.isfile(entrada[folha][:-1] + '.csv'):
                 if args.teste:
                     print(CMD, questoes, entrada[folha])
                 else:
