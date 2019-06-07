@@ -62,6 +62,7 @@ def GeraDashboard(pasta, provas, arquivos, base):
     saida.write(header)
     saida.write('<thead><tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>Ocorrência</th><th>Presença</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr></thead><tbody>\n')
     for p in sorted(provas.keys()):
+        print(p, end='\r')
         prova = provas[p]
         (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos)
         folhas = math.ceil(len(prova) / 20)
@@ -97,7 +98,6 @@ def GeraDashboard(pasta, provas, arquivos, base):
         else:
             saida.write('<td class="red">' + str(folhasFaltantes) + '</td></tr>\n')
 
-
     saida.write(footer)
     saida.close()
     return
@@ -117,7 +117,7 @@ if __name__ == '__main__':
     entrada = csv.reader(open(args.provas))
     next(entrada)
     alunos = [LinhaProva(a) for a in entrada]
-    print(len(alunos), ' alunos considerados.')
+    print(len(alunos), 'provas consideradas.')
 
     base = os.path.dirname(sys.argv[0])
 
