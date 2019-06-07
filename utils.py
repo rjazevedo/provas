@@ -39,6 +39,9 @@ class LinhaProva:
         self.novo = False
         self.codigo = ''
         self.GeraCodigo()
+        self.totalFolhas = self.folhasDissertativas
+        if self.questoesObjetivas != 0:
+            self.totalFolhas += 1
         return
 
     def GeraCodigo(self):
