@@ -31,17 +31,13 @@ if __name__ == '__main__':
     for p in provas:
         if p.questoesObjetivas != 0:
             folha = p.idPaginas()[0]
-            if 'LIN' in folha:
-                questoes = ' 6 '
-            else:
-                questoes = ' 4 '
-            
+
             # A folha .png tem que existir na pasta de entrada mas o arquivo .csv não pode existir
             if folha in entrada and not os.path.isfile(entrada[folha][:-4] + '.csv'):
                 if args.teste:
-                    print(CMD, questoes, entrada[folha])
+                    print(CMD,  str(p.questoesObjetivas), entrada[folha])
                 else:
-                    os.system(CMD + questoes + entrada[folha])
+                    os.system(CMD + ' ' + str(p.questoesObjetivas) + ' ' + entrada[folha])
                 contagem += 1
 
     print(contagem, 'arquivos processados')

@@ -160,7 +160,7 @@ if __name__ == '__main__':
     print(divergencia, 'divergências entre tamanho de arquivo.')
     print('Gravando saída...')
 
-    csv.writer(open('notas.csv', 'wt')).writerows(notas)
+    csv.writer(open(args.saida, 'wt')).writerows(notas)
 
 
 
