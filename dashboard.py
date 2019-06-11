@@ -56,15 +56,22 @@ def DashboardProva(pasta, alunos, arquivos):
 
 def GeraDashboard(pasta, provas, arquivos, base):
 
+    resumoPolos = {}
     saida = open(os.path.join(pasta, 'index.html'), 'wt')
     header = open(os.path.join(base, 'header.html')).read() 
     footer = open(os.path.join(base, 'footer.html')).read()
     saida.write(header)
+    saida.write('<h2><a href="resumo.html">Resumo por polo</a></h2>\n')
     saida.write('<thead><tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>Ocorrência</th><th>Presença</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr></thead><tbody>\n')
     for p in sorted(provas.keys()):
         print(p, ' ' * 30, end='\r')
         prova = provas[p]
         (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos)
+        if not prova[0].nomePolo in resumoPolos:
+            resumoPolos[prova[0].nomePolo] = [totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes]
+        else:
+            resumoPolos[prova[0].nomePolo].append([totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes])
+
         folhas = math.ceil(len(prova) / 20)
         saida.write('<tr><td>' + prova[0].polo + '</td><td>' + prova[0].nomePolo + '</td><td>' + prova[0].data + '</td><td><a href="' + nomeArquivo + '">' + prova[0].disciplina + '</a></td><td>' + prova[0].nomeDisciplina + '</td>')
 
@@ -100,6 +107,39 @@ def GeraDashboard(pasta, provas, arquivos, base):
 
     saida.write(footer)
     saida.close()
+
+    resumo = open(os.path.join(pasta, 'resumo.html'), 'wt')
+    resumo.write(header)
+    resumo.write('<thead><tr><th>Polo</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr></thead><tbody>\n')
+    for (polo, provas) in enumerate(resumoPolos):
+        somaAlunos = somaCompletos = somaIncompletos = somaAlunosFaltantes = somaFolhasFaltantes = 0
+        for [totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes] in provas:
+            somaAlunos += totalAlunos
+            somaCompletos += alunosCompletos
+            somaIncompletos += alunosIncompletos
+            somaAlunosFaltantes += alunosFaltantes
+            somaFolhasFaltantes += folhasFaltantes
+
+        resumo.write('<tr><td>' + polo + '</td><td>' + str(somaAlunos) + '</td><td>' + str(somaCompletos) + '</td>')
+
+        if somaIncompletos != 0:
+            resumo.write('<td class="red">' + str(somaIncompletos) + '</td>')
+        else:
+            resumo.write('<td>0</td>')
+
+        if somaAlunosFaltantes != 0:
+            resumo.write('<td class="red">' + str(somaAlunosFaltantes) + '</td>')
+        else:
+            resumo.write('<td>0</td>')
+
+        if somaFolhasFaltantes != 0:
+            resumo.write('<td class="red">' + str(somaFolhasFaltantes) + '</td></tr>\n')
+        else:
+            resumo.write('<td></td></tr>\n')
+
+    resumo.write(footer)
+    resumo.close()
+
     return
 
 
