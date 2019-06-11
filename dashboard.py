@@ -65,6 +65,8 @@ def GeraDashboard(pasta, provas, arquivos, base):
     saida.write('<thead><tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>Ocorrência</th><th>Presença</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr></thead><tbody>\n')
     for p in sorted(provas.keys()):
         print(p, ' ' * 30, end='\r')
+        if p[0] > 'B':
+            break
         prova = provas[p]
         (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos)
         if not prova[0].nomePolo in resumoPolos:
@@ -111,7 +113,8 @@ def GeraDashboard(pasta, provas, arquivos, base):
     resumo = open(os.path.join(pasta, 'resumo.html'), 'wt')
     resumo.write(header)
     resumo.write('<thead><tr><th>Polo</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr></thead><tbody>\n')
-    for (polo, provas) in enumerate(resumoPolos):
+    for polo in sorted(resumoPolos.keys()):
+        provas = resumoPolos[polo]
         somaAlunos = somaCompletos = somaIncompletos = somaAlunosFaltantes = somaFolhasFaltantes = 0
         for [totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes] in provas:
             somaAlunos += totalAlunos
