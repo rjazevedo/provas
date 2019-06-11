@@ -65,7 +65,7 @@ def GeraDashboard(pasta, provas, arquivos, base):
     saida.write('<thead><tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>Ocorrência</th><th>Presença</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr></thead><tbody>\n')
     for p in sorted(provas.keys()):
         print(p, ' ' * 30, end='\r')
-        if p[0] > 'AG':
+        if p[0] > 'A':
             break
         prova = provas[p]
         (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos)
