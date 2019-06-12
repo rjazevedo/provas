@@ -90,6 +90,7 @@ def GeraDashboard(pasta, provas, arquivos, base):
 
         saida.write('<td>' + str(totalAlunos) + '</td>')
         saida.write('<td>' + str(alunosCompletos) + '</td>')
+
         if alunosIncompletos == 0:
             saida.write('<td>' + str(alunosIncompletos) + '</td>')
         else:
@@ -136,7 +137,7 @@ def GeraDashboard(pasta, provas, arquivos, base):
         if somaFolhasFaltantes != 0:
             resumo.write('<td class="red">' + str(somaFolhasFaltantes) + '</td></tr>\n')
         else:
-            resumo.write('<td></td></tr>\n')
+            resumo.write('<td>0</td></tr>\n')
 
     resumo.write(footer)
     resumo.close()

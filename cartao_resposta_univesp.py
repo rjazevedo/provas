@@ -450,6 +450,12 @@ def ListaPresencaBase(myCanvas, pagina, totalPaginas):
     myCanvas.setFont('Helvetica', 10)
     myCanvas.drawString(marginright - 2.6 * cm, 1.2 * cm, 'Página {} de {}'.format(pagina, totalPaginas))
 
+    for i in range(1, 21):
+        myCanvas.setFillColorRGB(0.2, 0.2, 0.2)
+        myCanvas.circle(2.7 * cm, (i + 1.5) * cm, tradius, stroke=1)
+        myCanvas.circle(4.2 * cm, (i + 1.5) * cm, tradius, stroke=1)
+        myCanvas.setFillColorRGB(0, 0, 0)
+
     return
 
 def IdentificaListaPresenca(myCanvas, disciplina, pagina):
@@ -488,10 +494,10 @@ def PreencheListaPresenca(myCanvas, alunos):
     myCanvas.setFont('Helvetica-Bold', 10)
 
     while len(alunos) > 0 and i > 0:
-        myCanvas.setFillColorRGB(0.2, 0.2, 0.2)
-        myCanvas.circle(2.7 * cm, (i + 1.5) * cm, tradius, stroke=1)
-        myCanvas.circle(4.2 * cm, (i + 1.5) * cm, tradius, stroke=1)
-        myCanvas.setFillColorRGB(0, 0, 0)
+        # myCanvas.setFillColorRGB(0.2, 0.2, 0.2)
+        # myCanvas.circle(2.7 * cm, (i + 1.5) * cm, tradius, stroke=1)
+        # myCanvas.circle(4.2 * cm, (i + 1.5) * cm, tradius, stroke=1)
+        # myCanvas.setFillColorRGB(0, 0, 0)
 
         myCanvas.drawString(marginleft + 3 * cm, (i + 1.4) * cm, alunos[0].nome)
         myCanvas.drawString(marginleft + 10.1 * cm, (i + 1.4) * cm, alunos[0].ra)
