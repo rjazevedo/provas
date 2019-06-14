@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
                                 for linha in listaPresenca:
                                     aluno = presencas[p].pop(0)
-                                    if linha[2] == 'Ausente':
+                                    if linha[1] == 'Ausente':
                                         c = campos.copy()
                                         c.append(aluno.ra)
                                         ausentes.append(c)
