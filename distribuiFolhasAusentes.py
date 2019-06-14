@@ -41,12 +41,17 @@ if __name__ == '__main__':
         if  prova.codigo in ausentes:
             for folha in prova.idPaginas():
                 if not folha in entrada:
-                    folha += '.png'
                     if args.teste:
                         print(folha)
                     else:
-                        shutil.copyfile(folhaBranca, os.path.join(args.provas, folha))
+                        shutil.copyfile(folhaBranca, os.path.join(args.provas, folha + '.png'))
                     contagem += 1
+
+            if prova.questoesObjetivas != 0:
+                nomeArquivo = prova.codigo + '-01.csv'
+                if not os.path.isfile(nomeArquivo):
+                    respostasBranco = [[x, '_'] for x in range(1, prova.questoesObjetivas + 1)]
+                    csv.writer(open(nomeArquivo, 'wt')).writerows(respostasBranco)
 
     print(contagem, 'arquivos em branco distribuidos')
 
