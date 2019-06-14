@@ -11,11 +11,11 @@ import sys
 from utils import LinhaProva, BuscaArquivos
 
 
-def DashboardProva(pasta, alunos, arquivos):
+def DashboardProva(pasta, alunos, arquivos, base):
     nomeArquivo = alunos[0].LabelProva() + '.html'
     saida = open(os.path.join(pasta, nomeArquivo), 'wt')
-    header = open('header.html').read() 
-    footer = open('footer.html').read()
+    header = open(os.path.join(base, 'header.html')).read() 
+    footer = open(os.path.join(base, 'footer.html')).read()
     saida.write(header)
 
     saida.write('<div class="row"><h2>' + alunos[0].LabelProva() + '</h2></div>')
@@ -66,7 +66,7 @@ def GeraDashboard(pasta, provas, arquivos, base):
     for p in sorted(provas.keys()):
         print(p, ' ' * 30, end='\r')
         prova = provas[p]
-        (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos)
+        (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos, base)
         if not prova[0].nomePolo in resumoPolos:
             resumoPolos[prova[0].nomePolo] = [[totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes]]
         else:
