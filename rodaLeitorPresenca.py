@@ -65,7 +65,6 @@ if __name__ == '__main__':
 
             if arquivo in entrada:
                 txtFile = os.path.join(os.path.dirname(entrada[arquivo]), 'result', os.path.basename(entrada[arquivo][:-4]) + '.txt')
-                print('*', txtFile, '*')
                 if os.path.isfile(entrada[arquivo]):
                     if args.forca or not os.path.isfile(txtFile):
                         if args.teste:
@@ -78,7 +77,7 @@ if __name__ == '__main__':
 
                                 for linha in listaPresenca:
                                     aluno = presencas[p].pop(0)
-                                    if linha[1] == 'Ausente':
+                                    if len(linha) > 1 and linha[1] == 'Ausente':
                                         c = campos.copy()
                                         c.append(aluno[0])
                                         ausentes.append(c)
