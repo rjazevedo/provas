@@ -50,8 +50,11 @@ if __name__ == '__main__':
             if prova.questoesObjetivas != 0:
                 nomeArquivo = prova.codigo + '-01.csv'
                 if not os.path.isfile(nomeArquivo):
-                    respostasBranco = [[x, '_'] for x in range(1, prova.questoesObjetivas + 1)]
-                    csv.writer(open(nomeArquivo, 'wt')).writerows(respostasBranco)
+                    if args.teste:
+                        print(nomeArquivo)
+                    else:
+                        respostasBranco = [[x, '_'] for x in range(1, prova.questoesObjetivas + 1)]
+                        csv.writer(open(nomeArquivo, 'wt')).writerows(respostasBranco)
 
     print(contagem, 'arquivos em branco distribuidos')
 
