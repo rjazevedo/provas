@@ -18,6 +18,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    print('Lendo entrada...')
+
     pngs = BuscaArquivos(args.provas, recursivo = True, tipo = '.png')
     pngs = Arquivos2Dict(pngs)
     print(len(pngs), 'arquivos de folhas presentes (.PNG).')
@@ -29,7 +31,7 @@ if __name__ == '__main__':
     provas = csv.reader(open(args.entrada))
     next(provas)
     provas = [LinhaProva(a) for a in provas]
-    print(len(provas), 'provas foram geradas e aplicadas.')
+    print(len(provas), 'provas foram geradas para aplicação.')
 
     ausentes = csv.reader(open(args.ausentes))
     ausentes = ['-'.join(x) for x in ausentes]
@@ -39,13 +41,13 @@ if __name__ == '__main__':
     provasIncompletas = {}
     polosPendentes = {}
 
+    print('Processando dados...')
     for prova in provas:
-        if  prova.codigo in ausentes:
-            for folha in prova.idPaginas():
-                if not folha in pngs:
-                    folhasFaltantes += 1
-                    provasIncompletas[prova.codigo] = True
-                    polosPendentes[prova.polo] = True
+        for folha in prova.idPaginas():
+            if not folha in pngs:
+                folhasFaltantes += 1
+                provasIncompletas[prova.codigo] = True
+                polosPendentes[prova.polo] = True
 
     print(folhasFaltantes, 'folhas faltantes.')
     print(len(provasIncompletas), 'provas incompletas.')
