@@ -38,8 +38,10 @@ if __name__ == '__main__':
     contagem = 0
 
     for prova in provas:
+        print(prova.codigo, prova.codigo in ausentes)
         if  prova.codigo in ausentes:
             for folha in prova.idPaginas():
+                print(folha, folha in entrada)
                 if not folha in entrada:
                     folha += '.png'
                     shutil.copyfile(folhaBranca, os.path.join(args.provas, folha))
