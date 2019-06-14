@@ -48,7 +48,7 @@ if __name__ == '__main__':
                     contagem += 1
 
             if prova.questoesObjetivas != 0:
-                nomeArquivo = prova.codigo + '-01.csv'
+                nomeArquivo = os.path.join(args.provas, format(prova.polo, '04d'), prova.codigo + '-01.csv')
                 if not os.path.isfile(nomeArquivo):
                     if args.teste:
                         print(nomeArquivo)
