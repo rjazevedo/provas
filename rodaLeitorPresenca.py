@@ -80,7 +80,7 @@ if __name__ == '__main__':
                                     aluno = presencas[p].pop(0)
                                     if linha[1] == 'Ausente':
                                         c = campos.copy()
-                                        c.append(aluno.ra)
+                                        c.append(aluno[0])
                                         ausentes.append(c)
 
                         contagem += 1
