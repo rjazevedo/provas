@@ -9,11 +9,20 @@ import sys
 from utils import BuscaArquivos, LinhaProva, Arquivos2Dict
 import shutil
 
+def QuebraNome(nome):
+    campos = os.path.basename(nome).split('-')
+    if len(campos) == 6:
+        return campos
+    else:
+        return ['', '', '', '']
+
+
 CMD='/home/provas/folhasProvas/presence/presence -c '
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Roda o scanner nos arquivos de respostas de múltipla escolha.')
     parser.add_argument('-e', '--entrada', type=str, required=True, help='Arquivo de entrada com descrição de todas as provas (.csv)')
+    parser.add_argument('-a', '--ausentes', type=str, required=True, help='Arquivo com as informações dos ausentes (.csv)')
     parser.add_argument('-p', '--provas', type=str, required=True, help='Pasta com as provas')
     parser.add_argument('-t', '--teste', action='store_true', required=False, help='Testa a execução (não executa nada)')
     parser.add_argument('-f', '--forca', action='store_true', required=False, help='Força a execução mesmo já tendo executado antes')
@@ -34,9 +43,10 @@ if __name__ == '__main__':
         if not labelProva in presencas:
             presencas[labelProva] = [[p.ra, p.nomeAluno]]
         else:
-            presencas[labelProva].append([p.ra, p. nomeAluno])
+            presencas[labelProva].append([p.ra, p.nomeAluno])
 
     contagem = 0
+    ausentes = []
     for p in presencas.keys():
         alunos = len(presencas[p])
         folha = 1
@@ -53,12 +63,26 @@ if __name__ == '__main__':
             arquivo = p + '-presenca-' + format(pagina, '02d')
             pagina += 1
 
+            txtFile = os.path.join(os.path.basename(entrada[arquivo]), 'result', entrada[arquivo][:-4] + '.txt')
             if arquivo in entrada and os.path.isfile(entrada[arquivo]):
-                if args.forca or not os.path.isfile(os.path.join(os.path.basename(entrada[arquivo]), 'result', entrada[arquivo][:-4] + '.txt')):
+                if args.forca or not os.path.isfile(txtFile):
                     if args.teste:
                         print(CMD,  quantidade, entrada[arquivo])
                     else:
                         os.system(CMD + ' ' + str(quantidade) + ' ' + entrada[arquivo])
+                        if os.path.isfile(txtFile):
+                            listaPresenca = [x[:-1].split('. ') for x in open(txtFile).readlines()]
+                            campos = QuebraNome(txtFile)[0:4]
+
+                            for linha in listaPresenca:
+                                aluno = alunos.pop(0)
+                                if linha[2] == 'Ausente':
+                                    c = campos.copy()
+                                    c.append(aluno.ra)
+                                    ausentes.append(c)
+
                     contagem += 1
 
     print(contagem, 'arquivos processados')
+    csv.writer(open(args.ausentes, 'wt')).writerows(ausentes)
+

@@ -15,7 +15,7 @@ def QuebraNome(nome):
     if len(campos) == 6:
         return campos
     else:
-        return ['', '', '', '']
+        return ['', '', '', '', '', '']
 
 
 def ConverteTXT2CSV(nome, ausentes):
@@ -24,7 +24,7 @@ def ConverteTXT2CSV(nome, ausentes):
     arquivoResposta = os.path.join(os.path.dirname(os.path.dirname(nome)), os.path.basename(nome)[:-4] + '.csv')
     if len(dados) == 1 and dados[0].startswith('Ausente'):
         campos = QuebraNome(nome)
-        ausentes.append(campos)
+        ausentes.append(campos[0:5])
         if campos[2].startswith('LIN'):   # 6 questões
             resposta = '1,_\n2,_\n3,_\n4,_\n5,_\n6,_\n'
         else:
@@ -32,7 +32,7 @@ def ConverteTXT2CSV(nome, ausentes):
 
         open(arquivoResposta, 'wt').writelines(resposta)
     else:
-        resposta = [x.split('. ') for x in dados]
+        resposta = [x[:-1].split('. ') for x in dados]
         csv.writer(open(arquivoResposta, 'wt')).writerows(resposta)
 
 
@@ -48,6 +48,7 @@ if __name__ == '__main__':
 
     for arquivo in txt:
         print(arquivo)
-        ConverteTXT2CSV(arquivo, ausentes)
+        if not '-presenca-' in arquivo:
+            ConverteTXT2CSV(arquivo, ausentes)
 
     csv.writer(open(args.saida, 'wt')).writerows(ausentes)
