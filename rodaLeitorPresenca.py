@@ -77,7 +77,7 @@ if __name__ == '__main__':
                                 campos = QuebraNome(txtFile)[0:4]
 
                                 for linha in listaPresenca:
-                                    aluno = alunos.pop(0)
+                                    aluno = presencas[p].pop(0)
                                     if linha[2] == 'Ausente':
                                         c = campos.copy()
                                         c.append(aluno.ra)
