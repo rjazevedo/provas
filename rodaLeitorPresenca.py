@@ -65,6 +65,7 @@ if __name__ == '__main__':
 
             if arquivo in entrada:
                 txtFile = os.path.join(os.path.basename(entrada[arquivo]), 'result', entrada[arquivo][:-4] + '.txt')
+                print(txtFile)
                 if os.path.isfile(entrada[arquivo]):
                     if args.forca or not os.path.isfile(txtFile):
                         if args.teste:
