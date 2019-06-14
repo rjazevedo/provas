@@ -63,25 +63,26 @@ if __name__ == '__main__':
             arquivo = p + '-presenca-' + format(pagina, '02d')
             pagina += 1
 
-            txtFile = os.path.join(os.path.basename(entrada[arquivo]), 'result', entrada[arquivo][:-4] + '.txt')
-            if arquivo in entrada and os.path.isfile(entrada[arquivo]):
-                if args.forca or not os.path.isfile(txtFile):
-                    if args.teste:
-                        print(CMD,  quantidade, entrada[arquivo])
-                    else:
-                        os.system(CMD + ' ' + str(quantidade) + ' ' + entrada[arquivo])
-                        if os.path.isfile(txtFile):
-                            listaPresenca = [x[:-1].split('. ') for x in open(txtFile).readlines()]
-                            campos = QuebraNome(txtFile)[0:4]
+            if arquivo in entrada:
+                txtFile = os.path.join(os.path.basename(entrada[arquivo]), 'result', entrada[arquivo][:-4] + '.txt')
+                if os.path.isfile(entrada[arquivo]):
+                    if args.forca or not os.path.isfile(txtFile):
+                        if args.teste:
+                            print(CMD,  quantidade, entrada[arquivo])
+                        else:
+                            os.system(CMD + ' ' + str(quantidade) + ' ' + entrada[arquivo])
+                            if os.path.isfile(txtFile):
+                                listaPresenca = [x[:-1].split('. ') for x in open(txtFile).readlines()]
+                                campos = QuebraNome(txtFile)[0:4]
 
-                            for linha in listaPresenca:
-                                aluno = alunos.pop(0)
-                                if linha[2] == 'Ausente':
-                                    c = campos.copy()
-                                    c.append(aluno.ra)
-                                    ausentes.append(c)
+                                for linha in listaPresenca:
+                                    aluno = alunos.pop(0)
+                                    if linha[2] == 'Ausente':
+                                        c = campos.copy()
+                                        c.append(aluno.ra)
+                                        ausentes.append(c)
 
-                    contagem += 1
+                        contagem += 1
 
     print(contagem, 'arquivos processados')
     csv.writer(open(args.ausentes, 'wt')).writerows(ausentes)
