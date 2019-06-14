@@ -154,7 +154,7 @@ if __name__ == '__main__':
             print('Não achei o arquivo com respostas:', p.codigo)
             semResposta += 1
 
-    print(quantidade, 'folhas corrigidas.')
+    print(quantidade, 'questões corrigidas.')
     print(semGabarito, 'provas sem gabarito.')
     print(semResposta, 'sem arquivo de resposta.')
     print(divergencia, 'divergências entre tamanho de arquivo.')

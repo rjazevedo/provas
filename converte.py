@@ -47,7 +47,6 @@ if __name__ == '__main__':
     ausentes = []
 
     for arquivo in txt:
-        print(arquivo)
         if not '-presenca-' in arquivo:
             ConverteTXT2CSV(arquivo, ausentes)
 
