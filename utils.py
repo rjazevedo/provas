@@ -62,14 +62,14 @@ class LinhaProva:
     def idProva(self):
         return self.disciplina + '-' + self.prova
 
-    def idPaginas(self):
+    def idPaginas(self, tipo = ''):
         limite = self.folhasDissertativas
         if self.questoesObjetivas > 0:
             limite += 1
         
         resposta = []
         for n in range(0, limite):
-            resposta.append(self.codigo + '-' + format(n + 1, '02d'))
+            resposta.append(self.codigo + '-' + format(n + 1, '02d') + tipo) 
 
         return resposta
 
@@ -88,8 +88,6 @@ class LinhaProva:
         self.GeraCodigo()
         self.ra = '________'
         return
-
-
 
 class Aluno:
     def __init__(self, campos):

@@ -14,7 +14,7 @@ def QuebraNome(nome):
     if len(campos) == 6:
         return campos
     else:
-        return ['', '', '', '']
+        return ['', '', '', '', '', '']
 
 
 CMD='/home/provas/folhasProvas/presence/presence -c '
