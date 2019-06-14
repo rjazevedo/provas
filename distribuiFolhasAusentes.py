@@ -36,6 +36,7 @@ if __name__ == '__main__':
     print(len(ausentes), 'ausentes a processar')
 
     contagem = 0
+    respostasBrancas = 0
 
     for prova in provas:
         if  prova.codigo in ausentes:
@@ -55,6 +56,8 @@ if __name__ == '__main__':
                     else:
                         respostasBranco = [[x, '_'] for x in range(1, prova.questoesObjetivas + 1)]
                         csv.writer(open(nomeArquivo, 'wt')).writerows(respostasBranco)
+                    respostasBrancas += 1
 
     print(contagem, 'arquivos em branco distribuidos')
+    print(respostasBrancas, 'respostas em branco distribuídas')
 

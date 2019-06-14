@@ -224,7 +224,7 @@ def ProcessaArquivos(listaArquivos, copiar):
                 contagem = MoveRefugo(nome, contagem)
         elif nome.endswith('.png') or nome.endswith('.PNG'):
             destino = os.path.join(args.trabalho, 'tmp.png')
-            if copiar:b
+            if copiar:
                 shutil.copyfile(nome, destino)
                 nome = destino
             if not DecodificaArquivo(nome, args.saida):
