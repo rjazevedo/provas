@@ -46,7 +46,10 @@ if __name__ == '__main__':
             presencas[labelProva].append([p.ra, p.nomeAluno])
 
     contagem = 0
-    ausentes = []
+    if os.path.isfile(args.ausentes):
+        ausentes = list(csv.reader(open(args.ausentes)))
+    else:
+        ausentes = []
     for p in presencas.keys():
         alunos = len(presencas[p])
         folha = 1
