@@ -33,6 +33,8 @@ class LinhaProva:
         self.nomeAluno = campos[0]
         self.ra = campos[1]
         self.polo = campos[2]
+        if len(self.polo) != 4:
+            self.polo = '0' * (4 - len(self.polo)) + self.polo
         self.nomePolo = campos[3]
         self.data = campos[4]
         self.curso = campos[5]
