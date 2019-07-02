@@ -20,7 +20,7 @@ def image_generator(orig):
     orig = cv2.cvtColor(orig, cv2.COLOR_BGR2GRAY)
     yield(orig)
     blur_values = (True,False)
-    threshold_values = (False,True)
+    threshold_values = (0, 1, 2, 3)
     kernel_size_values = (3,5)
     dilation_values = (0,2,1,0)
     erosion_values = (0,1,2,3)
@@ -32,10 +32,15 @@ def image_generator(orig):
         erosion = z[4]
         # printDebug("blur={}, threshold={},kernel_size={},dilation={},erosion={}".format(z[0],z[1],z[2],z[3],z[4]))
         image = orig.copy()
-        if threshold:
+        if threshold != 0:
+            if threshold == 1:
+                image = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,37,2)
+            elif threshold == 2:
+                _, image = cv2.threshold(image, 220, 255, cv2.THRESH_BINARY)
+            elif threshold == 3:
+                _, image = cv2.threshold(image, 235, 255, cv2.THRESH_BINARY)
             #thresh_val, thresh_img = cv2.threshold(image, 0, 255, cv2.THRESH_OTSU)
             #thresh_val, thresh_img = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
-            image = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,37,2)
 
         if blur:
             image = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
