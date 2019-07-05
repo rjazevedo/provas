@@ -75,6 +75,9 @@ class LinhaProva:
 
         return resposta
 
+    def idPresenca(self):
+        return self.polo + '-' + self.disciplina + '-' + self.prova + '-' + self.ra
+
     def LabelProva(self):
         return self.dataStr + '-' + self.polo + '-' + self.disciplina + '-' + self.prova
 

@@ -11,7 +11,7 @@ import sys
 from utils import LinhaProva, BuscaArquivos
 
 
-def DashboardProva(pasta, alunos, arquivos, base):
+def DashboardProva(pasta, alunos, arquivos, ausentes, base):
     nomeArquivo = alunos[0].LabelProva() + '.html'
     saida = open(os.path.join(pasta, nomeArquivo), 'wt')
     header = open(os.path.join(base, 'header.html')).read() 
@@ -33,7 +33,7 @@ def DashboardProva(pasta, alunos, arquivos, base):
         folhas = 0
         for i in range(1, aluno.totalFolhas + 1):
             arquivo = aluno.codigo + '-' + '{:02d}'.format(i) + '.png'
-            if arquivo in arquivos:
+            if arquivo in arquivos or aluno.idPresenca() in ausentes:
                 saida.write('<td>' + str(i) + '</td>')
                 folhas += 1
             else:
@@ -54,7 +54,7 @@ def DashboardProva(pasta, alunos, arquivos, base):
     return (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes)
 
 
-def GeraDashboard(pasta, provas, arquivos, base):
+def GeraDashboard(pasta, provas, arquivos, ausentes, base):
 
     resumoPolos = {}
     saida = open(os.path.join(pasta, 'index.html'), 'wt')
@@ -66,7 +66,7 @@ def GeraDashboard(pasta, provas, arquivos, base):
     for p in sorted(provas.keys()):
         print(p)
         prova = provas[p]
-        (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos, base)
+        (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos, ausentes, base)
         if not prova[0].nomePolo in resumoPolos:
             resumoPolos[prova[0].nomePolo] = [[totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes]]
         else:
@@ -150,6 +150,7 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--entrada', type=str, required=True, help='Pasta de entrada')
     parser.add_argument('-p', '--provas', type=str, required=True, help='Arquivo informações sobre as provas')
     parser.add_argument('-s', '--saida', type=str, required=True, help='Pasta de saida')
+    parser.add_argument('-a', '--ausentes', type=str, required=False, help='Arquivo com informações de ausências')
 
     args = parser.parse_args()
 
@@ -161,6 +162,13 @@ if __name__ == '__main__':
     alunos = [LinhaProva(a) for a in entrada]
     print(len(alunos), 'provas consideradas.')
 
+    if args.ausentes != None:
+        ausentes = csv.reader(open(args.ausentes))
+        ausentes = ['-'.join(x) for x in ausentes]
+        print(len(ausentes), 'ausentes a processar')
+    else:
+        ausentes = []
+
     base = os.path.dirname(sys.argv[0])
 
     provas = {}
@@ -171,4 +179,4 @@ if __name__ == '__main__':
         else:
             provas[aluno.OrdemProva()] = [aluno]
 
-    GeraDashboard(args.saida, provas, listaArquivos, base)
+    GeraDashboard(args.saida, provas, listaArquivos, ausentes, base)

@@ -17,6 +17,7 @@ if not os.path.isfile(fileName):
     sys.exit(1)
 
 dbpass = open(fileName).readlines()[0][:-1]
+# print(dbpass)
 engine = create_engine(dbpass) 
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -43,9 +44,9 @@ class Students(Base):
     holder_data = Column(JSON)
     internship_data = Column(JSON)
 
-    user = relationship('Users', backref='users')
+    user = relationship('Users', uselist = False)
 
-    activities = relationship('ActivityRecords')
+    # activities = relationship('ActivityRecords', )
 
     def __repr__(self):
         return str(self.academic_register) + ' - ' + self.user.name
@@ -83,7 +84,7 @@ class CurricularActivities(Base):
     def __repr__(self):
         return self.code + ' - ' + self.name
 
-
+# Registro de Disciplinas
 class ActivityRecords(Base):
     __tablename__ = 'activity_records'
 
@@ -111,12 +112,115 @@ class ActivityRecords(Base):
     activity_offer_id = Column(Integer)
     lms_submissions_data = Column(JSON)
 
-    curricular_activity = relationship('CurricularActivities', backref = 'curricular_activities')
+    curricular_activity = relationship('CurricularActivities', uselist = False)
     student = relationship('Students', backref = 'students')
-
 
     def __repr__(self):
         return str(self.student_id) + ' - ' + self.curricular_activity.name
+
+# Submissões de Provas
+class ActivityRecordSubmissions(Base): 
+    __tablename__ = 'activity_record_submissions'
+
+    id = Column(Integer, primary_key = True)
+    activity_record_id = Column(Integer, ForeignKey('activity_records.id'))
+    submission_type = Column(String)
+    grade = Column(Float)
+    link_document = Column(String)
+    absent = Column(Boolean)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    template = Column(String)
+    complementary_data = Column(JSON)
+    annulled = Column(Boolean)
+    activity_test_id = Column(Integer, ForeignKey('activity_tests.id'))
+
+    activity_record = relationship('ActivityRecords', uselist = False)
+    activity_test = relationship('ActivityTests', uselist = False)
+
+    def __repr__(self):
+        return self.submission_type + ' - ' + str(self.grade)
+
+
+# Oferta de Disciplina
+class ActivityOffers(Base):
+    __tablename__ = 'activity_offers'
+
+    id = Column(Integer, primary_key = True)
+    ava_id = Column(Integer)
+    ava_sis = Column(String)
+    offer_date = Column(String)
+    offer_type = Column(Integer)
+    curricular_activity_id = Column(Integer)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    status = Column(Integer)
+    calendar_id = Column(Integer)
+    status_date = Column(DateTime)
+
+# Questões das Provas
+class ActivityTestQuestions(Base):
+    __tablename__ = 'activity_test_questions'
+
+    id = Column(Integer, primary_key = True)
+    question_type = Column(String)
+    number = Column(Integer)
+    weight = Column(Float)
+    activity_test_id = Column(Integer, ForeignKey('activity_tests.id'))
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    annulled = Column(Boolean)
+
+    activity_test = relationship('ActivityTests', backref = 'activity_tests')
+
+    def __repr__(self):
+        return str(self.number) + ' - ' + self.question_type
+
+# Provas
+class ActivityTests(Base):
+    __tablename__ = 'activity_tests'
+
+    id = Column(Integer, primary_key = True)
+    code = Column(String)
+    total_pages = Column(Integer)
+    curricular_activity_id = Column(Integer, ForeignKey('curricular_activities.id'))
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+
+    curricular_activity = relationship('CurricularActivities', uselist = False)
+
+    def __repr__(self):
+        return self.curricular_activity.code + ' - ' + self.curricular_activity.name + ' - ' + self.code + '(' + str(self.total_pages) + ')'
+
+# Correções das questões
+class ActivityRecordSubmissionCorrections(Base):
+    __tablename__ = 'activity_record_submission_corrections'
+
+    id = Column(Integer, primary_key = True)
+    grade = Column(String)
+    corrector_data = Column(JSON)
+    activity_record_submission_id = Column(Integer, ForeignKey('activity_record_submissions.id'))
+    activity_test_question_id = Column(Integer, ForeignKey('activity_test_questions.id'))
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+
+    activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
+    activity_test_question = relationship('ActivityTestQuestions', uselist = False)
+
+
+# Corretores das provas
+class ActivityRecordSubmissionCorrectors(Base):
+    __tablename__ = 'activity_record_submission_correctors'
+
+    id = Column(Integer, primary_key = True)
+    activity_record_submission_id = Column(Integer, ForeignKey('activity_record_submissions.id'))
+    internal_user_id = Column(Integer, ForeignKey('internal_users.id'))
+    role = Column(String)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+
+    activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
+    internal_user = relationship('InternalUsers', uselist = False)
 
 class Users(Base):
     __tablename__ = 'users'
@@ -179,6 +283,17 @@ class Users(Base):
     def __repr__(self):
         return self.name
 
+class InternalUsers(Base):
+    __tablename__ = 'internal_users'
+
+    id = Column(Integer, primary_key = True)
+    name = Column(String)
+    email = Column(String)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    status = Column(String)
+    role = Column(String)
+
 class Courses(Base):
     __tablename__ = 'courses'
 
@@ -195,7 +310,6 @@ class Courses(Base):
     def __repr__(self):
         return self.name
 
-
 class CourseCatalogs(Base):
     __tablename__ = 'course_catalogs'
 
@@ -210,9 +324,11 @@ class CourseCatalogs(Base):
     duration_semesters = Column(Integer)
     regulation = Column(String)
 
+    curriculums = relationship('CourseCurriculums', back_populates = 'course_catalog')
+    activities = relationship('CourseActivities', back_populates = 'course_catalog')
+
     def __repr__(self):
         return self.code
-
 
 class CourseCurriculums(Base):
     __tablename__ = 'course_curriculums'
@@ -225,12 +341,11 @@ class CourseCurriculums(Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
-    course_catalog = relationship('CourseCatalogs', backref = 'course_catalogs')
-    curricular_activity = relationship('CurricularActivities', backref = 'curricular_activities')
+    course_catalog = relationship('CourseCatalogs', back_populates = 'curriculums')
+    # curricular_activity = relationship('CurricularActivities', backref = 'curricular_activities')
 
     def __repr__(self):
         return self.course_catalog.code
-
 
 class CourseActivities(Base):
     __tablename__ = 'course_activities'
@@ -242,45 +357,11 @@ class CourseActivities(Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
-    course_catalog = relationship('CourseCatalogs', backref = 'course_catalogs')
-    curricular_activity = relationship('CurricularActivities', backref = 'curricular_activities')
+    course_catalog = relationship('CourseCatalogs', back_populates = 'activities')
+    curricular_activity = relationship('CurricularActivities')
 
     def __repr__(self):
         return self.course_catalog.code
-
-
-class ActivityTestQuestions(Base):
-    __tablename__ = 'activity_test_questions'
-
-    id = Column(Integer, primary_key = True)
-    question_type = Column(String)
-    number = Column(Integer)
-    weight = Column(Float)
-    activity_test_id = Column(Integer, ForeignKey('activity_tests.id'))
-    created_at = Column(DateTime)
-    updated_at = Column(DateTime)
-    annulled = Column(Boolean)
-
-    activity_test = relationship('ActivityTests', backref = 'activity_tests')
-
-    def __repr__(self):
-        return str(self.number) + ' - ' + self.question_type
-
-
-class ActivityTests(Base):
-    __tablename__ = 'activity_tests'
-
-    id = Column(Integer, primary_key = True)
-    code = Column(String)
-    total_pages = Column(Integer)
-    curricular_activity_id = Column(Integer, ForeignKey('curricular_activities.id'))
-    created_at = Column(DateTime)
-    updated_at = Column(DateTime)
-
-    curricular_activity = relationship('CurricularActivities', backref='curricular_activities')
-
-    def __repr__(self):
-        return self.curricular_activity.code + ' - ' + self.curricular_activity.name + ' - ' + self.code + '(' + str(self.total_pages) + ')'
 
 
 
@@ -290,16 +371,19 @@ for instance in session.query(Students)[0:10]:
     print(instance)
     last = instance
 
-for activity in instance.activities:
-    print(activity.curricular_activity)
+for activity in session.query(ActivityRecordSubmissions)[0:10]:
+    print(activity)
+
+# for activity in last.activities:
+#     print(activity.curricular_activity)
 
 # print('**ActivityRecords')
 # for instance in session.query(ActivityRecords)[0:10]:
 #     print(instance)
 
-print('**CurricularActivities')
-for instance in session.query(CurricularActivities)[0:10]:
-    print(instance)
+# print('**CurricularActivities')
+# for instance in session.query(CurricularActivities)[0:10]:
+#     print(instance)
 
 # print('**Users')
 # for instance in session.query(Users)[0:10]:
@@ -309,4 +393,4 @@ for instance in session.query(CurricularActivities)[0:10]:
 # for instance in session.query(Courses)[0:10]:
 #     print(instance)
 
-top10 = [CourseCatalogs, CourseCurriculums, ]
+# top10 = [CourseCatalogs, CourseCurriculums, ]
