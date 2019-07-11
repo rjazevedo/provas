@@ -15,8 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--entrada', type=str, required=True, help='Arquivo de entrada com descrição de todas as provas (.csv)')
     parser.add_argument('-n', '--numeroPolo', type=str, required=True, help='Numero do polo a preencher as folhas ausentes (4 dígitos)')
     parser.add_argument('-p', '--provas', type=str, required=True, help='Pasta com as provas')
-    parser.add_argument('-t', '--teste', action='store_true', required=False, help='Testa a execução (não executa nada)')
-    parser.add_argument('-f', '--forca', action='store_true', required=False, help='Força a execução mesmo já tendo executado antes')
+    parser.add_argument('-t', '--teste', action='store_true', required=False, help='Testa a execução (não realiza as cópias nada)')
 
     folhaBranca = os.path.join(os.path.dirname(sys.argv[0]), 'folha-nao-digitalizada.png')
 
