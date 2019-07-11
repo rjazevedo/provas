@@ -31,7 +31,6 @@ if __name__ == '__main__':
     print(len(provas), 'provas a verificar')
 
     contagem = 0
-    respostasBrancas = 0
 
     for prova in provas:
         if prova.polo == args.numeroPolo:
@@ -40,19 +39,14 @@ if __name__ == '__main__':
                     if args.teste:
                         print(folha)
                     else:
-                        shutil.copyfile(folhaBranca, os.path.join(args.provas, folha + '.png'))
+                        shutil.copyfile(folhaBranca, os.path.join(args.provas, prova.polo, folha + '.png'))
+                        if folha.endswith('-01') and prova.questoesObjetivas != 0:
+                            nomeArquivo = os.path.join(args.provas, prova.polo, folha + '.csv')
+                            respostasBranco = [[x, '_'] for x in range(1, prova.questoesObjetivas + 1)]
+                            csv.writer(open(nomeArquivo, 'wt')).writerows(respostasBranco)
+
                     contagem += 1
 
-            if prova.questoesObjetivas != 0:
-                nomeArquivo = os.path.join(args.provas, prova.polo, prova.codigo + '-01.csv')
-                if not os.path.isfile(nomeArquivo):
-                    if args.teste:
-                        print(nomeArquivo)
-                    else:
-                        respostasBranco = [[x, '_'] for x in range(1, prova.questoesObjetivas + 1)]
-                        csv.writer(open(nomeArquivo, 'wt')).writerows(respostasBranco)
-                    respostasBrancas += 1
 
     print(contagem, 'arquivos em branco distribuidos')
-    print(respostasBrancas, 'respostas em branco distribuídas')
 
