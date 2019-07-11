@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Modelo de dados das provas"""
+""" Modelo de dados do SGA"""
 
 import sqlalchemy
 from sqlalchemy import create_engine
@@ -18,7 +18,7 @@ if not os.path.isfile(fileName):
 
 dbpass = open(fileName).readlines()[0][:-1]
 # print(dbpass)
-engine = create_engine(dbpass) 
+engine = create_engine(dbpass)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -45,11 +45,14 @@ class Students(Base):
     internship_data = Column(JSON)
 
     user = relationship('Users', uselist = False)
-
-    # activities = relationship('ActivityRecords', )
+    activity_records = relationship('ActivityRecords')
 
     def __repr__(self):
         return str(self.academic_register) + ' - ' + self.user.name
+
+    def Historico(self):
+        for activity in self.activity_records:
+            print(activity)
 
 class CurricularActivities(Base):
     __tablename__ = 'curricular_activities'
@@ -109,17 +112,18 @@ class ActivityRecords(Base):
     updated_at = Column(DateTime)
     status = Column(Integer)
     validated = Column(Boolean)
-    activity_offer_id = Column(Integer)
+    activity_offer_id = Column(Integer, ForeignKey('activity_offers.id'))
     lms_submissions_data = Column(JSON)
 
     curricular_activity = relationship('CurricularActivities', uselist = False)
-    student = relationship('Students', backref = 'students')
+    student = relationship('Students', uselist = False)
+    activity_offer = relationship('ActivityOffers', uselist = False)
 
     def __repr__(self):
-        return str(self.student_id) + ' - ' + self.curricular_activity.name
+        return str(self.curricular_activity.code) + ' - ' + self.curricular_activity.name + ' - ' + str(self.grade_total) + ' - ' + str(self.status)
 
 # Submissões de Provas
-class ActivityRecordSubmissions(Base): 
+class ActivityRecordSubmissions(Base):
     __tablename__ = 'activity_record_submissions'
 
     id = Column(Integer, primary_key = True)
@@ -141,6 +145,35 @@ class ActivityRecordSubmissions(Base):
     def __repr__(self):
         return self.submission_type + ' - ' + str(self.grade)
 
+# Correções das questões
+class ActivityRecordSubmissionCorrections(Base):
+    __tablename__ = 'activity_record_submission_corrections'
+
+    id = Column(Integer, primary_key = True)
+    grade = Column(String)
+    corrector_data = Column(JSON)
+    activity_record_submission_id = Column(Integer, ForeignKey('activity_record_submissions.id'))
+    activity_test_question_id = Column(Integer, ForeignKey('activity_test_questions.id'))
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+
+    activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
+    activity_test_question = relationship('ActivityTestQuestions', uselist = False)
+
+
+# Corretores das provas
+class ActivityRecordSubmissionCorrectors(Base):
+    __tablename__ = 'activity_record_submission_correctors'
+
+    id = Column(Integer, primary_key = True)
+    activity_record_submission_id = Column(Integer, ForeignKey('activity_record_submissions.id'))
+    internal_user_id = Column(Integer, ForeignKey('internal_users.id'))
+    role = Column(String)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+
+    activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
+    internal_user = relationship('InternalUsers', uselist = False)
 
 # Oferta de Disciplina
 class ActivityOffers(Base):
@@ -151,12 +184,18 @@ class ActivityOffers(Base):
     ava_sis = Column(String)
     offer_date = Column(String)
     offer_type = Column(Integer)
-    curricular_activity_id = Column(Integer)
+    curricular_activity_id = Column(Integer, ForeignKey('curricular_activities.id'))
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
     status = Column(Integer)
     calendar_id = Column(Integer)
     status_date = Column(DateTime)
+
+    curricular_activity = relationship('CurricularActivities', uselist = False)
+    activity_records = relationship('ActivityRecords')
+
+    def __repr__(self):
+        return self.offer_date + ' - ' + str(self.curricular_activity)
 
 # Questões das Provas
 class ActivityTestQuestions(Base):
@@ -192,35 +231,6 @@ class ActivityTests(Base):
     def __repr__(self):
         return self.curricular_activity.code + ' - ' + self.curricular_activity.name + ' - ' + self.code + '(' + str(self.total_pages) + ')'
 
-# Correções das questões
-class ActivityRecordSubmissionCorrections(Base):
-    __tablename__ = 'activity_record_submission_corrections'
-
-    id = Column(Integer, primary_key = True)
-    grade = Column(String)
-    corrector_data = Column(JSON)
-    activity_record_submission_id = Column(Integer, ForeignKey('activity_record_submissions.id'))
-    activity_test_question_id = Column(Integer, ForeignKey('activity_test_questions.id'))
-    created_at = Column(DateTime)
-    updated_at = Column(DateTime)
-
-    activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
-    activity_test_question = relationship('ActivityTestQuestions', uselist = False)
-
-
-# Corretores das provas
-class ActivityRecordSubmissionCorrectors(Base):
-    __tablename__ = 'activity_record_submission_correctors'
-
-    id = Column(Integer, primary_key = True)
-    activity_record_submission_id = Column(Integer, ForeignKey('activity_record_submissions.id'))
-    internal_user_id = Column(Integer, ForeignKey('internal_users.id'))
-    role = Column(String)
-    created_at = Column(DateTime)
-    updated_at = Column(DateTime)
-
-    activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
-    internal_user = relationship('InternalUsers', uselist = False)
 
 class Users(Base):
     __tablename__ = 'users'
@@ -364,15 +374,30 @@ class CourseActivities(Base):
         return self.course_catalog.code
 
 
+# ao = session.query(ActivityOffers).filter(ActivityOffers.offer_date == '201802')
+# esteano = [x for x in ao if str(x).startswith('201802')]
+# for d in esteano:
+#   print(d, len(d.activity_records))
+#   for ar in d.activity_records:
+#     print(' ', ar)
 
-print('**Students')
-last = None
-for instance in session.query(Students)[0:10]:
-    print(instance)
-    last = instance
 
-for activity in session.query(ActivityRecordSubmissions)[0:10]:
-    print(activity)
+# print('**Students')
+# for instance in session.query(Students)[0:1]:
+#     prit(instance)
+#     instance.Historico()
+
+# Busca um aluno e mostra o histórico dele
+# student = session.query(Students).filter(Students.academic_register == '1711876').one()
+# print(student)
+# student.Historico()
+
+# for disciplina in session.query(ActivityRecords).filter(ActivityRecords.student_id == student.id):
+#     print(disciplina)
+
+
+# for activity in session.query(ActivityRecords)[0:10]:
+#     print(activity)
 
 # for activity in last.activities:
 #     print(activity.curricular_activity)
@@ -394,3 +419,19 @@ for activity in session.query(ActivityRecordSubmissions)[0:10]:
 #     print(instance)
 
 # top10 = [CourseCatalogs, CourseCurriculums, ]
+
+
+# Query sobre as provas
+# select *
+# from activity_record_submissions ars /* submissões de prova (regular, DP, exame etc.) */
+# join activity_records ar /* registros de disciplina */
+# on ars.activity_record_id = ar.id
+# join activity_offers ao /* ofertas de disciplina */
+# on ar.activity_offer_id = ao.id
+# join activity_tests at /* provas */
+# on ars.activity_test_id = at.id
+# join activity_test_questions atq /* questões de prova */
+# on atq.activity_test_id = at.id
+# join activity_record_submission_corrections arsc /* correções de questões de provas */
+# on arsc.activity_record_submission_id = ars.id
+
