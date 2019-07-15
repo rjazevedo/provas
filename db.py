@@ -84,6 +84,8 @@ class CurricularActivities(Base):
     parent_id = Column(Integer)
     responsible_teachers = Column(JSON)
 
+    activity_offers = relationship('ActivityOffers')
+
     def __repr__(self):
         return self.code + ' - ' + self.name
 
