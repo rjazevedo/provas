@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker, relationship
 import os
 import sys
 
-fileName = 'dbpass.txt'
+fileName = os.path.join(os.path.dirname(sys.argv[0]), 'dbpass.txt')
 if not os.path.isfile(fileName):
     print('Não encontrato:', fileName)
     sys.exit(1)
@@ -93,6 +93,15 @@ class CurricularActivities(Base):
 class ActivityRecords(Base):
     __tablename__ = 'activity_records'
 
+    # 0 = matriculado
+    # 1 = aguardando nota (caiu em desuso nesse 1º semestre/2019)
+    # 2 = nota recebida (em desuso)
+    # 3 = aprovado
+    # 4 = reprovado
+    # 5 = trancado
+    # 6 = aproveitamento de estudo
+    # 7 = exame de proficiência (basicamente, Aproveitamento de Estudo para disciplinas de Inglês)
+
     id = Column(Integer, primary_key = True)
     date_begin = Column(DateTime)
     date_conclusion = Column(DateTime)
@@ -161,7 +170,6 @@ class ActivityRecordSubmissionCorrections(Base):
 
     activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
     activity_test_question = relationship('ActivityTestQuestions', uselist = False)
-
 
 # Corretores das provas
 class ActivityRecordSubmissionCorrectors(Base):
@@ -232,7 +240,6 @@ class ActivityTests(Base):
 
     def __repr__(self):
         return self.curricular_activity.code + ' - ' + self.curricular_activity.name + ' - ' + self.code + '(' + str(self.total_pages) + ')'
-
 
 class Users(Base):
     __tablename__ = 'users'
@@ -319,8 +326,10 @@ class Courses(Base):
     parent_id = Column(Integer)
     level = Column(String)
 
+    catalogs = relationship('CourseCatalogs')
+
     def __repr__(self):
-        return self.name
+        return self.code + ' - ' + self.name
 
 class CourseCatalogs(Base):
     __tablename__ = 'course_catalogs'
@@ -338,6 +347,7 @@ class CourseCatalogs(Base):
 
     curriculums = relationship('CourseCurriculums', back_populates = 'course_catalog')
     activities = relationship('CourseActivities', back_populates = 'course_catalog')
+    course = relationship('Courses', uselist = False)
 
     def __repr__(self):
         return self.code
@@ -354,11 +364,11 @@ class CourseCurriculums(Base):
     updated_at = Column(DateTime)
 
     course_catalog = relationship('CourseCatalogs', back_populates = 'curriculums')
-    # curricular_activity = relationship('CurricularActivities', backref = 'curricular_activities')
+    curricular_activity = relationship('CurricularActivities', uselist = False)
 
     def __repr__(self):
-        return self.course_catalog.code
-
+        return str(self.curricular_activity) + ' - ' + str(self.semester) + ' - ' + str(self.period)
+ 
 class CourseActivities(Base):
     __tablename__ = 'course_activities'
 
@@ -375,53 +385,80 @@ class CourseActivities(Base):
     def __repr__(self):
         return self.course_catalog.code
 
+class AcademicRecords(Base):
+    __tablename__ = 'academic_records'
+    
+    id = Column(Integer, primary_key=True)
+    date_begin = Column(DateTime)
+    date_conclusion = Column(DateTime)
+    date_graduation = Column(DateTime)
+    date_complete_withdrawal = Column(DateTime)
+    entrance_exam_grade = Column(Float)
+    entrance_exam_classification = Column(Integer)
+    student_id = Column(Integer, ForeignKey('students.id'))
+    course_catalog_id = Column(Integer, ForeignKey('course_catalogs.id'))
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    course_id = Column(Integer, ForeignKey('courses.id'))
+    date_deregistration = Column(DateTime)
+    ingress_type = Column(String)
+    class_period = Column(String)
+    location_id = Column(Integer, ForeignKey('locations.id'))
+    entrance_location_id = Column(Integer)
+    parent_id = Column(Integer)
+    calendar_id = Column(Integer)
+    academic_register = Column(Integer)
+    date_shipping = Column(DateTime)
 
-# ao = session.query(ActivityOffers).filter(ActivityOffers.offer_date == '201802')
-# esteano = [x for x in ao if str(x).startswith('201802')]
-# for d in esteano:
-#   print(d, len(d.activity_records))
-#   for ar in d.activity_records:
-#     print(' ', ar)
+    location = relationship('Locations', uselist=False)
+    student = relationship('Students', uselist=False)
+    course_catalog = relationship('CourseCatalogs', uselist=False)
+    course = relationship('Courses', uselist=False)
+
+    def __repr__(self):
+        return str(self.course_catalog.code) + ' - ' + str(self.student.academic_register)
+
+class Locations(Base):
+    __tablename__ = 'locations'
+
+    id = Column(Integer, primary_key=True)
+    institution = Column(String)
+    address_street = Column(String)
+    address_number = Column(String)
+    address_complement = Column(String)
+    address_neighborhood = Column(String)
+    address_zip = Column(String)
+    address_city = Column(String)
+    email_main = Column(String)
+    email_second = Column(String)
+    email_third = Column(String)
+    phone = Column(String)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    lat = Column(Float)
+    lng = Column(Float)
+    address_state = Column(String)
+    secretary_id = Column(Integer)
+    email = Column(String)
 
 
-# print('**Students')
-# for instance in session.query(Students)[0:1]:
-#     prit(instance)
-#     instance.Historico()
+class Calendar(Base):
+    __tablename__ = 'calendars'
 
-# Busca um aluno e mostra o histórico dele
-# student = session.query(Students).filter(Students.academic_register == '1711876').one()
-# print(student)
-# student.Historico()
+    id = Column(Integer, primary_key = True)
+    year = Column(Integer)
+    semester = Column(Integer)
+    period = Column(Integer)
+    date_begin = Column(DateTime)
+    date_conclusion = Column(DateTime)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    is_entrance_period = Column(Boolean)
+    calendar_type = Column(String)
+    alias = Column(String)
 
-# for disciplina in session.query(ActivityRecords).filter(ActivityRecords.student_id == student.id):
-#     print(disciplina)
-
-
-# for activity in session.query(ActivityRecords)[0:10]:
-#     print(activity)
-
-# for activity in last.activities:
-#     print(activity.curricular_activity)
-
-# print('**ActivityRecords')
-# for instance in session.query(ActivityRecords)[0:10]:
-#     print(instance)
-
-# print('**CurricularActivities')
-# for instance in session.query(CurricularActivities)[0:10]:
-#     print(instance)
-
-# print('**Users')
-# for instance in session.query(Users)[0:10]:
-#     print(instance)
-
-# print('**Courses')
-# for instance in session.query(Courses)[0:10]:
-#     print(instance)
-
-# top10 = [CourseCatalogs, CourseCurriculums, ]
-
+    def __repr__(self):
+        return str(self.year) + 's' + str(self.semester) + '.' + str(self.period)
 
 # Query sobre as provas
 # select *
