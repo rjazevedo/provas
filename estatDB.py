@@ -15,6 +15,7 @@ import db
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+import datetime
 
 args = None
 
@@ -264,7 +265,10 @@ def ListaCatalogo(c):
                     .filter(db.AcademicRecords.date_deregistration == None)
 
     data = []
+    idades = []
     for ar in ars:
+        if ar.student.user.birth_date != None:
+            idades.append(datetime.date.today().year - ar.student.user.birth_date.year)
         ch = 0
         for activity in ar.student.activity_records:
             if (activity.status == 3 or activity.status == 6 or activity.status == 7) and activity.curricular_activity_id in disciplinas:
@@ -277,13 +281,23 @@ def ListaCatalogo(c):
     plt.hist(dataArray, bins=20)
     plt.ylabel('Quantidade de alunos')
     plt.xlabel('Carga horária cumprida no curso')
-    plt.title('Histograma de alunos por progressão no curso')
+    plt.title('Histograma de alunos por progressão: ' + c)
     pdfCatalogo.savefig()
     plt.close()
 
     pdfCatalogo.close()
 
+    pdfIdade = PdfPages('estatistica-idades-' + c + '.pdf')
 
+    idadesArray = np.array(idades)
+    plt.hist(idadesArray, bins=20)
+    plt.ylabel('Quantidade de alunos')
+    plt.xlabel('Faixa etária')
+    plt.title('Distribuição de faixa etária: ' + c)
+    pdfIdade.savefig()
+    plt.close()
+
+    pdfIdade.close()
 
 
 
