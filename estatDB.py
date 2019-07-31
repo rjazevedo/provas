@@ -243,9 +243,11 @@ def ListaCatalogo(c):
 
     lista.sort()
 
-    print('Catálogo:', c)
-    for l in lista:
-        print(*l)
+    # print('Catálogo:', c)
+    # for l in lista:
+    #     print(*l)
+
+    print(ch, 'horas totais no curso.')
 
     quantidade = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalogo.id).count()
     print(quantidade, 'alunos totais.')

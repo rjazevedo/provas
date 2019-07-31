@@ -237,6 +237,7 @@ class ActivityTests(Base):
     updated_at = Column(DateTime)
 
     curricular_activity = relationship('CurricularActivities', uselist = False)
+    questions = relationship('ActivityTestQuestions')
 
     def __repr__(self):
         return self.curricular_activity.code + ' - ' + self.curricular_activity.name + ' - ' + self.code + '(' + str(self.total_pages) + ')'
