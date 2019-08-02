@@ -3,3 +3,5 @@ original
 .DS_Store
 reportlab-userguide.pdf
 .idea
+dbpass.txt
+*.csv

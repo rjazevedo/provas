@@ -89,6 +89,22 @@ class CurricularActivities(Base):
     def __repr__(self):
         return self.code + ' - ' + self.name
 
+# Anexos
+class Attachments(Base):
+    __tablename__ = 'attachments'
+
+    id = Column(Integer, primary_key = True)
+    attach_reference_id = Column(Integer) # activity_record_submissions.id quando anexo é folha de resposta
+    attach_reference_type = Column(String)
+    attach_path = Column(String)
+    attach_type = Column(String)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    sheets_data = Column(JSON)
+
+    def __repr__(self):
+        return str(self.id) + ' - ' + self.attach_reference_type + ' - ' + self.attach_type
+
 # Registro de Disciplinas
 class ActivityRecords(Base):
     __tablename__ = 'activity_records'
