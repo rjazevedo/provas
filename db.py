@@ -330,6 +330,9 @@ class InternalUsers(Base):
     status = Column(String)
     role = Column(String)
 
+    def __repr__(self):
+        return self.email + ' - ' + self.role
+
 class Courses(Base):
     __tablename__ = 'courses'
 
