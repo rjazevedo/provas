@@ -4,12 +4,22 @@
 """Carrega links de folhas de resposta de provas no SGA a partir de um CSV:
 Cód. da disciplina,Cód. da prova,RA do aluno,Número da folha,Link do arquivo da folha de resposta"""
 
+###############################################
+# Uso: folhasSGA.py -a folhas.csv -c 38
+#
+# folhas.csv: link deve começar em "SGA/..."
+# 38: é o calendário do bimestre 2019/2
+#
+# o arquivo dbpass.txt deve estar no diretório
+###############################################
+
 from sqlalchemy import func
 from sqlalchemy.orm.attributes import flag_modified
 import os
 import sys
 import argparse
 import db
+import csv
 
 args = None
 
@@ -76,7 +86,9 @@ def carregaFolha(
     submission = sess.query(db.ActivityRecordSubmissions) \
                      .filter(db.ActivityRecordSubmissions.activity_record_id == record.id) \
                      .filter(db.ActivityRecordSubmissions.submission_type == st) \
+                     .filter(db.ActivityRecordSubmissions.activity_test_id == test.id) \
                      .first()
+
     if not submission:
         submission = db.ActivityRecordSubmissions(
                                                     activity_record_id = record.id,
@@ -86,8 +98,6 @@ def carregaFolha(
                                                     updated_at = func.now()
                                                  )
         sess.add(submission)
-    else:
-        submission.activity_test_id = test.id
 
     # anexo (cria um caso não exista)
     attach = sess.query(db.Attachments) \
@@ -121,7 +131,8 @@ def carregaFolha(
 
     sess.commit()
 
-    print(
+    print(  
+            "Link carregado: ",
             ac,  # activity_code
             tc,  # test_code
             ar,  # academic_register
@@ -157,31 +168,18 @@ if __name__ == '__main__':
         sys.exit(1)
 
     ####################
-    # TO DO
     # percorre CSV
     ####################
 
-    ####################
-    # teste
-
-    submission_type = 'regular'
-    calendar_id = 38
-
-    activity_code = 'AAG002'
-    test_code = 'P001'
-    academic_register = '1600311'
-    number = 3
-    link_sheet = 'SGA/provas/0001/20190425-0001-AAG002-P001-1600311-06.png'
-
-    carregaFolha( 
-                  activity_code,     # str, Cód. da disciplina
-                  test_code,         # str, Cód. da prova
-                  academic_register, # str, RA do aluno
-                  number,            # int, Número da folha
-                  link_sheet,        # str, Link do arquivo da folha de resposta
-                  submission_type,   ### str, Tipo da submissão
-                  calendar_id        ### int, ID do calendário
-                )
-
-    ####################
-
+    with open(arquivo, newline='') as f:
+        reader = csv.reader(f, delimiter=',')
+        for row in reader:
+            carregaFolha(
+                          row[0],      # str, Cód. da disciplina
+                          row[1],      # str, Cód. da prova
+                          row[2],      # str, RA do aluno
+                          int(row[3]), # int, Número da folha
+                          row[4],      # str, Link do arquivo da folha de resposta
+                          tipo,        ### str, Tipo da submissão
+                          calendario   ### int, ID do calendário
+                        )
