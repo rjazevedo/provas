@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Carrega o link de uma folha de resposta, de uma prova, de um aluno, no SGA"""
+"""Carrega links de folhas de resposta de provas no SGA a partir de um CSV:
+Cód. da disciplina,Cód. da prova,RA do aluno,Número da folha,Link do arquivo da folha de resposta"""
 
 from sqlalchemy import func
 from sqlalchemy.orm.attributes import flag_modified
@@ -26,7 +27,7 @@ def carregaFolha(
                   n,   # number
                   ls,  # link_sheet
                   st,  # submission_type
-                  cid, # calendar_id
+                  cid  # calendar_id
                 ):
 
     """Carrega o link de uma folha de resposta, de uma prova, de um aluno, no SGA"""
@@ -39,14 +40,14 @@ def carregaFolha(
 
     # disciplina
     activity = sess.query(db.CurricularActivities) \
-                .filter(db.CurricularActivities.code == ac) \
-                .first()
+                   .filter(db.CurricularActivities.code == ac) \
+                   .first()
 
     # oferta
     offer = sess.query(db.ActivityOffers) \
-             .filter(db.ActivityOffers.calendar_id == cid) \
-             .filter(db.ActivityOffers.offer_type == offer_types[st]) \
-             .first()
+                .filter(db.ActivityOffers.calendar_id == cid) \
+                .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                .first()
 
     # aluno
     student = sess.query(db.Students).filter(db.Students.academic_register == ar).first()
@@ -57,25 +58,25 @@ def carregaFolha(
 
     # registro
     record = sess.query(db.ActivityRecords) \
-              .filter(db.ActivityRecords.student_id == student.id) \
-              .filter(db.ActivityRecords.curricular_activity_id == activity.id) \
-              .filter(db.ActivityRecords.activity_offer_id == offer.id) \
-              .first()
+                 .filter(db.ActivityRecords.student_id == student.id) \
+                 .filter(db.ActivityRecords.curricular_activity_id == activity.id) \
+                 .filter(db.ActivityRecords.activity_offer_id == offer.id) \
+                 .first()
 
     # prova
     test = sess.query(db.ActivityTests) \
-            .filter(db.ActivityTests.code == tc) \
-            .filter(db.ActivityTests.curricular_activity_id == activity.id) \
-            .first()
+               .filter(db.ActivityTests.code == tc) \
+               .filter(db.ActivityTests.curricular_activity_id == activity.id) \
+               .first()
 
     if not record: erro( "Missing ActivityRecord: %d, %d, %d" % (student.id, activity.id, offer.id) )
     if not test: erro( "Missing ActivityTests: %s, %d" % (tc, activity.id) )
 
     # submissão (cria uma caso não exista)
     submission = sess.query(db.ActivityRecordSubmissions) \
-                  .filter(db.ActivityRecordSubmissions.activity_record_id == record.id) \
-                  .filter(db.ActivityRecordSubmissions.submission_type == st) \
-                  .first()
+                     .filter(db.ActivityRecordSubmissions.activity_record_id == record.id) \
+                     .filter(db.ActivityRecordSubmissions.submission_type == st) \
+                     .first()
     if not submission:
         submission = db.ActivityRecordSubmissions(
                                                     activity_record_id = record.id,
@@ -90,10 +91,10 @@ def carregaFolha(
 
     # anexo (cria um caso não exista)
     attach = sess.query(db.Attachments) \
-                       .filter(db.Attachments.attach_reference_id == submission.id) \
-                       .filter(db.Attachments.attach_reference_type == 'ActivityRecordSubmission') \
-                       .filter(db.Attachments.attach_type == 'response_sheets') \
-                       .first()
+                 .filter(db.Attachments.attach_reference_id == submission.id) \
+                 .filter(db.Attachments.attach_reference_type == 'ActivityRecordSubmission') \
+                 .filter(db.Attachments.attach_type == 'response_sheets') \
+                 .first()
 
     if not attach:
         attach = db.Attachments(
@@ -120,11 +121,24 @@ def carregaFolha(
 
     sess.commit()
 
+    print(
+            ac,  # activity_code
+            tc,  # test_code
+            ar,  # academic_register
+            n,   # number
+            ls,  # link_sheet
+            st,  # submission_type
+            cid  # calendar_id
+          )
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Carrega o link de uma folha de resposta, de uma prova, de um aluno, no SGA')
+    parser = argparse.ArgumentParser(description='Carrega links de folhas de resposta de provas no SGA'
+                                                 ' a partir de um CSV com as colunas: Cód. da disciplina,'
+                                                 'Cód. da prova,RA do aluno,Número da folha,'
+                                                 'Link do arquivo da folha de resposta')
     parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV de folhas de resposta')
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
-    parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular"')
+    parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
 
     args = parser.parse_args()
 
@@ -156,7 +170,7 @@ if __name__ == '__main__':
     activity_code = 'AAG002'
     test_code = 'P001'
     academic_register = '1600311'
-    number = 6
+    number = 3
     link_sheet = 'SGA/provas/0001/20190425-0001-AAG002-P001-1600311-06.png'
 
     carregaFolha( 
