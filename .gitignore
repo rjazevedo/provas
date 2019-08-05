@@ -4,4 +4,6 @@ original
 reportlab-userguide.pdf
 .idea
 dbpass.txt
+dbpass-prod.txt
+dbpass-readonly.txt
 *.csv
