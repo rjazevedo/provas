@@ -114,7 +114,6 @@ def associaCorretor(
     submission = sess.query(db.ActivityRecordSubmissions) \
                      .filter(db.ActivityRecordSubmissions.activity_record_id == record.id) \
                      .filter(db.ActivityRecordSubmissions.submission_type == st) \
-                     .filter(db.ActivityRecordSubmissions.activity_test_id == test.id) \
                      .first()
 
     if not submission:
