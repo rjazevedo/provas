@@ -16,6 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--numeroPolo', type=str, required=True, help='Numero do polo a preencher as folhas ausentes (4 dígitos)')
     parser.add_argument('-p', '--provas', type=str, required=True, help='Pasta com as provas')
     parser.add_argument('-d', '--disciplina', type=str, required=False, help='Processa somente a disciplina especificada')
+    parser.add_argument('-a', '--aluno', type=str, required=False, help='Processa somente o aluno especificado')
     parser.add_argument('-t', '--teste', action='store_true', required=False, help='Testa a execução (não realiza as cópias nada)')
 
     folhaBranca = os.path.join(os.path.dirname(sys.argv[0]), 'folha-nao-digitalizada.png')
@@ -36,18 +37,19 @@ if __name__ == '__main__':
     for prova in provas:
         if prova.polo == args.numeroPolo:
             if args.disciplina is None or prova.disciplina == args.disciplina:
-                for folha in prova.idPaginas():
-                    if not folha in entrada:
-                        if args.teste:
-                            print(folha)
-                        else:
-                            shutil.copyfile(folhaBranca, os.path.join(args.provas, prova.polo, folha + '.png'))
-                            if folha.endswith('-01') and prova.questoesObjetivas != 0:
-                                nomeArquivo = os.path.join(args.provas, prova.polo, folha + '.csv')
-                                respostasBranco = [[x, '_'] for x in range(1, prova.questoesObjetivas + 1)]
-                                csv.writer(open(nomeArquivo, 'wt')).writerows(respostasBranco)
+                if args.aluno is None or prova.ra == args.aluno:
+                    for folha in prova.idPaginas():
+                        if not folha in entrada:
+                            if args.teste:
+                                print(folha)
+                            else:
+                                shutil.copyfile(folhaBranca, os.path.join(args.provas, prova.polo, folha + '.png'))
+                                if folha.endswith('-01') and prova.questoesObjetivas != 0:
+                                    nomeArquivo = os.path.join(args.provas, prova.polo, folha + '.csv')
+                                    respostasBranco = [[x, '_'] for x in range(1, prova.questoesObjetivas + 1)]
+                                    csv.writer(open(nomeArquivo, 'wt')).writerows(respostasBranco)
 
-                        contagem += 1
+                            contagem += 1
 
 
     print(contagem, 'arquivos em branco distribuidos')
