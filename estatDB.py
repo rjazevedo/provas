@@ -236,6 +236,7 @@ def ListaCatalogo(c):
     lista = []
     disciplinas = {}
     ch = 0
+    pendencias = {}
     for atividade in catalogo.curriculums:
         lista.append((atividade.semester, atividade.period, atividade.curricular_activity.workload, str(atividade.curricular_activity)))
         ch += atividade.curricular_activity.workload
@@ -252,30 +253,47 @@ def ListaCatalogo(c):
     quantidade = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalogo.id).count()
     print(quantidade, 'alunos totais.')
 
-    quantidade2 = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalogo.id) \
-                    .filter(db.AcademicRecords.date_conclusion == None) \
-                    .filter(db.AcademicRecords.date_graduation == None) \
-                    .filter(db.AcademicRecords.date_complete_withdrawal == None) \
-                    .filter(db.AcademicRecords.date_deregistration == None).count()
 
-    print(quantidade2, 'alunos ativos.')
+    enrolled = db.session.query(db.AcademicRecords, db.Students) \
+                 .filter(db.AcademicRecords.course_catalog_id == catalogo.id, \
+                         db.Students.current_status == 'enrolled', \
+                         db.AcademicRecords.student_id == db.Students.id) \
+                 .count()
+    enrolled_dp = db.session.query(db.AcademicRecords, db.Students) \
+                    .filter(db.AcademicRecords.course_catalog_id == catalogo.id, \
+                            db.Students.current_status == 'enrolled_dp', \
+                            db.AcademicRecords.student_id == db.Students.id) \
+                    .count()
+    
+    print(enrolled, 'matriculados')
+    print(enrolled_dp, 'matriculados em DP')
+    quantidade2 = enrolled + enrolled_dp
+    print(quantidade2, 'alunos matriculados + DP')
+    
+    pendencias = {}
+    for d in disciplinas.keys():
+        pendencias[d] = quantidade2
+    
+    ars = db.session.query(db.AcademicRecords, db.Students) \
+                    .filter(db.AcademicRecords.course_catalog_id == catalogo.id, \
+                            db.AcademicRecords.student_id == db.Students.id,
+                            or_(db.Students.current_status == 'enrolled', db.Students.current_status == 'enrolled_dp')) \
+                    .all()
 
-    ars = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalogo.id) \
-                    .filter(db.AcademicRecords.date_conclusion == None) \
-                    .filter(db.AcademicRecords.date_graduation == None) \
-                    .filter(db.AcademicRecords.date_complete_withdrawal == None) \
-                    .filter(db.AcademicRecords.date_deregistration == None)
-
+    print('Lista de alunos matriculados mas com Carga Horária 0:')
     data = []
     idades = []
-    for ar in ars:
+    for (ar, st) in ars:
         if ar.student.user.birth_date != None:
             idades.append(datetime.date.today().year - ar.student.user.birth_date.year)
         ch = 0
         for activity in ar.student.activity_records:
             if (activity.status == 3 or activity.status == 6 or activity.status == 7) and activity.curricular_activity_id in disciplinas:
                 ch += disciplinas[activity.curricular_activity_id]
+                pendencias[activity.curricular_activity_id] -= 1
         data.append(ch)
+        if ch == 0:
+            print(st)
 
     pdfCatalogo = PdfPages('estatistica-catalogo-' + c + '.pdf')
 
@@ -300,8 +318,10 @@ def ListaCatalogo(c):
     plt.close()
 
     pdfIdade.close()
-
-
+    
+    for (k, d) in enumerate(pendencias):
+        ca = db.session.query(db.CurricularActivities).filter(db.CurricularActivities.id == k).one()
+        print(ca, d)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Estatística das Notas das Disciplinas.')
