@@ -1,2 +1,2 @@
 BEGIN { FS = ","; OFS = "," }
-{gsub("/home/dados/provas/","",$5); print}
+{gsub("/home/provas/dados/","",$5); print}

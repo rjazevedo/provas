@@ -110,7 +110,7 @@ def carregaNota(
     question = sess.query(db.ActivityTestQuestions) \
                    .filter(db.ActivityTestQuestions.activity_test_id == test.id) \
                    .filter(db.ActivityTestQuestions.number == qn) \
-                   .filter(db.ActivityTestQuestions.question_type == 'objective')
+                   .filter(db.ActivityTestQuestions.question_type == 'objective') \
                    .first()
 
     if not question:
@@ -136,7 +136,7 @@ def carregaNota(
 
     corrector_data = { 'comments': cc }
 
-    # correção
+    # correção (sobrescreve sempre!)
     correction = sess.query(db.ActivityRecordSubmissionCorrections) \
                      .filter(db.ActivityRecordSubmissionCorrections.activity_record_submission_id == submission.id) \
                      .filter(db.ActivityRecordSubmissionCorrections.activity_test_question_id == question.id) \
