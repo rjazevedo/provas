@@ -37,7 +37,7 @@ def DashboardProva(pasta, alunos, arquivos, ausentes, base):
                 saida.write('<td>' + str(i) + '</td>')
                 folhas += 1
             else:
-                saida.write('<td class="red">' + str(i) + '</td>')
+                saida.write('<td class="red">' + str(i) + '?</td>')
                 folhasFaltantes += 1
 
         if folhas == aluno.totalFolhas:
