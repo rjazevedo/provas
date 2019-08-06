@@ -18,6 +18,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--disciplina', type=str, required=False, help='Processa somente a disciplina especificada')
     parser.add_argument('-a', '--aluno', type=str, required=False, help='Processa somente o aluno especificado')
     parser.add_argument('-t', '--teste', action='store_true', required=False, help='Testa a execução (não realiza as cópias nada)')
+    parser.add_argument('-v', '--verbose', action='store_true', required=False, help='Indica as folhas que foram incluidas')
 
     folhaBranca = os.path.join(os.path.dirname(sys.argv[0]), 'folha-nao-digitalizada.png')
 
@@ -43,6 +44,8 @@ if __name__ == '__main__':
                             if args.teste:
                                 print(folha)
                             else:
+                                if args.verbose:
+                                    print(folha)
                                 shutil.copyfile(folhaBranca, os.path.join(args.provas, prova.polo, folha + '.png'))
                                 if folha.endswith('-01') and prova.questoesObjetivas != 0:
                                     nomeArquivo = os.path.join(args.provas, prova.polo, folha + '.csv')
