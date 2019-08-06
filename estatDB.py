@@ -237,10 +237,12 @@ def ListaCatalogo(c):
     disciplinas = {}
     ch = 0
     pendencias = {}
+    nomes = {}
     for atividade in catalogo.curriculums:
         lista.append((atividade.semester, atividade.period, atividade.curricular_activity.workload, str(atividade.curricular_activity)))
         ch += atividade.curricular_activity.workload
         disciplinas[atividade.curricular_activity_id] = atividade.curricular_activity.workload
+        nomes[atividade.curricular_activity_id] = str(atividade)
 
     lista.sort()
 
@@ -319,9 +321,11 @@ def ListaCatalogo(c):
 
     pdfIdade.close()
     
-    for (k, d) in enumerate(pendencias):
-        ca = db.session.query(db.CurricularActivities).filter(db.CurricularActivities.id == k).one()
-        print(ca, d)
+    ordenado = sorted([[pendencias[k], nomes[k]] for k in pendencias.keys()])
+
+    for [p, n] in ordenado:
+        print(p, '-', n)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Estatística das Notas das Disciplinas.')
@@ -331,6 +335,7 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--todas', action='store_true', required=False, help='Gera as estatísticas para todas as disciplinas para todas as ofertas')
     parser.add_argument('-m', '--minimo', type=int, required=False, help='Número mínimo de alunos para considerar para cada oferta de disciplina')
     parser.add_argument('-c', '--catalogo', type=str, required=False, help='Seleciona um catálogo específico')
+    parser.add_argument('-d', '--disciplinas', type=int, required=False, help='Imprime as disciplinas do histórico de um aluno, dado o RA')
 
     args = parser.parse_args()
 
