@@ -121,7 +121,6 @@ def carregaNota(
     submission = sess.query(db.ActivityRecordSubmissions) \
                      .filter(db.ActivityRecordSubmissions.activity_record_id == record.id) \
                      .filter(db.ActivityRecordSubmissions.submission_type == st) \
-                     .filter(db.ActivityRecordSubmissions.activity_test_id == test.id) \
                      .first()
 
     if not submission:
@@ -133,6 +132,8 @@ def carregaNota(
                                                     updated_at = func.now()
                                                  )
         sess.add(submission)
+
+    submission.activity_test_id = test.id
 
     corrector_data = { 'comments': cc }
 
