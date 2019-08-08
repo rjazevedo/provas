@@ -25,7 +25,7 @@ de acordo com a carga atual de cada corretor"""
 # o arquivo dbpass.txt deve estar no diretório
 ########################################################
 
-from sqlalchemy import func
+from sqlalchemy import func, or_
 import os
 import sys
 import argparse
@@ -39,7 +39,6 @@ offer_types = { 'regular': 1, 'dp': 2 }
 def erro( str ):
     print( "Erro: " + str )
 
-
 def associa( 
             ca,   # Cód. da disciplina
             cid,   # ID do calendário
@@ -49,7 +48,6 @@ def associa(
 
     print( "Calendário: ", cid )
     print( "Disciplina: ", ca )
-    print()
 
     ####################
     # Inicia Sessão 
@@ -57,32 +55,68 @@ def associa(
     sess = db.Session()
     sess.autoflush = True  # default
 
-    # submissões
-    submissions = sess.query(db.ActivityRecordSubmissions,
-                             db.ActivityRecords,
-                             db.ActivityOffers,
-                             db.CurricularActivities) \
-                      .filter(db.ActivityOffers.curricular_activity_id == db.CurricularActivities.id) \
+    # todas as submissões da disciplina/calendario/tipo
+    submissions = sess.query(db.ActivityRecordSubmissions.id) \
+                      .join(db.ActivityRecords,db.ActivityOffers,db.CurricularActivities) \
                       .filter(db.ActivityOffers.offer_type == offer_types[st]) \
-                      .filter(db.ActivityRecords.activity_offer_id == db.ActivityOffers.id) \
-                      .filter(db.ActivityRecordSubmissions.activity_record_id == db.ActivityRecords.id) \
                       .filter(db.CurricularActivities.code == ca) \
                       .filter(db.ActivityOffers.calendar_id == cid) \
-                      .filter(db.ActivityRecordSubmissions.submission_type == st) \
-                      .all()
+                      .filter(db.ActivityRecordSubmissions.submission_type == st)
 
-    print( len(submissions) )
+    print( "Número de provas submetidas: ", submissions.count() )
 
-    # provas
-#    test = sess.query(db.ActivityTests) \
-#               .filter(db.ActivityTests.curricular_activity_id == activity.id) \
-#               .all()
+    # ids de submissões que já têm 'grader' associados
+    has_grader_ids = sess.query(db.ActivityRecordSubmissionCorrectors.activity_record_submission_id) \
+                     .distinct(db.ActivityRecordSubmissionCorrectors.activity_record_submission_id) \
+                     .join(db.ActivityRecordSubmissions,db.ActivityRecords,db.ActivityOffers,db.CurricularActivities) \
+                     .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                     .filter(db.CurricularActivities.code == ca) \
+                     .filter(db.ActivityOffers.calendar_id == cid) \
+                     .filter(db.ActivityRecordSubmissions.submission_type == st) \
+                     .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader')
 
-#    for t in test:
-#       print( t.id )
-#       print( t.code )
-#       print( t.total_pages )
-#       print( t.curricular_activity_id )
+    # ids de submissões que não têm 'grader' associados
+    no_grader_ids = sess.query(db.ActivityRecordSubmissions.id).distinct(db.ActivityRecordSubmissions.id) \
+                    .join(db.ActivityRecords,db.ActivityOffers,db.CurricularActivities) \
+                    .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                    .filter(db.CurricularActivities.code == ca) \
+                    .filter(db.ActivityOffers.calendar_id == cid) \
+                    .filter(db.ActivityRecordSubmissions.submission_type == st) \
+                    .filter(db.ActivityRecordSubmissions.id.notin_(has_grader_ids))
+
+    print( "Número de provas submetidas, sem corretor associado: ", no_grader_ids.count() )
+
+    # ids (internal_users) dos 'grader's atualmente associados às submissões
+    graders =  sess.query(db.ActivityRecordSubmissionCorrectors.internal_user_id) \
+                     .distinct(db.ActivityRecordSubmissionCorrectors.internal_user_id) \
+                     .join(db.ActivityRecordSubmissions,db.ActivityRecords,db.ActivityOffers,db.CurricularActivities) \
+                     .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                     .filter(db.CurricularActivities.code == ca) \
+                     .filter(db.ActivityOffers.calendar_id == cid) \
+                     .filter(db.ActivityRecordSubmissions.submission_type == st) \
+                     .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader')
+
+    print( "Número de corretores atualmente associados: ", graders.count() )
+
+    print( "Carga atual total associada a cada corretor (qualquer disciplina deste tipo/calendario):" )
+
+    carga =  sess.query(db.ActivityRecordSubmissionCorrectors.internal_user_id) \
+                     .join(db.ActivityRecordSubmissions,db.ActivityRecords,db.ActivityOffers) \
+                     .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                     .filter(db.ActivityOffers.calendar_id == cid) \
+                     .filter(db.ActivityRecordSubmissions.submission_type == st)
+
+    go = []
+
+    for g in graders:
+        c = sess.query(db.InternalUsers).filter(db.InternalUsers.id == g.internal_user_id).first()
+        cnt = carga.filter(db.ActivityRecordSubmissionCorrectors.internal_user_id == g.internal_user_id).count()
+        go.append( [cnt,c.name,c.email,c.role] )
+
+    go.sort(reverse=True)
+
+    for g in go:
+        print( "[", g[0], "]", g[1], ",", g[2], ",", g[3] )
 
 #    sess.commit()
 
