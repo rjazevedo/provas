@@ -632,9 +632,9 @@ def ProcessaPoloDisciplina(listaPresenca):
         aluno.GeraCodigo()
         FolhaResposta(c, aluno, aluno.questoesObjetivas, aluno.folhasDissertativas)
 
-    FolhaResposta(c, alunoX, alunoX.questoesObjetivas, alunoX.folhasDissertativas)
-    FolhaResposta(c, alunoY, alunoY.questoesObjetivas, alunoY.folhasDissertativas)
-    FolhaResposta(c, alunoZ, alunoZ.questoesObjetivas, alunoZ.folhasDissertativas)
+    # FolhaResposta(c, alunoX, alunoX.questoesObjetivas, alunoX.folhasDissertativas)
+    # FolhaResposta(c, alunoY, alunoY.questoesObjetivas, alunoY.folhasDissertativas)
+    # FolhaResposta(c, alunoZ, alunoZ.questoesObjetivas, alunoZ.folhasDissertativas)
 
     ListaPresenca(listaPresenca)
     FolhaOcorrencia(alunoX)
