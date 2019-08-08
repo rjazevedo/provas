@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Carrega notas de questões objetivas no SGA a partir de um CSV:
-Cód. da disciplina,Cód. da prova,RA do aluno,Número da questão,Nota da questão,Comentário do corretor"""
+"""Marca aluno como ausente em uma prova no SGA a partir de um CSV com as colunas:
+_, _, Cód. da disciplina, Cód. da prova,RA do aluno"""
 
 ###############################################
-# Uso: sgaNotas.py -a notas.csv -c 38
+# Uso: sgaAusentes.py -a ausentes.csv -c 38
 #
 # 38: é o calendário do bimestre 2019/2
 #
@@ -13,7 +13,6 @@ Cód. da disciplina,Cód. da prova,RA do aluno,Número da questão,Nota da quest
 ###############################################
 
 from sqlalchemy import func
-from sqlalchemy.orm.attributes import flag_modified
 import os
 import sys
 import argparse
@@ -27,27 +26,21 @@ offer_types = { 'regular': 1, 'dp': 2 }
 def erro( str ):
     print( "Erro: " + str )
 
-def carregaNota( 
-                  ac,  # activity_code
-                  tc,  # test_code
-                  ar,  # academic_register
-                  qn,  # question number
-                  qg,  # question grade
-                  cc,  # corrector comment
-                  st,  # submission_type
-                  cid  # calendar_id
-                ):
+def marcaAluno( 
+                ac,  # activity_code
+                tc,  # test_code
+                ar,  # academic_register
+                st,  # submission_type
+                cid  # calendar_id
+              ):
 
-    """Carrega a nota de uma questão, de uma prova, de um aluno, no SGA"""
+    """Marca um aluno como ausente em uma prova, no SGA"""
 
     print(  
-            "Tenta carregar a nota de uma questão objetiva: ",
+            "Tenta marcar um aluno como ausente: ",
             ac,  # activity_code
             tc,  # test_code
             ar,  # academic_register
-            qn,  # question number
-            qg,  # question grade
-            cc,  # corrector comment
             st,  # submission_type
             cid  # calendar_id
           )
@@ -106,17 +99,6 @@ def carregaNota(
       erro( "Missing ActivityTests: %s, %d" % (tc, activity.id) )
       return
 
-    # questão
-    question = sess.query(db.ActivityTestQuestions) \
-                   .filter(db.ActivityTestQuestions.activity_test_id == test.id) \
-                   .filter(db.ActivityTestQuestions.number == qn) \
-                   .filter(db.ActivityTestQuestions.question_type == 'objective') \
-                   .first()
-
-    if not question:
-      erro( "Missing ActivityTestQuestions: %d, %d, objective" % (test.id, qn) )
-      return
-
     # submissão (cria uma caso não exista)
     submission = sess.query(db.ActivityRecordSubmissions) \
                      .filter(db.ActivityRecordSubmissions.activity_record_id == record.id) \
@@ -134,39 +116,17 @@ def carregaNota(
         sess.add(submission)
 
     submission.activity_test_id = test.id
-
-    corrector_data = { 'comments': cc }
-
-    # correção (sobrescreve sempre!)
-    correction = sess.query(db.ActivityRecordSubmissionCorrections) \
-                     .filter(db.ActivityRecordSubmissionCorrections.activity_record_submission_id == submission.id) \
-                     .filter(db.ActivityRecordSubmissionCorrections.activity_test_question_id == question.id) \
-                     .first()
-
-    if not correction:
-        correction = db.ActivityRecordSubmissionCorrections(
-                                                    activity_record_submission_id = submission.id,
-                                                    activity_test_question_id = question.id,
-                                                    created_at = func.now(),
-                                                    updated_at = func.now()
-                                                 )
-        sess.add(correction)
-
-    correction.grade = qg
-    correction.corrector_data = corrector_data
-
-    flag_modified(correction, "corrector_data")  # Sqlalchemy JSON é imutável por default
+    submission.absent = True
 
     sess.commit()
 
     print( "Sucesso!" )
 
-
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Carrega notas de questões objetivas no SGA a partir de um CSV:'
-                                                 'Cód. da disciplina,Cód. da prova,RA do aluno,Número da questão,'
-                                                 'Nota da questão,Comentário do corretor')
-    parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV de notas')
+    parser = argparse.ArgumentParser(description='Marca aluno como ausente em uma prova no SGA'
+                                                 ' a partir de um CSV com as colunas: _, _, Cód. da disciplina,'
+                                                 'Cód. da prova,RA do aluno')
+    parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV de alunos ausentes')
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
 
@@ -188,18 +148,18 @@ if __name__ == '__main__':
 
     ####################
     # percorre CSV
+    #
+    # 0,       1,   2,     3,   4
+    # 20190417,0103,MCA503,P001,1801725
     ####################
 
     with open(arquivo, newline='') as f:
         reader = csv.reader(f, delimiter=',')
         for row in reader:
-            carregaNota(
-                          row[0],      # str, Cód. da disciplina
-                          row[1],      # str, Cód. da prova
-                          row[2],      # str, RA do aluno
-                          int(row[3]), # int, Número da questão
-                          row[4],      # str, Nota da questão
-                          row[5],      # str, Comentário do Corretor
-                          tipo,        ### str, Tipo da submissão
-                          calendario   ### int, ID do calendário
-                       )
+            marcaAluno(
+                        row[2],      # str, Cód. da disciplina
+                        row[3],      # str, Cód. da prova
+                        row[4],      # str, RA do aluno
+                        tipo,        ### str, Tipo da submissão
+                        calendario   ### int, ID do calendário
+                      )
