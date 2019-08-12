@@ -35,9 +35,10 @@ if __name__ == '__main__':
 
     ausentes = csv.reader(open(args.ausentes))
     ausentes = ['-'.join(x) for x in ausentes]
-    print(len(ausentes), 'folhas de resposta estão marcadas como ausentes.')
+    print(len(ausentes), 'cadernos de resposta estão marcadas como ausentes.')
 
     folhasFaltantes = 0
+    provasCompletas = {}
     provasIncompletas = {}
     polosPendentes = {}
 
@@ -48,7 +49,10 @@ if __name__ == '__main__':
                 folhasFaltantes += 1
                 provasIncompletas[prova.codigo] = True
                 polosPendentes[prova.polo] = True
+        if not provasIncompletas[prova.codigo]:
+            provasCompletas[prova.codigo] = True
 
+    print(len(provasCompletas), 'provas completas.')
     print(folhasFaltantes, 'folhas faltantes.')
     print(len(provasIncompletas), 'provas incompletas.')
     print(len(polosPendentes), 'polos com pendências.')
