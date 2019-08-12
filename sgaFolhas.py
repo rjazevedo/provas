@@ -36,7 +36,8 @@ def carregaFolha(
                   n,   # number
                   ls,  # link_sheet
                   st,  # submission_type
-                  cid  # calendar_id
+                  cid, # calendar_id
+                  forca # forca substituição
                 ):
 
     """Carrega o link de uma folha de resposta, de uma prova, de um aluno, no SGA"""
@@ -49,7 +50,8 @@ def carregaFolha(
             n,   # number
             ls,  # link_sheet
             st,  # submission_type
-            cid  # calendar_id
+            cid,  # calendar_id
+            forca # forca substituição
           )
 
     ####################
@@ -144,13 +146,20 @@ def carregaFolha(
     if not attach.sheets_data: attach.sheets_data = []
 
     has_sheet_n = False
-    for e in attach.sheets_data:
+    sheet_n_i = 0
+    for i in range(len(attach.sheets_data)):
+        e = attach.sheets_data[i]
         if e['number'] == n:
             has_sheet_n = True
+            sheet_n_i = i
+
+    sheet_link = {'number': n, 'path': TEST_PATH + ls}
 
     # carrega folha caso não exista
     if not has_sheet_n:
-        attach.sheets_data.append( {'number': n, 'path': TEST_PATH + ls} )
+        attach.sheets_data.append( sheet_link )
+    elif forca:
+        attach.sheets_data[sheet_n_i] = sheet_link
         
     flag_modified(attach, "sheets_data")  # Sqlalchemy JSON é imutável por default
 
@@ -166,6 +175,7 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV de folhas de resposta')
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
+    parser.add_argument('-f', '--forca', action='store_true', help='Substitui forçosamente o link, caso já exista uma folha de mesmo número')
 
     args = parser.parse_args()
 
@@ -197,5 +207,6 @@ if __name__ == '__main__':
                           int(row[3]), # int, Número da folha
                           row[4],      # str, Link do arquivo da folha de resposta
                           tipo,        ### str, Tipo da submissão
-                          calendario   ### int, ID do calendário
+                          calendario,  ### int, ID do calendário
+                          args.forca   # bool, força substituição do link, caso já exista
                         )
