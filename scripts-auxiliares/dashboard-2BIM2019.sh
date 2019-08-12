@@ -1,4 +1,5 @@
 #!/bin/bash
+#Autor: Daniel Consiglieri
 cd ~/tmp
 mkdir d2BIM2019
 echo "Inicio da geração do DashBoard - 2 Bimestre 2019"
