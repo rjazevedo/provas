@@ -49,7 +49,7 @@ if __name__ == '__main__':
                 folhasFaltantes += 1
                 provasIncompletas[prova.codigo] = True
                 polosPendentes[prova.polo] = True
-        if not provasIncompletas[prova.codigo]:
+        if not prova.codigo in provasIncompletas:
             provasCompletas[prova.codigo] = True
 
     print(len(provasCompletas), 'provas completas.')
