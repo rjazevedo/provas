@@ -1,5 +1,8 @@
 #!/bin/bash
+#Descricao: Script que gera Dashboard do 2 Bimestre
 #Autor: Daniel Consiglieri
+#Data Criacao:Jun 2019
+#Revisao:
 cd ~/tmp
 mkdir d2BIM2019
 echo "Inicio da geração do DashBoard - 2 Bimestre 2019"
