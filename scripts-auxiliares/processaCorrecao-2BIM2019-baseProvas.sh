@@ -22,7 +22,6 @@ echo "Iniciando o processamento de Correção 2 Bimestre de 2019"
 cd ${PATH_PROVAS}
 #Incializa um arquivo de ausentes
 >ausentes.csv
-#${HOME_NFS}/tmp/srcTMP/remove-csv-txt.sh
 echo "Executando o rodaScannerME, aguarde o processamento..."
 ${HOME}/src/rodaScannerME.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -p ${HOME_NFS}/${PATH_PROVAS}
 echo "Executando converte, aguarde o processamento..."
