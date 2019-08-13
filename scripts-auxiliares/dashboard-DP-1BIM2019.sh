@@ -1,0 +1,30 @@
+#!/bin/bash
+#Descricao: Script que gera Dashboard DP 1 Bimestre
+#Autor: Daniel Consiglieri
+#Data Criacao:Jun 2019
+#Revisao:13-ago-2019
+
+#**Inicialiazacao de Variaveis**#
+HOME="/home/provas"
+#Diretorio de NFS
+HOME_NFS="/home/provas/dados"
+#Caminho das provas DP 1 Bimestre
+PATH_PROVAS="SGA/provas"
+#Caminho do arquivo de estrutura Ausentes
+ESTRUTURA_AUSENTES=""
+#Caminho do arquivo de estrutura Dashboad
+ESTRUTURA_DASHBOARD="csv/2019dp1/todasProvasJuntas.csv"
+#Nome da pasta temporaria de trabalho DP 1 Bimestre
+TRABALHO_TMP="d1DPBIM2019"
+#Destino de Dashboad DP 1 bimestre
+DESTINO_DASHBOARD="SGA/dashboard/dp"
+#**Fim de variáveis de parametrizacao**#
+
+cd ${HOME}/tmp
+mkdir ${TRABALHO_TMP}
+echo "Inicio da geração do DashBoard - DP 1o Bimestre 2019"
+~/src/dashboard.py -e ${HOME_NFS}/${PATH_PROVAS} -p ${HOME_NFS}/${ESTRUTURA_DASHBOARD} -s ${HOME}/tmp/${TRABALHO_TMP}
+cd ${HOME}/tmp/${TRABALHO_TMP}
+cp -f *.html ${HOME_NFS}/${DESTINO_DASHBOARD}
+cd ${HOME}/tmp
+rm -rf ${TRABALHO_TMP}
