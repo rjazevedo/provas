@@ -11,6 +11,8 @@ Cód. da disciplina,Cód. da prova,RA do aluno,Número da folha,Link do arquivo 
 # 38: é o calendário do bimestre 2019/2
 #
 # o arquivo dbpass.txt deve estar no diretório
+#
+# Corresponde à: CreateSubmissionsResponseSheetsFromCSV
 ###############################################
 
 from sqlalchemy import func

@@ -10,6 +10,8 @@ Cód. da disciplina,Cód. da prova,RA do aluno,Email do corretor"""
 # 38: é o calendário do bimestre 2019/2
 #
 # o arquivo dbpass.txt deve estar no diretório
+#
+# Corresponde à: CreateSubmissionsCorrectorsFromCSV
 ###############################################
 
 from sqlalchemy import func
