@@ -1,19 +1,39 @@
 #!/bin/bash
-echo "Iniciando o processamento de Correção 2 Bimestre de 2019"
+#Descricao: Script que gera Dashboard do 2 Bimestre
+#Autor: Daniel Consiglieri
+#Data Criacao:Jun 2019
+#Revisao:13-ago-2019
 
-cd ~/dados/SGA/provas_2_bimestre/
-#~/dados/tmp/srcTMP/remove-csv-txt.sh
+#**Inicialiazacao de Variaveis**#
+HOME="/home/provas"
+#Diretorio de NFS
+HOME_NFS="/home/provas/dados"
+#Caminho das provas 2 Bimestre
+PATH_PROVAS="SGA/provas_2_bimestre"
+#Caminho do arquivo de estrutura Dashboad
+ESTRUTURA_PROVAS="gdrive_rclone/2_bimestre/origem/csv/todasProvasJuntas.csv"
+#Caminho do arquivo de gabaritos
+GABARITO_PROVAS="gdrive_rclone/2_bimestre/origem/csv/GabaritoMultiplasEscolhas-2BIM-2019.csv"
+SAIDA_CSV="/home/provas/dados/SGA/provas_2_bimestre/Saida"
+#**Fim de variáveis de parametrizacao**#
+
+echo "Iniciando o processamento de Correção 2 Bimestre de 2019"
+#Direcionando para a pasta de saida
+cd ${PATH_PROVAS}
+#Incializa um arquivo de ausentes
+>ausentes.csv
+#${HOME_NFS}/tmp/srcTMP/remove-csv-txt.sh
 echo "Executando o rodaScannerME, aguarde o processamento..."
-~/src/rodaScannerME.py -e ~/dados/gdrive_rclone/2_bimestre/origem/csv/todasProvasJuntas.csv -p ~/dados/SGA/provas_2_bimestre/
+${HOME}/src/rodaScannerME.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -p ${HOME_NFS}/${PATH_PROVAS}
 echo "Executando converte, aguarde o processamento..."
-~/src/converte.py -e ~/dados/SGA/provas_2_bimestre/ -s ausentes.csv
+${HOME}/src/converte.py -e ${HOME_NFS}/${PATH_PROVAS} -s ausentes.csv
 echo "Executando rodaLeitorPresenca, aguarde o processamento..."
-~/src/rodaLeitorPresenca.py -e ~/dados/gdrive_rclone/2_bimestre/origem/csv/todasProvasJuntas.csv -a ausentes.csv -p ~/dados/SGA/provas_2_bimestre/
-echo "Executando distribuiFolhasAusentes, aguarde o processamento..."
-#~/src/distribuiFolhasAusentes.py -e ~/dados/gdrive_rclone/2_bimestre/origem/csv/todasProvasJuntas.csv -a ausentes.csv -p ~/dados/SGA/provas_2_bimestre/
+${HOME}/src/rodaLeitorPresenca.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -a ausentes.csv -p ${HOME_NFS}/${PATH_PROVAS}
+#echo "Executando distribuiFolhasAusentes, aguarde o processamento..."
+#${HOME}/src/distribuiFolhasAusentes.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -a ausentes.csv -p ${HOME_NFS}/${PATH_PROVAS}
 echo "Organizando as provas de ausentes no servidor..."
-~/src/distribuiPorPolos.sh
+${HOME}/src/distribuiPorPolos.sh
 echo "Executando corrigeME, aguarde o processamento..."
-~/src/corrigeME-20190717.py -e ~/dados/gdrive_rclone/2_bimestre/origem/csv/todasProvasJuntas.csv -g ~/dados/gdrive_rclone/2_bimestre/origem/csv/GabaritoMultiplasEscolhas-2BIM-2019.csv -a ~/dados/SGA/provas_2_bimestre/ -s notas.csv
+${HOME}/src/corrigeME-20190717.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -g ${HOME_NFS}/${GABARITO_PROVAS} -a ${HOME_NFS}/${PATH_PROVAS} -s notas.csv
 echo "Provas Corrigidas"
 echo "Script processaCorre��o 2 Bimestre de 2019 finalizado"
