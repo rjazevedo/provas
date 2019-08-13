@@ -2,12 +2,29 @@
 #Descricao: Script que gera Dashboard do 2 Bimestre
 #Autor: Daniel Consiglieri
 #Data Criacao:Jun 2019
-#Revisao:
-cd ~/tmp
-mkdir d2BIM2019
+#Revisao:13-ago-2019
+
+#**Inicialiazacao de Variaveis**#
+HOME="/home/provas"
+#Diretorio de NFS
+HOME_NFS="/home/provas/dados"
+#Caminho das provas 2 Bimestre
+PATH_PROVAS="SGA/provas_2_bimestre"
+#Caminho do arquivo de estrutura Ausentes
+ESTRUTURA_AUSENTES="SGA/provas_2_bimestre/ausentes.csv"
+#Caminho do arquivo de estrutura Dashboad
+ESTRUTURA_DASHBOARD="gdrive_rclone/2_bimestre/origem/csv/dashboard-2BIM-2019.csv"
+#Nome da pasta temporaria de trabalho 2 Bimestre
+TRABALHO_TMP="d2BIM2019"
+#Destino de Dashboad 2 bimestre
+DESTINO_DASHBOARD="SGA/dashboard/2bim"
+#**Fim de variáveis de parametrizacao**#
+
+cd ${HOME}/tmp
+mkdir ${TRABALHO_TMP}
 echo "Inicio da geração do DashBoard - 2 Bimestre 2019"
-~/src/dashboard.py -e ~/dados/SGA/provas_2_bimestre -p ~/dados/gdrive_rclone/2_bimestre/origem/csv/dashboard-2BIM-2019.csv -s ~/tmp/d2BIM2019 -a ~/dados/SGA/provas_2_bimestre/ausentes.csv
-cd ~/tmp/d2BIM2019
-cp -f *.html ~/dados/SGA/dashboard/2bim
-cd ~/tmp
-rm -rf d2BIM2019
+~/src/dashboard.py -e ${HOME_NFS}/${PATH_PROVAS} -p ${HOME_NFS}/${ESTRUTURA_DASHBOARD} -s ${HOME}/tmp/${TRABALHO_TMP} -a ${HOME_NFS}/${ESTRUTURA_AUSENTES}
+cd ${HOME}/tmp/${TRABALHO_TMP}
+cp -f *.html ${HOME_NFS}/${DESTINO_DASHBOARD}
+cd ${HOME}/tmp
+rm -rf ${TRABALHO_TMP}
