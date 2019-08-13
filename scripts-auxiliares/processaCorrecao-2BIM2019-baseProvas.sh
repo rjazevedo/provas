@@ -34,5 +34,9 @@ echo "Organizando as provas de ausentes no servidor..."
 ${HOME}/src/distribuiPorPolos.sh
 echo "Executando corrigeME, aguarde o processamento..."
 ${HOME}/src/corrigeME-20190717.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -g ${HOME_NFS}/${GABARITO_PROVAS} -a ${HOME_NFS}/${PATH_PROVAS} -s notas.csv
+echo "Filtrando arquivo de saida de correcao"
+#Esse passo Ã© necessÃ¡rio para nÃ£o sobrescrever correcoes manuais
+awk '!/em branco/' notas.csv > nota_filtrada.csv
 echo "Provas Corrigidas"
 echo "Script processaCorreção 2 Bimestre de 2019 finalizado"
+
