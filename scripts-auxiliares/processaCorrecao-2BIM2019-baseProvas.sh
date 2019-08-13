@@ -10,7 +10,7 @@ HOME="/home/provas"
 HOME_NFS="/home/provas/dados"
 #Caminho das provas 2 Bimestre
 PATH_PROVAS="SGA/provas_2_bimestre"
-#Caminho do arquivo de estrutura Dashboad
+#Caminho do arquivo de estrutura Provas
 ESTRUTURA_PROVAS="gdrive_rclone/2_bimestre/origem/csv/todasProvasJuntas.csv"
 #Caminho do arquivo de gabaritos
 GABARITO_PROVAS="gdrive_rclone/2_bimestre/origem/csv/GabaritoMultiplasEscolhas-2BIM-2019.csv"
