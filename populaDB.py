@@ -66,10 +66,12 @@ class LinhaProva:
             a = arquivo + '-' + format(i, '02d') + '.png'
             if os.path.isfile(a):
                 retorno.append([self.disciplina, self.prova, self.ra, i, a])
-        if len(retorno) == nFolhas:
-            return retorno
-        else: 
-            return []
+        return retorno
+# Alterado por Guilherme em 14/8, 12:16
+#        if len(retorno) == nFolhas:
+#            return retorno
+#        else: 
+#            return []
 
 class CorretorDisciplina:
     def __init__(self, nome, corretor):
