@@ -10,6 +10,8 @@ Cód. da disciplina,Cód. da prova,RA do aluno,Número da questão,Nota da quest
 # 38: é o calendário do bimestre 2019/2
 #
 # o arquivo dbpass.txt deve estar no diretório
+#
+# corresponde à: CreateSubmissionsCorrectionsObjectivesFromCSV (SGA)
 ###############################################
 
 from sqlalchemy import func

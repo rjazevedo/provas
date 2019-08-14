@@ -16,8 +16,8 @@ de acordo com a carga atual de cada corretor"""
 #    Lista estatísticas de submissões da disciplina e
 #    de corretores atualmente associados
 # 
-# 2)  sgaCarrossel.py -c calendario -d codigo_da_disciplina
-#    sgaCarrossel.py -c 37 -d AAG001
+# 2) sgaCarrossel.py -c calendario -d codigo_da_disciplina --commit
+#    sgaCarrossel.py -c 37 -d AAG001 --commit
 # 
 #    Lista estatísticas de submissões da disciplina e
 #    de corretores atualmente associados; roda o carrossel para
@@ -81,10 +81,11 @@ def estatistica(
 
 
 def associa( 
-            ca,   # Cód. da disciplina
-            cid,  # ID do calendário
-            st,   # Tipo da submissão
-            sess  # DB sesssion
+            ca,    # Cód. da disciplina
+            cid,   # ID do calendário
+            st,    # Tipo da submissão
+            sess,  # DB sesssion
+            commit # efetiva carrossel no BD
             ):
     """Associa corretores a provas de uma disciplina de acordo com a carga dos corretos no SGA"""
 
@@ -126,8 +127,12 @@ def associa(
 
     estatistica( ca, cid, st, sess )
 
-    print()
-    print( "Associa corretores:" )
+    if ( commit ):
+        print()
+        print( "Associa corretores:" )
+
+                
+
 
 
 
@@ -175,26 +180,25 @@ if __name__ == '__main__':
              disciplina, 
              calendario,
              tipo,
-             sess
+             sess,
+             args.commit
            )
 
-    if not os.path.isfile(arquivo):
-        print( 'Arquivo ' + arquivo + ' não encontrado!' )
-        sys.exit(1)
+#    if not os.path.isfile(arquivo):
+#        print( 'Arquivo ' + arquivo + ' não encontrado!' )
+#        sys.exit(1)
 
     ####################
     # percorre CSV
     ####################
 
-    pool = {}
+#    pool = {}
 
-    with open(arquivo, newline='') as f:
-        reader = csv.reader(f, delimiter=',')
-        for row in reader:
-            ca_code  = row[0]  # str, Cód. da disciplina
-            iu_email = row[1]  # str, Email do corretor (internal_user)
-
-
+#    with open(arquivo, newline='') as f:
+#        reader = csv.reader(f, delimiter=',')
+#        for row in reader:
+#            ca_code  = row[0]  # str, Cód. da disciplina
+#            iu_email = row[1]  # str, Email do corretor (internal_user)
 
 
 #    sess.commit()
