@@ -21,18 +21,17 @@ import csv
 
 args = None
 
-offer_types = { 'regular': 1, 'dp': 2 }
 TEST_PATH = '/var/data/nfs/provas/' # está no .ENV no SGA
 
 def erro( str ):
     print( "Erro: " + str )
 
-def carregaFolha( 
-                  ac,  # activity_code
-                  tc,  # test_code
-                  ns,  # number of sheets
-                  lk   # link
-                ):
+def carregaGuia( 
+                ac,  # activity_code
+                tc,  # test_code
+                ns,  # number of sheets
+                lk   # link
+               ):
 
     """Cria registros de provas e guias de correção no SGA"""
 
@@ -42,7 +41,7 @@ def carregaFolha(
             tc,  # test_code
             ns,  # number of sheets
             lk   # link
-        )
+         )
 
     ####################
     # Inicia Sessão 
@@ -120,9 +119,9 @@ if __name__ == '__main__':
     with open(arquivo, newline='') as f:
         reader = csv.reader(f, delimiter=',')
         for row in reader:
-            carregaFolha(
-                          row[0],      # str, Cód. da disciplina
-                          row[1],      # str, Cód. da prova
-                          int(row[2]), # int, Número de folhas
-                          row[3]       # str, Link do arquivo
-                        )
+            carregaGuia(
+                        row[0],      # str, Cód. da disciplina
+                        row[1],      # str, Cód. da prova
+                        int(row[2]), # int, Número de folhas
+                        row[3]       # str, Link do arquivo
+                       )
