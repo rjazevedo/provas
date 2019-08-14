@@ -23,8 +23,13 @@ HOME_NFS="/home/provas/dados"
 PATH_PROVAS="SGA/provas_2_bimestre"
 #Caminho da Saida Gerada
 SAIDA_CSV="/home/provas/dados/SGA/provas_2_bimestre/Saida"
+#Backup de csv anteriores
+BACKUP_CSV=""
 #**Fim de variáveis de parametrizacao**#
 
 
 echo "Inicio da geração do PopulaDB - 2 Bimestre"
-${HOME}/src/populaDB.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV}
+${HOME}/src/populaDB.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${SAIDA_CSV}/log.txt
+echo "Tratando dos arquivos csv gerados"
+awk -f ${HOME}/src/filtra.awk ${SAIDA_CSV}/folhas.csv > ${SAIDA_CSV}/folha_filtrada.csv
+${SAIDA_CSV}/folha_filtrada.csv > ${SAIDA_CSV}/folhas.csv

@@ -39,4 +39,3 @@ echo "Filtrando arquivo de saida de correcao"
 awk '!/em branco/' notas.csv > nota_filtrada.csv
 echo "Provas Corrigidas"
 echo "Script processaCorreção 2 Bimestre de 2019 finalizado"
-
