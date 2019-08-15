@@ -5,9 +5,6 @@
 de acordo com a carga atual de cada corretor"""
 
 ########################################################
-# Sempre um dryrun por default, sempre somente uma
-# simulação. Para efetivar associações no BD, use: --commit
-# 
 # Casos de uso:
 # 
 # 1) sgaCarrossel.py -c calendario -d codigo_da_disciplina
@@ -16,13 +13,12 @@ de acordo com a carga atual de cada corretor"""
 #    Lista estatísticas de submissões da disciplina e
 #    de corretores atualmente associados
 # 
-# 2) sgaCarrossel.py -c calendario -d codigo_da_disciplina --commit
-#    sgaCarrossel.py -c 37 -d AAG001 --commit
+# 2) sgaCarrossel.py -a arquivo_de_corretores -c calendario --commit
+#    sgaCarrossel.py -a corretores.csv -c 37 --commit
 # 
-#    Lista estatísticas de submissões da disciplina e
-#    de corretores atualmente associados; roda o carrossel para
-#    todas as submissões sem 'grader' associado; lista a
-#    estatística de corretores associados
+#    Roda o carrossel para todas as submissões sem 'grader' associado,
+#    de todas as disciplinas no arquivo; depois, lista a estatística de
+#    corretores associados para cada disciplina
 # 
 # o arquivo dbpass.txt deve estar no diretório
 ########################################################
@@ -41,20 +37,18 @@ offer_types = { 'regular': 1, 'dp': 2 }
 def erro( str ):
     print( "Erro: " + str )
 
-def estatistica(
-                ca,   # Cód. da disciplina
-                cid,  # ID do calendário
-                st,   # Tipo da submissão
-                sess  # DB sesssion
-                ):
+def estatistica( ca ):
+
+    global sess, tipo, calendario
+
     # ids (internal_users) dos 'grader's atualmente associados às submissões
     graders =  sess.query(db.ActivityRecordSubmissionCorrectors.internal_user_id) \
                      .distinct(db.ActivityRecordSubmissionCorrectors.internal_user_id) \
                      .join(db.ActivityRecordSubmissions,db.ActivityRecords,db.ActivityOffers,db.CurricularActivities) \
-                     .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                     .filter(db.ActivityOffers.offer_type == offer_types[tipo]) \
                      .filter(db.CurricularActivities.code == ca) \
-                     .filter(db.ActivityOffers.calendar_id == cid) \
-                     .filter(db.ActivityRecordSubmissions.submission_type == st) \
+                     .filter(db.ActivityOffers.calendar_id == calendario) \
+                     .filter(db.ActivityRecordSubmissions.submission_type == tipo) \
                      .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader')
 
     print( "Número de corretores atualmente associados: ", graders.count() )
@@ -63,9 +57,9 @@ def estatistica(
 
     carga =  sess.query(db.ActivityRecordSubmissionCorrectors.internal_user_id) \
                      .join(db.ActivityRecordSubmissions,db.ActivityRecords,db.ActivityOffers) \
-                     .filter(db.ActivityOffers.offer_type == offer_types[st]) \
-                     .filter(db.ActivityOffers.calendar_id == cid) \
-                     .filter(db.ActivityRecordSubmissions.submission_type == st)
+                     .filter(db.ActivityOffers.offer_type == offer_types[tipo]) \
+                     .filter(db.ActivityOffers.calendar_id == calendario) \
+                     .filter(db.ActivityRecordSubmissions.submission_type == tipo)
 
     go = []
 
@@ -80,56 +74,7 @@ def estatistica(
         print( "[", g[0], "]", g[1], ",", g[2], ",", g[3] )
 
 
-def associa( 
-            ca,    # Cód. da disciplina
-            cid,   # ID do calendário
-            st,    # Tipo da submissão
-            sess,  # DB sesssion
-            commit # efetiva carrossel no BD
-            ):
-    """Associa corretores a provas de uma disciplina de acordo com a carga dos corretos no SGA"""
-
-    print( "Calendário: ", cid )
-    print( "Disciplina: ", ca )
-
-    # todas as submissões da disciplina/calendario/tipo
-    submissions = sess.query(db.ActivityRecordSubmissions.id) \
-                      .join(db.ActivityRecords,db.ActivityOffers,db.CurricularActivities) \
-                      .filter(db.ActivityOffers.offer_type == offer_types[st]) \
-                      .filter(db.CurricularActivities.code == ca) \
-                      .filter(db.ActivityOffers.calendar_id == cid) \
-                      .filter(db.ActivityRecordSubmissions.submission_type == st)
-
-    print( "Número de provas submetidas: ", submissions.count() )
-
-    # ids de submissões que já têm 'grader' associados
-    has_grader_ids = sess.query(db.ActivityRecordSubmissionCorrectors.activity_record_submission_id) \
-                     .distinct(db.ActivityRecordSubmissionCorrectors.activity_record_submission_id) \
-                     .join(db.ActivityRecordSubmissions,db.ActivityRecords,db.ActivityOffers,db.CurricularActivities) \
-                     .filter(db.ActivityOffers.offer_type == offer_types[st]) \
-                     .filter(db.CurricularActivities.code == ca) \
-                     .filter(db.ActivityOffers.calendar_id == cid) \
-                     .filter(db.ActivityRecordSubmissions.submission_type == st) \
-                     .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader')
-
-    # ids de submissões que não têm 'grader' associados
-    no_grader_ids = sess.query(db.ActivityRecordSubmissions.id).distinct(db.ActivityRecordSubmissions.id) \
-                    .join(db.ActivityRecords,db.ActivityOffers,db.CurricularActivities) \
-                    .filter(db.ActivityOffers.offer_type == offer_types[st]) \
-                    .filter(db.CurricularActivities.code == ca) \
-                    .filter(db.ActivityOffers.calendar_id == cid) \
-                    .filter(db.ActivityRecordSubmissions.submission_type == st) \
-                    .filter(db.ActivityRecordSubmissions.id.notin_(has_grader_ids))
-
-    ids_cnt = no_grader_ids.count()
-
-    print( "Número de provas submetidas, sem corretor associado: ", ids_cnt )
-
-    estatistica( ca, cid, st, sess )
-
-    if ( commit ):
-        print()
-        print( "Associa corretores:" )
+def associa_grader():
 
 #        submission_corrector = db.ActivityRecordSubmissionCorrectors(
 #                                                    activity_record_submission_id = submission.id,
@@ -140,13 +85,85 @@ def associa(
 #                                                   )
 #        sess.add(submission_corrector)
 
+
+def associa( ca ):
+    """Associa corretores a provas de uma disciplina de acordo com a carga dos corretos no SGA"""
+
+    global sess, tipo, calendario, commit
+
+    print( "Calendário: ", calendario )
+    print( "Disciplina: ", ca )
+
+    # todas as submissões da disciplina/calendario/tipo
+    submissions = sess.query(db.ActivityRecordSubmissions.id) \
+                      .join(db.ActivityRecords,db.ActivityOffers,db.CurricularActivities) \
+                      .filter(db.ActivityOffers.offer_type == offer_types[tipo]) \
+                      .filter(db.CurricularActivities.code == ca) \
+                      .filter(db.ActivityOffers.calendar_id == calendario) \
+                      .filter(db.ActivityRecordSubmissions.submission_type == tipo)
+
+    print( "Número de provas submetidas: ", submissions.count() )
+
+    # ids de submissões que já têm 'grader' associados
+    has_grader_ids = sess.query(db.ActivityRecordSubmissionCorrectors.activity_record_submission_id) \
+                     .distinct(db.ActivityRecordSubmissionCorrectors.activity_record_submission_id) \
+                     .join(db.ActivityRecordSubmissions,db.ActivityRecords,db.ActivityOffers,db.CurricularActivities) \
+                     .filter(db.ActivityOffers.offer_type == offer_types[tipo]) \
+                     .filter(db.CurricularActivities.code == ca) \
+                     .filter(db.ActivityOffers.calendar_id == calendario) \
+                     .filter(db.ActivityRecordSubmissions.submission_type == tipo) \
+                     .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader')
+
+    # ids de submissões que não têm 'grader' associados
+    no_grader_ids = sess.query(db.ActivityRecordSubmissions.id).distinct(db.ActivityRecordSubmissions.id) \
+                    .join(db.ActivityRecords,db.ActivityOffers,db.CurricularActivities) \
+                    .filter(db.ActivityOffers.offer_type == offer_types[tipo]) \
+                    .filter(db.CurricularActivities.code == ca) \
+                    .filter(db.ActivityOffers.calendar_id == calendario) \
+                    .filter(db.ActivityRecordSubmissions.submission_type == tipo) \
+                    .filter(db.ActivityRecordSubmissions.id.notin_(has_grader_ids))
+
+    ids_cnt = no_grader_ids.count()
+
+    print( "Número de provas submetidas, sem corretor associado: ", ids_cnt )
+
+    if ( commit ):
+        print()
+        print( "Associa corretores:" )
+
+        # TO DO
+
+    estatistica( ca )
+
+
+def carrega_carga():
+    global sess, tipo, calendario, pool
+
+    carga =  sess.query(db.ActivityRecordSubmissionCorrectors.internal_user_id) \
+                 .join(db.ActivityRecordSubmissions,db.ActivityRecords,db.ActivityOffers) \
+                 .filter(db.ActivityOffers.offer_type == offer_types[tipo]) \
+                 .filter(db.ActivityOffers.calendar_id == calendario) \
+                 .filter(db.ActivityRecordSubmissions.submission_type == tipo)
+
+    for code in pool:
+        for iu in pool[code]:
+            # corretor (internal_user)
+            corrector = sess.query(db.InternalUsers) \
+                            .filter(db.InternalUsers.email == iu[2]) \
+                            .first()
+            if corrector:
+                iu[0] = carga.filter(db.ActivityRecordSubmissionCorrectors.internal_user_id == corrector.id).count()
+                iu[1] = corrector.id
+
+        pool[code].sort()
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Associa corretores (internal_users) a provas de alunos'
                                                  ' no SGA de acordo com a carga atual de cada corretor')
     parser.add_argument('-a', '--arquivo', type=str, help='Arquivo CSV com os emails dos corretores')
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
-    parser.add_argument('-d', '--disciplina', type=str, required=True, help='Código da disciplina')
+    parser.add_argument('-d', '--disciplina', type=str, help='Código da disciplina')
     parser.add_argument('--commit', action='store_true', help='Efetiva associações no BD')
 
     args = parser.parse_args()
@@ -167,32 +184,32 @@ if __name__ == '__main__':
     sess = db.Session()
     sess.autoflush = True  # default
 
-    associa( 
-             disciplina, 
-             calendario,
-             tipo,
-             sess,
-             args.commit
-           )
+    arquivo = args.arquivo
 
-#    if not os.path.isfile(arquivo):
-#        print( 'Arquivo ' + arquivo + ' não encontrado!' )
-#        sys.exit(1)
+    if arquivo is not None:
+        if not os.path.isfile(arquivo):
+            print( 'Arquivo ' + arquivo + ' não encontrado!' )
+            sys.exit(1)
 
-    ####################
-    # percorre CSV
-    ####################
+        ####################
+        # percorre CSV
+        ####################
+        pool = {}
 
-#    pool = {}
+        with open(arquivo, newline='') as f:
+            reader = csv.reader(f, delimiter=',')
+            for row in reader:
+                ca_code  = row[0]  # str, Cód. da disciplina
+                iu_email = row[1]  # str, Email do corretor (internal_user)
 
-#    with open(arquivo, newline='') as f:
-#        reader = csv.reader(f, delimiter=',')
-#        for row in reader:
-#            ca_code  = row[0]  # str, Cód. da disciplina
-#            iu_email = row[1]  # str, Email do corretor (internal_user)
+                if ca_code not in pool: pool[ca_code] = []
+                pool[ca_code].append( [0,          # carga total
+                                       0,          # id
+                                       iu_email] ) # email
 
+        if args.commit:
+            carrega_carga()
+            for code in pool:
+                associa( code )
 
-#    sess.commit()
-
-#    if args.commit:
-
+    sess.commit()
