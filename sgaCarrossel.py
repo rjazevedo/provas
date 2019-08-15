@@ -131,11 +131,6 @@ def associa(
         print()
         print( "Associa corretores:" )
 
-                
-
-
-
-
 #        submission_corrector = db.ActivityRecordSubmissionCorrectors(
 #                                                    activity_record_submission_id = submission.id,
 #                                                    role = 'grader',
@@ -144,10 +139,6 @@ def associa(
 #                                                    updated_at = func.now()
 #                                                   )
 #        sess.add(submission_corrector)
-
-
-
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Associa corretores (internal_users) a provas de alunos'
