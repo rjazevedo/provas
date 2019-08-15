@@ -11,7 +11,7 @@ HOME_NFS="/home/provas/dados"
 #Caminho das provas 2 Bimestre
 PATH_PROVAS="SGA/provas_2_bimestre"
 #Caminho do arquivo de estrutura Ausentes
-ESTRUTURA_AUSENTES="SGA/provas_2_bimestre/ausentes.csv"
+ESTRUTURA_AUSENTES="gdrive_rclone/2_bimestre/origem/csv/ausentes.csv"
 #Caminho do arquivo de estrutura Dashboad
 ESTRUTURA_DASHBOARD="gdrive_rclone/2_bimestre/origem/csv/dashboard-2BIM-2019.csv"
 #Nome da pasta temporaria de trabalho 2 Bimestre

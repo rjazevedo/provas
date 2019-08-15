@@ -1,5 +1,5 @@
 #!/bin/bash
-#Descricao: Script que gera Dashboard do 2 Bimestre
+#Descricao: Script que processa Correcoes do 2 Bimestre
 #Autor: Daniel Consiglieri
 #Data Criacao:Jun 2019
 #Revisao:13-ago-2019
@@ -11,6 +11,8 @@ BACKUP_CSV="/home/provas/dados/backup/2019b2"
 CALENDARIO="38"
 #Data
 DATA=$(date +%Y%m%d_%H-%M-%S)
+#Caminho do arquivo de estrutura Provas
+ESTRUTURA_CSV="gdrive_rclone/2_bimestre/origem/csv/"
 #Caminho do arquivo de estrutura Provas
 ESTRUTURA_PROVAS="gdrive_rclone/2_bimestre/origem/csv/todasProvasJuntas.csv"
 #Caminho do arquivo de gabaritos
@@ -48,5 +50,6 @@ ${HOME}/src/corrigeME-20190717.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -g ${HOME_N
 echo "Filtrando arquivo de saida de correcao"
 #Esse passo Ã© necessÃ¡rio para nÃ£o sobrescrever correcoes manuais
 awk '!/em branco/' ${SAIDA_CSV}/notas.csv > ${SAIDA_CSV}/nota_filtrada.csv
+cat ${SAIDA_CSV}/ausentes_${DATA}.csv > ${SAIDA_CSV}/ausentes.csv
 echo "Provas Corrigidas"
 echo "Script processaCorreção 2 Bimestre de 2019 finalizado"
