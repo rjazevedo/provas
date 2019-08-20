@@ -37,6 +37,7 @@ def DashboardProva(pasta, alunos, arquivos, ausentes, base, pendencias):
             arquivo = aluno.codigo + '-' + '{:02d}'.format(i) + '.png'
             if arquivo in arquivos or aluno.idPresenca() in ausentes:
                 saida.write('<td>' + str(i) + '</td>')
+                p += '<td>' + str(i) + '</td>'
                 folhas += 1
             else:
                 saida.write('<td class="red">' + str(i) + '?</td>')
