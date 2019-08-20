@@ -30,6 +30,7 @@ def DashboardProva(pasta, alunos, arquivos, ausentes, base, pendencias):
     for aluno in alunos:
         totalAlunos += 1
         saida.write('<tr><td>' + aluno.ra + '</td><td>' + aluno.nomeAluno + '</td>')
+        p = '<tr><td>' + aluno.polo + '</td><td>' + aluno.nomePolo + '</td><td>' + aluno.data + '</td><td>' + aluno.disciplina + '</td><td>' + aluno.nomeDisciplina + '</td><td>' + aluno.ra + '</td><td>' + aluno.nomeAluno + '</td>'
         
         folhas = 0
         for i in range(1, aluno.totalFolhas + 1):
@@ -39,17 +40,18 @@ def DashboardProva(pasta, alunos, arquivos, ausentes, base, pendencias):
                 folhas += 1
             else:
                 saida.write('<td class="red">' + str(i) + '?</td>')
-                pendencias.write('<tr><td>' + aluno.polo + '</td><td>' + aluno.nomePolo + '</td><td>' + aluno.data + '</td><td>' + aluno.disciplina + '</td><td>' + aluno.nomeDisciplina + '</td>')
-                pendencias.write('<td class="red">' + str(i) + '?</td>')
-                pendencias.write('</tr>\n')
+                p += '<td class="red">' + str(i) + '?</td>'
                 folhasFaltantes += 1
 
+        p += '</tr>\n'
         if folhas == aluno.totalFolhas:
             alunosCompletos += 1
         elif folhas != 0:
             alunosIncompletos += 1
+            pendencias.write(p)
         else:
             alunosFaltantes += 1
+            pendencias.write(p)
         
         saida.write('</tr>\n')
 
