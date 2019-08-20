@@ -11,7 +11,7 @@ import sys
 import datetime
 from utils import LinhaProva, BuscaArquivos
 
-def DashboardProva(pasta, alunos, arquivos, ausentes, base, pendencias):
+def DashboardProva(pasta, alunos, arquivos, ausentes, base, pendencias, incompletas):
     nomeArquivo = alunos[0].LabelProva() + '.html'
     saida = open(os.path.join(pasta, nomeArquivo), 'wt')
     header = open(os.path.join(base, 'header.html')).read() 
@@ -50,6 +50,7 @@ def DashboardProva(pasta, alunos, arquivos, ausentes, base, pendencias):
         elif folhas != 0:
             alunosIncompletos += 1
             pendencias.write(p)
+            incompletas.write(p)
         else:
             alunosFaltantes += 1
             pendencias.write(p)
@@ -68,19 +69,23 @@ def GeraDashboard(pasta, provas, arquivos, ausentes, base):
     header = open(os.path.join(base, 'header.html')).read() 
     footer = open(os.path.join(base, 'footer.html')).read()
     saida.write(header)
-    saida.write('<h2>' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h2>\n')
+    saida.write('<h2>Gerado em:' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h2>\n')
     saida.write('<h2><a href="resumo.html">Resumo por polo</a></h2>\n')
     saida.write('<h2><a href="pendencias.html">Pendências por aluno</a></h2>\n')
+    saida.write('<h2><a href="incompletas.html">Provas incompletas</a></h2>\n')
     saida.write('<thead><tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>Ocorrência</th><th>Presença</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr></thead><tbody>\n')
     
     pendencias = open(os.path.join(pasta, 'pendencias.html'), 'wt')
     pendencias.write(header)
     pendencias.write('<tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>RA</th><th>Nome</th><th colspan="5">Folhas</th></tr>\n')
+    incompletas = open(os.path.join(pasta, 'incompletas.html'), 'wt')
+    imcompletas.write(header)
+    incompletas.write('<tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>RA</th><th>Nome</th><th colspan="5">Folhas</th></tr>\n')
 
     for p in sorted(provas.keys()):
         print(p)
         prova = provas[p]
-        (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos, ausentes, base, pendencias)
+        (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos, ausentes, base, pendencias, incompletas)
         if not prova[0].nomePolo in resumoPolos:
             resumoPolos[prova[0].nomePolo] = [[totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes]]
         else:
@@ -121,6 +126,7 @@ def GeraDashboard(pasta, provas, arquivos, ausentes, base):
             saida.write('<td class="red">' + str(folhasFaltantes) + '</td></tr>\n')
 
     pendencias.write(footer)
+    incompletas.write(footer)
     saida.write(footer)
     saida.close()
 
