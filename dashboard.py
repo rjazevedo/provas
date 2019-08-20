@@ -79,7 +79,7 @@ def GeraDashboard(pasta, provas, arquivos, ausentes, base):
     pendencias.write(header)
     pendencias.write('<tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>RA</th><th>Nome</th><th colspan="5">Folhas</th></tr>\n')
     incompletas = open(os.path.join(pasta, 'incompletas.html'), 'wt')
-    imcompletas.write(header)
+    incompletas.write(header)
     incompletas.write('<tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>RA</th><th>Nome</th><th colspan="5">Folhas</th></tr>\n')
 
     for p in sorted(provas.keys()):
