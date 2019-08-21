@@ -206,5 +206,5 @@ if __name__ == '__main__':
     
     if args.ausentes != None:
         print(len(possiveisAusentes), 'possíveis ausentes.')
-        csv.writer(open('possiveisAusentes.csv', 'wt')).writerows(possiveisAusentes)
+        csv.writer(open('/home/provas/dados/possiveisAusentes.csv', 'wt')).writerows(possiveisAusentes)
         
