@@ -207,5 +207,5 @@ if __name__ == '__main__':
     if args.ausentes != None:
         nomeArquivo = os.path.join(os.path.dirname(args.ausentes), 'possiveisAusentes.csv')
         print(len(possiveisAusentes), 'possíveis ausentes.')
-        csv.writer(open(nomeArquivo), 'wt').writerows(possiveisAusentes)
+        csv.writer(open(nomeArquivo, 'wt')).writerows(possiveisAusentes)
         
