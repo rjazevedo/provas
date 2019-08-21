@@ -11,7 +11,7 @@ import sys
 import datetime
 from utils import LinhaProva, BuscaArquivos
 
-def DashboardProva(pasta, alunos, arquivos, ausentes, base, pendencias, incompletas):
+def DashboardProva(pasta, alunos, arquivos, ausentes, possiveisAusentes, base, pendencias, incompletas):
     nomeArquivo = alunos[0].LabelProva() + '.html'
     saida = open(os.path.join(pasta, nomeArquivo), 'wt')
     header = open(os.path.join(base, 'header.html')).read() 
@@ -54,6 +54,7 @@ def DashboardProva(pasta, alunos, arquivos, ausentes, base, pendencias, incomple
         else:
             alunosFaltantes += 1
             pendencias.write(p)
+            possiveisAusentes.append([aluno.dataStr, aluno.polo, aluno.disciplina, aluno.prova, aluno.ra])
         
         saida.write('</tr>\n')
 
@@ -62,7 +63,7 @@ def DashboardProva(pasta, alunos, arquivos, ausentes, base, pendencias, incomple
     return (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes)
 
 
-def GeraDashboard(pasta, provas, arquivos, ausentes, base):
+def GeraDashboard(pasta, provas, arquivos, ausentes, possiveisAusentes, base):
 
     resumoPolos = {}
     saida = open(os.path.join(pasta, 'index.html'), 'wt')
@@ -85,7 +86,7 @@ def GeraDashboard(pasta, provas, arquivos, ausentes, base):
     for p in sorted(provas.keys()):
         print(p)
         prova = provas[p]
-        (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos, ausentes, base, pendencias, incompletas)
+        (nomeArquivo, totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes) = DashboardProva(pasta, prova, arquivos, ausentes, possiveisAusentes, base, pendencias, incompletas)
         if not prova[0].nomePolo in resumoPolos:
             resumoPolos[prova[0].nomePolo] = [[totalAlunos, alunosCompletos, alunosIncompletos, alunosFaltantes, folhasFaltantes]]
         else:
@@ -199,5 +200,12 @@ if __name__ == '__main__':
             provas[aluno.OrdemProva()].append(aluno)
         else:
             provas[aluno.OrdemProva()] = [aluno]
-
-    GeraDashboard(args.saida, provas, listaArquivos, ausentes, base)
+            
+    possiveisAusentes = []
+    GeraDashboard(args.saida, provas, listaArquivos, ausentes, possiveisAusentes, base)
+    
+    if args.ausentes != None:
+        nomeArquivo = os.path.join(os.path.dirname(args.ausentes), 'possiveisAusentes.csv')
+        print(len(possiveisAusentes), 'possíveis ausentes.')
+        csv.writer(open(nomeArquivo), 'wt').writerows(possiveisAusentes)
+        
