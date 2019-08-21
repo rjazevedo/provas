@@ -187,7 +187,6 @@ if __name__ == '__main__':
     if args.ausentes != None:
         ausentes = csv.reader(open(args.ausentes))
         ausentes = ['-'.join(x) for x in ausentes]
-        print(ausentes[0])
         print(len(ausentes), 'ausentes a processar')
     else:
         ausentes = []
