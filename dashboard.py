@@ -18,7 +18,7 @@ def DashboardProva(pasta, alunos, arquivos, ausentes, possiveisAusentes, base, p
     footer = open(os.path.join(base, 'footer.html')).read()
     saida.write(header)
 
-    saida.write('<div class="row"><h2>' + alunos[0].LabelProva() + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '</h2></div>')
+    saida.write('<div class="row"><h2>' + alunos[0].LabelProva() + ' ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '</h2></div>')
 
     totalAlunos = 0
     alunosCompletos = 0
@@ -70,7 +70,7 @@ def GeraDashboard(pasta, provas, arquivos, ausentes, possiveisAusentes, base):
     header = open(os.path.join(base, 'header.html')).read() 
     footer = open(os.path.join(base, 'footer.html')).read()
     saida.write(header)
-    saida.write('<h2>Gerado em:' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h2>\n')
+    saida.write('<h2>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h2>\n')
     saida.write('<h2><a href="resumo.html">Resumo por polo</a></h2>\n')
     saida.write('<h2><a href="pendencias.html">Pendências por aluno</a></h2>\n')
     saida.write('<h2><a href="incompletas.html">Provas incompletas</a></h2>\n')
