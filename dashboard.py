@@ -205,7 +205,6 @@ if __name__ == '__main__':
     GeraDashboard(args.saida, provas, listaArquivos, ausentes, possiveisAusentes, base)
     
     if args.ausentes != None:
-        nomeArquivo = os.path.join(os.path.dirname(args.ausentes), 'possiveisAusentes.csv')
         print(len(possiveisAusentes), 'possíveis ausentes.')
-        csv.writer(open(nomeArquivo, 'wt')).writerows(possiveisAusentes)
+        csv.writer(open('possiveisAusentes.csv', 'wt')).writerows(possiveisAusentes)
         
