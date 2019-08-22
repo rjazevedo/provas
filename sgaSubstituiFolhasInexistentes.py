@@ -10,6 +10,7 @@ folha_nao_digitalizada = '/var/data/nfs/provas/SGA/folha-nao-digitalizada.png'
 
 for att in db.session.query(db.Attachments).all():
     if att.sheets_data is not None:
+        modificado = False
         for pageInfo in att.sheets_data:
             if pageInfo['path'].startswith('/var/data/nfs/provas/SGA/provas_2_bimestre'):
                 fileName = '/home/provas/dados' + pageInfo['path'][20:]
@@ -17,5 +18,7 @@ for att in db.session.query(db.Attachments).all():
                     quantidade += 1
                     print(fileName, 'ausente')
                     pageInfo['path'] = folha_nao_digitalizada
-                    flag_modified(att, "sheets_data")
-                    db.session.commit()
+                    modificado = True
+        if modificado:
+            flag_modified(att, "sheets_data")
+            db.session.commit()
