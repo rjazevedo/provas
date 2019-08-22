@@ -22,3 +22,4 @@ for att in db.session.query(db.Attachments).all():
         if modificado:
             flag_modified(att, "sheets_data")
             db.session.commit()
+            print('Atualizado')
