@@ -12,7 +12,7 @@
 HOME="/home/provas/dados"
 
 # origem dos dados no google drive
-ORIGDIR="gdrive_rclone/Processamento-DP/Distribuicao de Provas"
+ORIGDIR="gdrive_rclone/Distribuicao de Provas"
 
 # destino na nuvem da Univesp (repositorio definitivo)
 DESTDIR="fileListenerDP"
