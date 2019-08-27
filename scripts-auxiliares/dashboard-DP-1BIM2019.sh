@@ -8,7 +8,7 @@
 #Isso é invariavel
 BASE_STRING="Dashboard Provas UNIVESP"
 #Personaliza com informações relativas ao periodo de referencia
-SUBSTITUI_STRING=" - DP 1º Bimestre 2019"
+SUBSTITUI_STRING=" - DP 1o Bimestre 2019"
 #Path para Home
 HOME="/home/provas"
 #Diretorio de NFS
