@@ -2,7 +2,7 @@
 #Descricao: Script que processa Correcoes do 2 Bimestre
 #Autor: Daniel Consiglieri
 #Data Criacao:Jun 2019
-#Revisao:13-ago-2019
+#Revisao:26-ago-2019
 
 #**Inicialiazacao de Variaveis**#
 #Backup de csv anteriores
@@ -53,6 +53,11 @@ awk '!/em branco/' ${SAIDA_CSV}/notas.csv > ${SAIDA_CSV}/nota_filtrada.csv
 #*************Modulo de backup ************************#
 cat ${SAIDA_CSV}/nota_filtrada.csv > ${BACKUP_CSV}/${DATA}_nota_filtrada.csv
 cat ${SAIDA_CSV}/notas.csv > ${BACKUP_CSV}/${DATA}_nota_raw.csv
+
+#Concatena o ausentes manual e automatico
+cat ${SAIDA_CSV}/ausentes.csv ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual.csv | sort | uniq > ${SAIDA_CSV}/ausentes_tmp.csv
+
+cat ${SAIDA_CSV}/ausentes_tmp.csv > ${SAIDA_CSV}/ausentes.csv
 cat ${SAIDA_CSV}/ausentes.csv > ${BACKUP_CSV}/${DATA}_ausentes.csv
 
 #******Modulo de Insercao de Banco de dados*****#
@@ -66,7 +71,6 @@ ${HOME}/src/sgaAusentes.py -a ${SAIDA_CSV}/ausentes.csv -c ${CALENDARIO} > ${LOG
 echo "Insercao de ausentes no Banco de Dados finalizada"
 
 #Rotina de atualizacao Ausentes
-cat ${SAIDA_CSV}/ausentes.csv > ${SAIDA_CSV}/ausentes_tmp.csv
 mv ${SAIDA_CSV}/ausentes_tmp.csv ${HOME_NFS}/${ESTRUTURA_AUSENTES}
 
 echo "Provas Corrigidas"
