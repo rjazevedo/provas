@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Marca aluno como ausente em uma prova no SGA a partir de um CSV com as colunas:
+"""Marca aluno como presente em uma prova no SGA a partir de um CSV com as colunas:
 _, _, Cód. da disciplina, Cód. da prova,RA do aluno"""
 
 ###############################################
-# Uso: sgaPresentes.py -a ausentes.csv -c 38
+# Uso: sgaPresentes.py -a presentes.csv -c 38
 #
 # 38: é o calendário do bimestre 2019/2
 #
@@ -34,10 +34,10 @@ def marcaAluno(
                 cid  # calendar_id
               ):
 
-    """Marca um aluno como ausente em uma prova, no SGA"""
+    """Marca um aluno como presente em uma prova, no SGA"""
 
     print(  
-            "Tenta marcar um aluno como ausente: ",
+            "Tenta marcar um aluno como presente: ",
             ac,  # activity_code
             tc,  # test_code
             ar,  # academic_register
@@ -123,10 +123,10 @@ def marcaAluno(
     print( "Sucesso!" )
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Marca aluno como ausente em uma prova no SGA'
+    parser = argparse.ArgumentParser(description='Marca aluno como presente em uma prova no SGA'
                                                  ' a partir de um CSV com as colunas: _, _, Cód. da disciplina,'
                                                  'Cód. da prova,RA do aluno')
-    parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV de alunos ausentes')
+    parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV de alunos presentes')
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
 
