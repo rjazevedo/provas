@@ -16,7 +16,7 @@ HOME_NFS="/home/provas/dados"
 #Caminho das provas DP 1 Bimestre
 PATH_PROVAS="SGA/provas"
 #Caminho do arquivo de estrutura Ausentes
-ESTRUTURA_AUSENTES=""
+ESTRUTURA_AUSENTES="csv/2019dp1/ausentes.csv"
 #Caminho do arquivo de estrutura Dashboad
 ESTRUTURA_DASHBOARD="csv/2019dp1/todasProvasJuntas.csv"
 #Nome da pasta temporaria de trabalho DP 1 Bimestre
@@ -28,7 +28,7 @@ DESTINO_DASHBOARD="SGA/dashboard/dp"
 cd ${HOME}/tmp
 mkdir ${TRABALHO_TMP}
 echo "Inicio da geração do DashBoard - DP 1o Bimestre 2019"
-~/src/dashboard.py -e ${HOME_NFS}/${PATH_PROVAS} -p ${HOME_NFS}/${ESTRUTURA_DASHBOARD} -s ${HOME}/tmp/${TRABALHO_TMP}
+~/src/dashboard.py -e ${HOME_NFS}/${PATH_PROVAS} -p ${HOME_NFS}/${ESTRUTURA_DASHBOARD} -s ${HOME}/tmp/${TRABALHO_TMP} -a ${HOME_NFS}/${ESTRUTURA_AUSENTES}
 cd ${HOME}/tmp/${TRABALHO_TMP}
 #Rotina de personalização de HTML
 sed -i "s/${BASE_STRING}/${BASE_STRING}${SUBSTITUI_STRING}/g" *.html
