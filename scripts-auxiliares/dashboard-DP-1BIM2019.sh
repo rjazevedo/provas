@@ -14,7 +14,7 @@ HOME="/home/provas"
 #Diretorio de NFS
 HOME_NFS="/home/provas/dados"
 #Caminho das provas DP 1 Bimestre
-PATH_PROVAS="SGA/provas"
+PATH_PROVAS="SGA/2019dp1/provas"
 #Caminho do arquivo de estrutura Ausentes
 ESTRUTURA_AUSENTES="csv/2019dp1/ausentes.csv"
 #Caminho do arquivo de estrutura Dashboad

@@ -16,6 +16,9 @@ DESTDIR="fileListener"
 # diretorio para salvamento do resultado do processamento feito por decodeqr.py
 SAVEDIR="fileListener/provas"
 
+#Caminho parcial para provas
+PATH_PROVAS="SGA/provas_2_bimestre"
+
 # diretorio temporario para execucao de decodeqr.py nos novos arquivos
 TMPDIR="fileListener/tmp${1}-${2}"
 
@@ -48,7 +51,7 @@ copy_file_and_execute_decodeqr()
   ##################
   # script do Daniel (adaptado por Guilherme, 6/8/2019)
   echo "Copiando para pasta final"
-  cp -n ${HOME}/${SAVEDIR}/${polo}/*  /home/provas/dados/SGA/provas_2_bimestre/${polo}
+  cp -n ${HOME}/${SAVEDIR}/${polo}/*  ${HOME}/${PATH_PROVAS}/${polo}
   ##################
 }
 

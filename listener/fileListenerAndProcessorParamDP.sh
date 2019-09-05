@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Específico para DP do calendario 37 (2019, bimestre 1)
+# Específico para DP do calendario 39 (2019, bimestre 1)
 #
 # Executar:
 # 
@@ -19,6 +19,9 @@ DESTDIR="fileListenerDP"
 
 # diretorio para salvamento do resultado do processamento feito por decodeqr.py
 SAVEDIR="fileListenerDP/provas"
+
+#Caminho parcial para provas
+PATH_PROVAS="SGA/provas"
 
 # diretorio temporario para execucao de decodeqr.py nos novos arquivos
 TMPDIR="fileListenerDP/tmp${1}-${2}"
@@ -52,7 +55,7 @@ copy_file_and_execute_decodeqr()
   ##################
   # script do Daniel (adaptado por Guilherme, 6/8/2019)
   echo "Copiando para pasta final"
-  cp -n ${HOME}/${SAVEDIR}/${polo}/*  /home/provas/dados/SGA/provas/${polo}
+  cp -n ${HOME}/${SAVEDIR}/${polo}/*  ${HOME}/${PATH_PROVAS}/${polo}
   ##################
 }
 

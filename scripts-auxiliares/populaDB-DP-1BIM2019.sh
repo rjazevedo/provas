@@ -20,9 +20,9 @@ HOME="/home/provas"
 #Diretorio de NFS
 HOME_NFS="/home/provas/dados"
 #Caminho das provas
-PATH_PROVAS="SGA/provas"
+PATH_PROVAS="SGA/2019dp1/provas"
 #Caminho da Saida Gerada
-SAIDA_CSV="/home/provas/dados/SGA/provas/Saida-DP"
+SAIDA_CSV="/home/provas/dados/SGA/2019dp1/provas/Saida-DP"
 #Backup de csv anteriores
 BACKUP_CSV="/home/provas/dados/backup/2019dp1"
 #**Fim de variáveis de parametrizacao**#

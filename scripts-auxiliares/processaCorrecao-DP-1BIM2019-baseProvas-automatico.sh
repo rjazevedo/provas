@@ -26,9 +26,9 @@ HOME_NFS="/home/provas/dados"
 #Caminnho para Logs (caminho completo)
 LOG="/home/provas/dados/log/2019dp1"
 #Caminho das provas
-PATH_PROVAS="SGA/provas"
+PATH_PROVAS="SGA/2019dp1/provas"
 #Path Completo de Saida (caminho completo)
-SAIDA_CSV="/home/provas/dados/SGA/provas/Saida-DP"
+SAIDA_CSV="/home/provas/dados/SGA/2019dp1/provas/Saida-DP"
 #Indicacao do tipo de prova (regular,dp)
 TIPO_PROVA="dp"
 #**Fim de variáveis de parametrizacao**#
