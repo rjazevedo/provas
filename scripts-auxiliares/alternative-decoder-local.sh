@@ -14,7 +14,10 @@ echo "Atencao!!! esse programa deve rodar dentro da configuração preparada, (r
 #Essa linha localiza todos os pdfs e os quebras e apaga os PDFs
 echo "Quebrando os PDFs..."
 #Busca os arquivos PDFs efetua a quebra depois os remove
-find  -iname \*.pdf -exec pdfimages {} {} -png \; -exec rm {} \; -exec echo "Pdf desmembrado: "{} \;
+find -iname \*.pdf -exec pdfimages {} {} -png \; -exec rm {} \; -exec echo "Pdf desmembrado: "{} \;
+#Melhora imagem
+find -iname \*.png -exec convert -quality 100 -density 150 -fill white -fuzz 80% +opaque "#000000" -antialias {} {} \;
+
 echo "Executando o decodeqr apos o quebra alternativa de PDF"
 ${HOME}/src/decodeqr.py -e Provas/ -t Trabalho/ -s Saida/ -r Refugo
 #procedimento para verificar se pasta é vazia
