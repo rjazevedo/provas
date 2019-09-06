@@ -16,7 +16,7 @@ DESTDIR="fileListener"
 # diretorio para salvamento do resultado do processamento feito por decodeqr.py
 SAVEDIR="fileListener/provas"
 
-#Caminho parcial para provas
+#Caminho parcial para provas destino final servidor
 PATH_PROVAS="SGA/provas_2_bimestre"
 
 # diretorio temporario para execucao de decodeqr.py nos novos arquivos

@@ -20,8 +20,8 @@ DESTDIR="fileListenerDP"
 # diretorio para salvamento do resultado do processamento feito por decodeqr.py
 SAVEDIR="fileListenerDP/provas"
 
-#Caminho parcial para provas
-PATH_PROVAS="SGA/provas"
+#Caminho parcial para provas destino final servidor
+PATH_PROVAS="SGA/2019dp1/provas"
 
 # diretorio temporario para execucao de decodeqr.py nos novos arquivos
 TMPDIR="fileListenerDP/tmp${1}-${2}"
