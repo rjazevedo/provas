@@ -28,7 +28,7 @@ BACKUP_CSV="/home/provas/dados/backup/2019b1"
 #**Fim de variáveis de parametrizacao**#
 
 
-echo "Inicio da geracao do PopulaDB - DP-1BIM2019"
+echo "Inicio da geracao do PopulaDB - 1BIM2019"
 ${HOME}/src/populaDB.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${SAIDA_CSV}/log.txt
 echo "Tratando dos arquivos csv gerados"
 sed -i "s#${HOME_NFS}/##g" ${SAIDA_CSV}/*.csv

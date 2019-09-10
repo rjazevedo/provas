@@ -33,8 +33,7 @@ then
 		echo "Corrigindo o arquivo"$a
 	done;
 	mkdir Refugo2
-	cd -
 	echo "Mais uma tentativa de recuperar Provas"
-	${HOME}/src/decodeqr.py -e Refugo/ -t Trabalho/ -s Saida/ -r Refugo/Refugo2
+	${HOME}/src/decodeqr.py -e ../Refugo/ -t ../Trabalho/ -s ../Saida/ -r Refugo2
 fi
 echo "Fim do alternative decoder"
