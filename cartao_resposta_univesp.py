@@ -12,6 +12,7 @@ import tempfile
 import string
 import math
 import copy
+import argparse
 
 from reportlab.graphics import renderPDF
 from reportlab.graphics.barcode import code128
@@ -30,6 +31,7 @@ vspace = 17
 hspace = 17
 width, height = A4
 logoUnivesp = 'univesp.png'
+args = None
 
 def DataInvertida(dataStr):
     return dataStr[6:10] + dataStr[3:5] + dataStr[0:2]
@@ -280,12 +282,13 @@ def Dissertativa(myCanvas):
 
     myCanvas.rect(marginleft, 2.2 * cm, marginright - marginleft, (19.2 - 2.2) * cm, stroke = 1, fill = 0)
 
-    myCanvas.setStrokeColorRGB(0.4, 0.4, 0.4)
-    i =  18.4 * cm
-    while i > 2.2 * cm:   
-        myCanvas.line(marginleft + 0.2 * cm, i, marginright - 0.2 * cm, i)
-        i -= 0.8 * cm
-    myCanvas.setStrokeColorRGB(0, 0, 0)
+    if not args.branco:
+        myCanvas.setStrokeColorRGB(0.4, 0.4, 0.4)
+        i =  18.4 * cm
+        while i > 2.2 * cm:   
+            myCanvas.line(marginleft + 0.2 * cm, i, marginright - 0.2 * cm, i)
+            i -= 0.8 * cm
+        myCanvas.setStrokeColorRGB(0, 0, 0)
 
     return
 
@@ -702,11 +705,12 @@ def GeraFolhasResposta(arquivo):
     # mCanvas.save()
     return
 
-
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('Uso: {} provas.csv'.format(sys.argv[0]), file=sys.stderr)
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='Gera o Caderno de Respostas de Provas UNIVESP')
+    parser.add_argument('-b', '--branco', action='store_true', required=False, help='Deixa as folhas dissertativas sem linhas pautadas')
+    parser.add_argument('arquivo', type=str, help='Arquivo com informações sobre as provas')
+
+    args = parser.parse_args()
 
     #c = canvas.Canvas('presenca.pdf', pagesize = A4)
     #ListaPresenca(c, 0, 0)
@@ -714,4 +718,4 @@ if __name__ == '__main__':
 
     #sys.exit(0)
     logoUnivesp = os.path.join(os.path.dirname(sys.argv[0]), logoUnivesp)
-    GeraFolhasResposta(sys.argv[1])
+    GeraFolhasResposta(args.arquivo)
