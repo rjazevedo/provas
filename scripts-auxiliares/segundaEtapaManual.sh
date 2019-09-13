@@ -70,5 +70,5 @@ do
 	-o -iname '20190617*png' \
 	-o -iname '20190619*png' \) -exec ${ACTION} {} ${PATH_PROVAS_1DP}/$a  \; -exec echo "Copiando " '{}' "para ${PATH_PROVAS_1DP}/$a" \; -exec mv {} ../Movidos_1DP \;
 	#Arquivos Limbo, sao os que nenhum padrao foi encontrado
-	find ./$a/ -type f -iname '*png' -exec ${ACTION} {} ${PATH_LIMBO}/$a  \; -exec echo "Copiando " '{}' "para ${PATH_LIMBO}/$a" \;	-exec mv {} ${PATH_LIMBO} \;
+	find ./$a/ -type f -iname '*png' -exec ${ACTION} {} ${PATH_LIMBO}  \; -exec echo "Copiando Limbo" '{}' "para ${PATH_LIMBO}/" \;	-exec mv {} ${PATH_LIMBO} \;
 done
