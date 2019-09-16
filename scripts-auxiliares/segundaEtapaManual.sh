@@ -51,7 +51,8 @@ do
 	-o -iname '20190426*png' \
 	-o -iname '20190427*png' \
 	-o -iname '20190429*png' \
-	-o -iname '20190502*png' \) -exec ${ACTION} {} ${PATH_PROVAS_1BIM}/$a  \; -exec echo "Copiando " '{}' "para ${PATH_PROVAS_1BIM}/$a" \; -exec mv {} ../Movidos_1BIM \;
+	-o -iname '20190502*png' \	
+	-o -iname '20190509*png' \) -exec ${ACTION} {} ${PATH_PROVAS_1BIM}/$a  \; -exec echo "Copiando " '{}' "para ${PATH_PROVAS_1BIM}/$a" \; -exec mv {} ../Movidos_1BIM \;
 	#Provas Regulares Segundo Bimestre
 	find ./$a/ -type f  \( -iname '20190626*png' \
 	-o -iname '20190627*png' \
