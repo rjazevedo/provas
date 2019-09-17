@@ -15,7 +15,7 @@ PATH_PROVAS_1BIM="/home/provas/dados/SGA/provas"
 PATH_PROVAS_2BIM="/home/provas/dados/SGA/2019b2/provas"
 PATH_PROVAS_1DP="/home/provas/dados/SGA/2019dp1/provas"
 PATH_PROVAS_EXAME_1BIM="/home/provas/dados/SGA/2019e1/provas"
-PATH_PROVAS_EXAME_2BIM=""
+PATH_PROVAS_EXAME_2BIM="/home/provas/dados/SGA/2019e2/provas"
 PATH_LIMBO="/home/provas/dados/tmp/Limbo"
 
 #Opcoes de comando
@@ -24,8 +24,10 @@ FORCED_ACTION="cp -f"
 #Fim das opcoes de comando
 
 mkdir Movidos_1BIM
-mkdir Movidos_2BIM 
-mkdir Movidos_1DP 
+mkdir Movidos_2BIM
+mkdir Movidos_1DP
+mkdir Movidos_Exame_1BIM
+mkdir Movidos_Exame_2BIM
 
 echo "acessando a pasta de Saida..."
 cd Saida/
@@ -70,6 +72,21 @@ do
 	-o -iname '20190612*png' \
 	-o -iname '20190617*png' \
 	-o -iname '20190619*png' \) -exec ${ACTION} {} ${PATH_PROVAS_1DP}/$a  \; -exec echo "Copiando " '{}' "para ${PATH_PROVAS_1DP}/$a" \; -exec mv {} ../Movidos_1DP \;
+	#Prova Exame 1o Bimestre
+	find ./$a/ -type f  \( -iname '20190819*png' \
+	-o -iname '20190820*png' \
+	-o -iname '20190821*png' \
+	-o -iname '20190822*png' \
+	-o -iname '20190823*png' \
+	-o -iname '20190829*png' \) -exec ${ACTION} {} ${PATH_PROVAS_EXAME_1BIM}/$a  \; -exec echo "Copiando " '{}' "para ${PATH_PROVAS_EXAME_1BIM}/$a" \; -exec mv {} ../Movidos_Exame_1BIM \;
+	#Prova Exame 2o Bimestre
+	find ./$a/ -type f  \( -iname '20190909*png' \
+	-o -iname '20190910' \
+	-o -iname '20190911' \
+	-o -iname '20190912' \
+	-o -iname '20190913' \
+	-o -iname '20190916' \
+	-o -iname '20190920' \) -exec ${ACTION} {} ${PATH_PROVAS_EXAME_2BIM}/$a  \; -exec echo "Copiando " '{}' "para ${PATH_PROVAS_EXAME_2BIM}/$a" \; -exec mv {} ../Movidos_Exame_2BIM \;
 	#Arquivos Limbo, sao os que nenhum padrao foi encontrado
 	find ./$a/ -type f -iname '*png' -exec ${ACTION} {} ${PATH_LIMBO}  \; -exec echo "Copiando Limbo" '{}' "para ${PATH_LIMBO}/" \;	-exec mv {} ${PATH_LIMBO} \;
 done

@@ -83,6 +83,7 @@ def carregaQuestao(
         question = db.ActivityTestQuestions(
                                             activity_test_id = test.id, 
                                             number = nq,
+                                            anulled = False,
                                             created_at = func.now(),
                                             updated_at = func.now()
                                            )
