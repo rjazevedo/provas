@@ -210,7 +210,7 @@ def QuebraPDF(arquivo):
     for a in apagar:
         contagem = MoveRefugo(a, contagem)
     print('==> Separando as folhas do PDF')
-    os.system('convert -density 150 -background white "' + arquivo + '" ' + os.path.join(args.trabalho, 'a.png'))
+    os.system('convert -quality 100 -density 150 -fill white -fuzz 80% +opaque "#000000" -antialias "' + arquivo + '" ' + os.path.join(args.trabalho, 'a.png'))
     lista = BuscaArquivos(args.trabalho)
     return lista
     
