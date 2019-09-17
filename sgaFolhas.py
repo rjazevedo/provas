@@ -25,7 +25,7 @@ import csv
 
 args = None
 
-offer_types = { 'regular': 1, 'dp': 2 }
+offer_types = { 'regular': 1, 'dp': 2, 'exam': 1 } #acrescentado o exam
 TEST_PATH = '/var/data/nfs/provas/' # está no .ENV no SGA
 
 def erro( str ):
@@ -186,8 +186,8 @@ if __name__ == '__main__':
     tipo = args.tipo
 
     if args.tipo is not None:
-        if args.tipo not in ['regular','dp']:
-            print( 'Tipo de submissão deve ser regular ou dp' )
+        if args.tipo not in ['regular','dp','exam']:#acrescimo de exam
+            print( 'Tipo de submissão deve ser regular, exame ou dp' )
             sys.exit(1)
         tipo = args.tipo
 
