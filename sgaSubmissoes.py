@@ -24,7 +24,7 @@ import csv
 
 args = None
 
-offer_types = { 'regular': 1, 'dp': 2 }
+offer_types = { 'regular': 1, 'dp': 2, 'exam': 1 } #acrescentado o exam
 
 def erro( str ):
     print( "Erro: " + str )

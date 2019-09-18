@@ -187,7 +187,7 @@ if __name__ == '__main__':
 
     if args.tipo is not None:
         if args.tipo not in ['regular','dp','exam']:#acrescimo de exam
-            print( 'Tipo de submissão deve ser regular, exame ou dp' )
+            print( 'Tipo de submissão deve ser regular, exam ou dp' )
             sys.exit(1)
         tipo = args.tipo
 

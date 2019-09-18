@@ -24,7 +24,7 @@ import csv
 
 args = None
 
-offer_types = { 'regular': 1, 'dp': 2 }
+offer_types = { 'regular': 1, 'dp': 2, 'exam': 1 } #acrescentado o exam
 
 def erro( str ):
     print( "Erro: " + str )
@@ -179,8 +179,8 @@ if __name__ == '__main__':
     tipo = args.tipo
 
     if args.tipo is not None:
-        if args.tipo not in ['regular','dp']:
-            print( 'Tipo de submissão deve ser regular ou dp' )
+        if args.tipo not in ['regular','dp','exam']:#acrescimo de exam
+            print( 'Tipo de submissão deve ser regular, exam ou dp' )
             sys.exit(1)
         tipo = args.tipo
 
