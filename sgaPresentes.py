@@ -13,6 +13,7 @@ _, _, Cód. da disciplina, Cód. da prova,RA do aluno"""
 ###############################################
 
 from sqlalchemy import func
+from sqlalchemy.orm.attributes import flag_modified
 import os
 import sys
 import argparse
@@ -27,11 +28,12 @@ def erro( str ):
     print( "Erro: " + str )
 
 def marcaAluno( 
-                ac,  # activity_code
-                tc,  # test_code
-                ar,  # academic_register
-                st,  # submission_type
-                cid  # calendar_id
+                ac,      # activity_code
+                tc,      # test_code
+                ar,      # academic_register
+                st,      # submission_type
+                cid,     # calendar_id
+                editavel #forca a habilitacao do status corrigível
               ):
 
     """Marca um aluno como presente em uma prova, no SGA"""
@@ -117,7 +119,11 @@ def marcaAluno(
 
     submission.activity_test_id = test.id
     submission.absent = False
-
+    campo_editavel = {'editable': 'true'}
+    if editavel:
+        submission.complementary_data = campo_editavel
+    flag_modified(submission, "complementary_data")  # Sqlalchemy JSON é imutável por default
+    
     sess.commit()
 
     print( "Sucesso!" )
@@ -129,7 +135,8 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV de alunos presentes')
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
-
+    parser.add_argument('-e', '--editavel', action='store_true', help='Habilita para correção um registro que tenha sido bloqueado')
+	
     args = parser.parse_args()
 
     arquivo = args.arquivo
@@ -157,9 +164,10 @@ if __name__ == '__main__':
         reader = csv.reader(f, delimiter=',')
         for row in reader:
             marcaAluno(
-                        row[2],      # str, Cód. da disciplina
-                        row[3],      # str, Cód. da prova
-                        row[4],      # str, RA do aluno
-                        tipo,        ### str, Tipo da submissão
-                        calendario   ### int, ID do calendário
+                        row[2],       # str, Cód. da disciplina
+                        row[3],       # str, Cód. da prova
+                        row[4],       # str, RA do aluno
+                        tipo,         ### str, Tipo da submissão
+                        calendario,   ### int, ID do calendário
+                        args.editavel # bool, faz com que uma prova se torne corrigível
                       )
