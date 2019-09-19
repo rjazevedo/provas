@@ -39,6 +39,9 @@ else
 
 	cat ${SAIDA_CSV}/ausentes_tmp.csv > ${SAIDA_CSV}/ausentes.csv
 	cat ${SAIDA_CSV}/ausentes.csv > ${BACKUP_CSV}/${DATA}_ausentes.csv
+	
+	cat ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual.csv | sort | uniq > ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual_tmp.csv
+	mv ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual_tmp.csv ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual.csv
 
 	#******Modulo de Insercao de Banco de dados*****#
 	#Incluindo notas
