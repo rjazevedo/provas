@@ -5,7 +5,9 @@
 BACKUP_CSV="/home/provas/dados/backup/2019b2"
 #Isso é invariavel, é uma base de busca de string
 BASE_STRING="Dashboard Provas UNIVESP"
-#Calendario no numero 38 se refere ao segundo bimestre de 2019
+#Caso o bimestre tenha sido consolidado preencher "sim", caso contrario deixar em branco
+BIMESTRE_CONSOLIDADO="sim"
+#Calendario SGA
 CALENDARIO="38"
 #Data
 DATA=$(date +%Y%m%d_%H-%M-%S)
