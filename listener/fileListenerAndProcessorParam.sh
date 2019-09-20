@@ -51,7 +51,11 @@ copy_file_and_execute_decodeqr()
   ##################
   # script do Daniel (adaptado por Guilherme, 6/8/2019)
   echo "Copiando para pasta final"
-  cp -n ${HOME}/${SAVEDIR}/${polo}/*  ${HOME}/${PATH_PROVAS}/${polo}
+  #--codigo antigo: cp -n ${HOME}/${SAVEDIR}/${polo}/*  ${HOME}/${PATH_PROVAS}/${polo}
+  #Nova rotina que coloca os arquivos no local correto
+  
+  ${HOME}/src/listener/move_arquivos.sh "${HOME}/${SAVEDIR}/${polo}" ${polo}
+  #
   ##################
 }
 
