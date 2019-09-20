@@ -22,7 +22,7 @@ ESTRUTURA_CORRETORES="gdrive_rclone/2_bimestre/origem/csv/corretores-2BIM-2019.c
 #Caminho do arquivo de estrutura Provas
 ESTRUTURA_CSV="gdrive_rclone/2_bimestre/origem/csv/"
 #Caminho do arquivo de estrutura Dashboad
-ESTRUTURA_DASHBOARD="gdrive_rclone/2_bimestre/origem/csv/dashboard-2BIM-2019.csv"
+ESTRUTURA_DASHBOARD="gdrive_rclone/2_bimestre/origem/csv/todasProvasJuntas.csv"
 #Caminho estrutura de guias
 ESTRUTURA_GUIAS="SGA/guias_2_bimestre_2019"
 #Caminho do arquivo de estrutura Provas
