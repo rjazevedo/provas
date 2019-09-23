@@ -54,7 +54,7 @@ copy_file_and_execute_decodeqr()
   #--codigo antigo: cp -n ${HOME}/${SAVEDIR}/${polo}/*  ${HOME}/${PATH_PROVAS}/${polo}
   
   #Nova rotina que coloca os arquivos no local correto
-   /home/provas/src/listener/move_arquivos.sh "${HOME}/${SAVEDIR}/${polo}" ${polo}
+   /home/provas/src/listener/move_arquivos.sh "${HOME}/${SAVEDIR}/${polo}" "${polo}"
   #
   ##################
 }
