@@ -30,5 +30,5 @@ echo "Copiando as provas para o servidor..."
 for a in 0*;
 do
 	/home/provas/src/listener/move_arquivos.sh ./$a/ "${a}" "${ACTION}"
-	mv *png ../Processados
+	mv $a/*png ../Processados
 done
