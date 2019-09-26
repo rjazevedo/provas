@@ -7,6 +7,7 @@ import csv
 import sys
 import argparse
 import os
+import random
 
 # Cabeçalho
 # 0 Nome
@@ -83,6 +84,7 @@ class CorretorDisciplina:
         self.lista.append(corretor)
 
     def Proximo(self):
+    	return random.choice(self.list)
         self.proximo += 1
         return self.lista[self.proximo % len(self.lista)]
 
