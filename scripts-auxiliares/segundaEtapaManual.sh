@@ -23,7 +23,7 @@ echo "Distribuindo as provas nos diretorios correspondete"
 ~/src/distribuiPorPolos.sh
 
 if [[ "$1" == "-f" ]]; then
-	ACTION="-fv";
+	ACTION="-f";
 	echo "+++++++++Copia Forcada++++++++" #debug
 fi
 echo "Copiando as provas para o servidor..."
