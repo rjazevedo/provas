@@ -89,8 +89,8 @@ class CorretorDisciplina:
 
     def Proximo(self):
         return random.choice(self.lista)
-        self.proximo += 1
-        return self.lista[self.proximo % len(self.lista)]
+        # self.proximo += 1
+        # return self.lista[self.proximo % len(self.lista)]
 
     def __str__(self):
         return self.nome + ': ' + str(self.lista)
@@ -125,11 +125,12 @@ if __name__ == '__main__':
 
     provas = {}
     for l in linhasProvas:
-        provas[l.idProva()] = l
+        provas[l.idProvaPolo()] = l
 
     saida = []
     questoes = []
     guias = []
+    # Processa uma vez cada prova distinta. Estamos olhando as variações dos polos aqui também.
     for prova in sorted(provas.keys()):
         p = provas[prova]
         saida.append([p.disciplina, p.provaPolo, p.folhasDissertativas + 1])
@@ -139,6 +140,7 @@ if __name__ == '__main__':
                 questoes.append([p.disciplina, p.provaPolo, q, 'Objetiva', 1.5])
             else:
                 questoes.append([p.disciplina, p.provaPolo, q, 'Objetiva', 2.0])
+                
         if p.folhasDissertativas != 0:
             questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 1, 'Dissertativa', 2.0])
             questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
@@ -167,9 +169,8 @@ if __name__ == '__main__':
         if len(a) != 0:
             if f.disciplina in disciplinas:
                 if (f.disciplina + f.prova + f.ra) not in temCorretor:
-                    correcoes.append([f.disciplina, f.prova, f.ra, disciplinas[f.disciplina].Proximo()])
+                    correcoes.append([f.disciplina, f.provaPolo, f.ra, disciplinas[f.disciplina].Proximo()])
                     folhas.extend(a)
-
             else:
                 print('Disciplina sem corretor:', f.disciplina)
 
