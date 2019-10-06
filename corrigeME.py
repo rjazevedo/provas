@@ -157,6 +157,7 @@ if __name__ == '__main__':
                     continue
             else:
                 p.prova = p.prova + '-' + p.polo
+                
             g = gabaritos[token]
             if g.Verifica(respostas):
                 for i in range(0, g.nQuestoes):

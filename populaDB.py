@@ -46,6 +46,7 @@ class LinhaProva:
         self.dataStr = DataInvertida(self.data)
         self.novo = False
         self.codigo = ''
+        self.provaPolo = self.prova + '-' + self.polo
         self.GeraCodigo()
         return
 
@@ -58,6 +59,9 @@ class LinhaProva:
 
     def idProva(self):
         return self.disciplina + '-' + self.prova
+    
+    def idProvaPolo(self):
+        return self.disciplina + '-' + self.provaPolo
 
     def EncontraArquivo(self, prefixo):
         arquivo = os.path.join(prefixo, self.polo, self.codigo)
@@ -128,22 +132,26 @@ if __name__ == '__main__':
     guias = []
     for prova in sorted(provas.keys()):
         p = provas[prova]
-        saida.append([p.disciplina, p.prova, p.folhasDissertativas + 1])
+        saida.append([p.disciplina, p.provaPolo, p.folhasDissertativas + 1])
 
         for q in range(1, p.questoesObjetivas + 1):
             if q < 5:
-                questoes.append([p.disciplina, p.prova, q, 'Objetiva', 1.5])
+                questoes.append([p.disciplina, p.provaPolo, q, 'Objetiva', 1.5])
             else:
-                questoes.append([p.disciplina, p.prova, q, 'Objetiva', 2.0])
+                questoes.append([p.disciplina, p.provaPolo, q, 'Objetiva', 2.0])
         if p.folhasDissertativas != 0:
-            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 1, 'Dissertativa', 2.0])
-            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
+            questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 1, 'Dissertativa', 2.0])
+            questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
 
-        guia = os.path.join(args.guias, p.idProva() + '.pdf')
+        guia = os.path.join(args.guias, p.idProvaPolo() + '.pdf')
         if os.path.isfile(guia):
-            guias.append([p.disciplina, p.prova, p.folhasDissertativas + 1, guia])
+            guias.append([p.disciplina, p.provaPolo, p.folhasDissertativas + 1, guia])
         else:
-            print('Arquivo não encontrado:', guia)
+            guia = os.path.join(args.guias, p.idProva() + '.pdf')
+            if os.path.isfile(guia):
+                guias.append([p.disciplina, p.prova, p.folhasDissertativas + 1, guia]))
+            else:
+                print('Arquivo não encontrado:', guia)
 
     disciplinas = {}
     for c in corretores:
