@@ -149,7 +149,7 @@ if __name__ == '__main__':
         else:
             guia = os.path.join(args.guias, p.idProva() + '.pdf')
             if os.path.isfile(guia):
-                guias.append([p.disciplina, p.prova, p.folhasDissertativas + 1, guia]))
+                guias.append([p.disciplina, p.prova, p.folhasDissertativas + 1, guia])
             else:
                 print('Arquivo não encontrado:', guia)
 
