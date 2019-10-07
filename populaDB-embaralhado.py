@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    print('Lendo entrada...')
+    print('[populaDB] Lendo entrada...')
     entrada = list(csv.reader(open(args.entrada)))
     corretores = list(csv.reader(open(args.corretores)))
 
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     for base in baseCorrecoes:
         temCorretor[base[0] + base[1] + base[2]] = True
 
-    print('Processando dados...')
+    print('[populaDB] Processando dados...')
     linhasProvas = [LinhaProva(x) for x in entrada[1:]]
 
     provas = {}
@@ -145,7 +145,7 @@ if __name__ == '__main__':
             questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 1, 'Dissertativa', 2.0])
             questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
 
-        guia = os.path.join(args.guias, p.idProvaPolo() + '-guia.pdf')
+        guia = os.path.join(args.guias, p.idProvaPolo() + '.pdf')
         if os.path.isfile(guia):
             guias.append([p.disciplina, p.provaPolo, p.folhasDissertativas + 1, guia])
         else:
@@ -153,7 +153,7 @@ if __name__ == '__main__':
             if os.path.isfile(guia):
                 guias.append([p.disciplina, p.prova, p.folhasDissertativas + 1, guia])
             else:
-                print('Arquivo não encontrado:', guia)
+                print('[populaDB] Arquivo não encontrado:', guia)
 
     disciplinas = {}
     for c in corretores:
@@ -172,10 +172,10 @@ if __name__ == '__main__':
                     correcoes.append([f.disciplina, f.provaPolo, f.ra, disciplinas[f.disciplina].Proximo()])
                     folhas.extend(a)
             else:
-                print('Disciplina sem corretor:', f.disciplina)
+                print('[populaDB] Disciplina sem corretor:', f.disciplina)
 
 
-    print('Gravando saída...')
+    print('[populaDB] Gravando saída...')
 
     csv.writer(open(os.path.join(args.saida, 'provas.csv'), 'wt')).writerows(saida)
     csv.writer(open(os.path.join(args.saida, 'questoes.csv'), 'wt')).writerows(questoes)
