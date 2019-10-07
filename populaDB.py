@@ -70,7 +70,7 @@ class LinhaProva:
         for i in range(1, nFolhas + 1):
             a = arquivo + '-' + format(i, '02d') + '.png'
             if os.path.isfile(a):
-                retorno.append([self.disciplina, self.prova, self.ra, i, a])
+                retorno.append([self.disciplina, self.provaPolo, self.ra, i, a])
         return retorno
 # Alterado por Guilherme em 14/8, 12:16
 #        if len(retorno) == nFolhas:
@@ -146,7 +146,6 @@ if __name__ == '__main__':
             questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
 
         guia = os.path.join(args.guias, p.idProvaPolo() + '-guia.pdf')
-        print(guia)
         if os.path.isfile(guia):
             guias.append([p.disciplina, p.provaPolo, p.folhasDissertativas + 1, guia])
         else:
