@@ -46,7 +46,6 @@ class LinhaProva:
         self.dataStr = DataInvertida(self.data)
         self.novo = False
         self.codigo = ''
-        self.provaPolo = self.prova + '-' + self.polo
         self.GeraCodigo()
         return
 
@@ -59,9 +58,6 @@ class LinhaProva:
 
     def idProva(self):
         return self.disciplina + '-' + self.prova
-    
-    def idProvaPolo(self):
-        return self.disciplina + '-' + self.provaPolo
 
     def EncontraArquivo(self, prefixo):
         arquivo = os.path.join(prefixo, self.polo, self.codigo)
@@ -70,7 +66,7 @@ class LinhaProva:
         for i in range(1, nFolhas + 1):
             a = arquivo + '-' + format(i, '02d') + '.png'
             if os.path.isfile(a):
-                retorno.append([self.disciplina, self.provaPolo, self.ra, i, a])
+                retorno.append([self.disciplina, self.prova, self.ra, i, a])
         return retorno
 # Alterado por Guilherme em 14/8, 12:16
 #        if len(retorno) == nFolhas:
@@ -88,7 +84,7 @@ class CorretorDisciplina:
         self.lista.append(corretor)
 
     def Proximo(self):
-        return random.choice(self.lista)
+    	return random.choice(self.lista)
         # self.proximo += 1
         # return self.lista[self.proximo % len(self.lista)]
 
@@ -125,35 +121,29 @@ if __name__ == '__main__':
 
     provas = {}
     for l in linhasProvas:
-        provas[l.idProvaPolo()] = l
+        provas[l.idProva()] = l
 
     saida = []
     questoes = []
     guias = []
-    # Processa uma vez cada prova distinta. Estamos olhando as variações dos polos aqui também.
     for prova in sorted(provas.keys()):
         p = provas[prova]
-        saida.append([p.disciplina, p.provaPolo, p.folhasDissertativas + 1])
+        saida.append([p.disciplina, p.prova, p.folhasDissertativas + 1])
 
         for q in range(1, p.questoesObjetivas + 1):
             if q < 5:
-                questoes.append([p.disciplina, p.provaPolo, q, 'Objetiva', 1.5])
+                questoes.append([p.disciplina, p.prova, q, 'Objetiva', 1.5])
             else:
-                questoes.append([p.disciplina, p.provaPolo, q, 'Objetiva', 2.0])
-                
+                questoes.append([p.disciplina, p.prova, q, 'Objetiva', 2.0])
         if p.folhasDissertativas != 0:
-            questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 1, 'Dissertativa', 2.0])
-            questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
+            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 1, 'Dissertativa', 2.0])
+            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
 
-        guia = os.path.join(args.guias, p.idProvaPolo() + '-guia.pdf')
+        guia = os.path.join(args.guias, p.idProva() + '.pdf')
         if os.path.isfile(guia):
-            guias.append([p.disciplina, p.provaPolo, p.folhasDissertativas + 1, guia])
+            guias.append([p.disciplina, p.prova, p.folhasDissertativas + 1, guia])
         else:
-            guia = os.path.join(args.guias, p.idProva() + '.pdf')
-            if os.path.isfile(guia):
-                guias.append([p.disciplina, p.prova, p.folhasDissertativas + 1, guia])
-            else:
-                print('Arquivo não encontrado:', guia)
+            print('Arquivo não encontrado:', guia)
 
     disciplinas = {}
     for c in corretores:
@@ -169,8 +159,9 @@ if __name__ == '__main__':
         if len(a) != 0:
             if f.disciplina in disciplinas:
                 if (f.disciplina + f.prova + f.ra) not in temCorretor:
-                    correcoes.append([f.disciplina, f.provaPolo, f.ra, disciplinas[f.disciplina].Proximo()])
+                    correcoes.append([f.disciplina, f.prova, f.ra, disciplinas[f.disciplina].Proximo()])
                     folhas.extend(a)
+
             else:
                 print('Disciplina sem corretor:', f.disciplina)
 
