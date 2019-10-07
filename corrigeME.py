@@ -121,7 +121,7 @@ if __name__ == '__main__':
     gabarito = list(csv.reader(open(args.gabarito)))[1:] # Pula cabeçalho
     # Pasta onde estão os gabaritos
     baseGabarito = os.path.dirname(args.gabarito)
-    variacoesGabarito = utils.BuscaArquivo(baseGabarito, tipo = '.csv', prefixo = 'gabarito-')
+    variacoesGabarito = utils.BuscaArquivos(baseGabarito, tipo = '.csv', prefixo = 'gabarito-')
 
     print('Processando dados...')
     linhasProvas = [LinhaProva(x) for x in entrada[1:]]
