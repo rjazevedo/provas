@@ -146,6 +146,7 @@ if __name__ == '__main__':
             questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
 
         guia = os.path.join(args.guias, p.idProvaPolo() + '-guia.pdf')
+        print(guia)
         if os.path.isfile(guia):
             guias.append([p.disciplina, p.provaPolo, p.folhasDissertativas + 1, guia])
         else:
