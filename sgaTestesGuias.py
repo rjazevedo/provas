@@ -95,6 +95,7 @@ def carregaGuia(
     attach.attach_path = TEST_PATH + lk
 
     sess.commit()
+    sess.close()
 
     print( "Sucesso!" )
 

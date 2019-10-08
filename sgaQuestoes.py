@@ -92,6 +92,7 @@ def carregaQuestao(
     question.weight = wq
     question.annulled = False
     sess.commit()
+    sess.close()
 
     print( "Sucesso!" )
 

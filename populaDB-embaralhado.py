@@ -173,7 +173,6 @@ if __name__ == '__main__':
             else:
                 print('[populaDB] Disciplina sem corretor:', f.disciplina)
 
-
     print('[populaDB] Gravando saída...')
 
     csv.writer(open(os.path.join(args.saida, 'provas.csv'), 'wt')).writerows(saida)
@@ -181,7 +180,5 @@ if __name__ == '__main__':
     csv.writer(open(os.path.join(args.saida, 'guias.csv'), 'wt')).writerows(guias)
     csv.writer(open(os.path.join(args.saida, 'folhas.csv'), 'wt')).writerows(folhas)
     csv.writer(open(os.path.join(args.saida, 'correcoes.csv'), 'wt')).writerows(correcoes)
-
-    sys.exit(0)
 
 

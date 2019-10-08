@@ -139,6 +139,7 @@ def associaCorretor(
         sess.add(submission_corrector)
 
     sess.commit()
+    sess.close()
 
     print( "Sucesso!" )
 

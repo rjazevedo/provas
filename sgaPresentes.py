@@ -125,6 +125,7 @@ def marcaAluno(
     flag_modified(submission, "complementary_data")  # Sqlalchemy JSON é imutável por default
     
     sess.commit()
+    sess.close()
 
     print( "Sucesso!" )
 

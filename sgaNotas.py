@@ -160,6 +160,7 @@ def carregaNota(
     flag_modified(correction, "corrector_data")  # Sqlalchemy JSON é imutável por default
 
     sess.commit()
+    sess.close()
 
     print( "Sucesso!" )
 

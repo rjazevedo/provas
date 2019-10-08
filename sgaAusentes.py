@@ -119,6 +119,7 @@ def marcaAluno(
     submission.absent = True
 
     sess.commit()
+    sess.close()
 
     print( "Sucesso!" )
 
