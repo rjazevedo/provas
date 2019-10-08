@@ -22,6 +22,11 @@ import csv
 args = None
 
 TEST_PATH = '/var/data/nfs/provas/' # está no .ENV no SGA
+####################
+# Inicia Sessão 
+####################
+sess = db.Session()
+sess.autoflush = True  # default
 
 def erro( str ):
     print( "Erro: " + str )
@@ -43,11 +48,11 @@ def carregaGuia(
             lk   # link
          )
 
-    ####################
-    # Inicia Sessão 
-    ####################
-    sess = db.Session()
-    sess.autoflush = True  # default
+    # ####################
+    # # Inicia Sessão 
+    # ####################
+    # sess = db.Session()
+    # sess.autoflush = True  # default
 
     # disciplina
     activity = sess.query(db.CurricularActivities) \
@@ -95,7 +100,7 @@ def carregaGuia(
     attach.attach_path = TEST_PATH + lk
 
     sess.commit()
-    sess.close()
+    # sess.close()
 
     print( "Sucesso!" )
 
