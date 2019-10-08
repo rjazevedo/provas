@@ -166,6 +166,7 @@ def carregaFolha(
     flag_modified(attach, "sheets_data")  # Sqlalchemy JSON é imutável por default
 
     sess.commit()
+    sess.close()
 
     print( "Sucesso!" )
 
