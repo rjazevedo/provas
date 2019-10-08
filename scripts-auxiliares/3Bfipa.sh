@@ -30,7 +30,7 @@ else
 	cat ${SAIDA_CSV}/questoes.csv > ${BACKUP_CSV}/${DATA}-full-insertion_questoes.csv
 
 	${HOME}/src/sgaTestesGuias.py -a ${SAIDA_CSV}/guias.csv
-	${HOME}/src/sgaQuestoes -a ${SAIDA_CSV}/questoes.csv
+	${HOME}/src/sgaQuestoes.py -a ${SAIDA_CSV}/questoes.csv
 
 	#******Modulo de Insercao de Banco de dados*****#
 	#Incluindo folhas
