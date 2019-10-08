@@ -22,6 +22,11 @@ import csv
 args = None
 
 offer_types = { 'regular': 1, 'dp': 2, 'exam': 1 } #acrescentado o exam
+####################
+# Inicia Sessão 
+####################
+sess = db.Session()
+sess.autoflush = True  # default
 
 def erro( str ):
     print( "Erro: " + str )
@@ -45,11 +50,11 @@ def marcaAluno(
             cid  # calendar_id
           )
 
-    ####################
-    # Inicia Sessão 
-    ####################
-    sess = db.Session()
-    sess.autoflush = True  # default
+    # ####################
+    # # Inicia Sessão 
+    # ####################
+    # sess = db.Session()
+    # sess.autoflush = True  # default
 
     # disciplina
     activity = sess.query(db.CurricularActivities) \
@@ -119,7 +124,7 @@ def marcaAluno(
     submission.absent = True
 
     sess.commit()
-    sess.close()
+    # sess.close()
 
     print( "Sucesso!" )
 
