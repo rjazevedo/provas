@@ -20,6 +20,12 @@ import db
 import csv
 
 args = None
+####################
+# Inicia Sessão 
+####################
+sess = db.Session()
+sess.autoflush = True  # default
+
 
 def erro( str ):
     print( "Erro: " + str )
@@ -49,11 +55,11 @@ def carregaQuestao(
             wq   # weight of question
          )
 
-    ####################
-    # Inicia Sessão 
-    ####################
-    sess = db.Session()
-    sess.autoflush = True  # default
+    # ####################
+    # # Inicia Sessão 
+    # ####################
+    # sess = db.Session()
+    # sess.autoflush = True  # default
 
     # disciplina
     activity = sess.query(db.CurricularActivities) \
@@ -72,6 +78,7 @@ def carregaQuestao(
 
     if not test:
       erro( "Missing ActivityTests: %s, %d" % (tc, activity.id) )
+      sess.commit
       return
 
     # questão (cria uma caso não exista)
@@ -92,7 +99,7 @@ def carregaQuestao(
     question.weight = wq
     question.annulled = False
     sess.commit()
-    sess.close()
+    # sess.close()
 
     print( "Sucesso!" )
 
