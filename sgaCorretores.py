@@ -25,6 +25,13 @@ args = None
 
 offer_types = { 'regular': 1, 'dp': 2, 'exam': 1 } #acrescentado o exam
 
+####################
+# Inicia Sessão 
+####################
+sess = db.Session()
+sess.autoflush = True  # default
+
+
 def erro( str ):
     print( "Erro: " + str )
 
@@ -49,11 +56,11 @@ def associaCorretor(
              cid  # calendar_id
           )
 
-    ####################
-    # Inicia Sessão 
-    ####################
-    sess = db.Session()
-    sess.autoflush = True  # default
+    # ####################
+    # # Inicia Sessão 
+    # ####################
+    # sess = db.Session()
+    # sess.autoflush = True  # default
 
     # corretor (internal_user)
     corrector = sess.query(db.InternalUsers) \
@@ -139,7 +146,6 @@ def associaCorretor(
         sess.add(submission_corrector)
 
     sess.commit()
-    sess.close()
 
     print( "Sucesso!" )
 

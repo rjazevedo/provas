@@ -27,6 +27,11 @@ args = None
 
 offer_types = { 'regular': 1, 'dp': 2, 'exam': 1 } #acrescentado o exam
 TEST_PATH = '/var/data/nfs/provas/' # está no .ENV no SGA
+####################
+# Inicia Sessão 
+####################
+sess = db.Session()
+sess.autoflush = True  # default
 
 def erro( str ):
     print( "Erro: " + str )
@@ -56,11 +61,11 @@ def carregaFolha(
             forca # forca substituição
           )
 
-    ####################
-    # Inicia Sessão 
-    ####################
-    sess = db.Session()
-    sess.autoflush = True  # default
+    # ####################
+    # # Inicia Sessão 
+    # ####################
+    # sess = db.Session()
+    # sess.autoflush = True  # default
 
     # disciplina
     activity = sess.query(db.CurricularActivities) \
@@ -166,7 +171,7 @@ def carregaFolha(
     flag_modified(attach, "sheets_data")  # Sqlalchemy JSON é imutável por default
 
     sess.commit()
-    sess.close()
+    # sess.close()
 
     print( "Sucesso!" )
 
