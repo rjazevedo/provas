@@ -18,7 +18,7 @@ if not os.path.isfile(fileName):
 
 dbpass = open(fileName).readlines()[0][:-1]
 # print(dbpass)
-engine = create_engine(dbpass)
+engine = create_engine(dbpass, pool_size=10, max_overflow=20)
 Session = sessionmaker(bind=engine)
 session = Session()
 
