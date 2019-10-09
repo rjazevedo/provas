@@ -29,10 +29,12 @@ else
 	#Incluindo folhas
 	echo "Iniciando insercao no Banco de Dados"
 	${HOME}/src/sgaFolhas.py -a ${SAIDA_CSV}/folhas.csv -c ${CALENDARIO} -t ${TIPO_PROVA} > ${LOG}/log_sgaFolhas_${DATA}.log
+	${HOME}/src/sgaFolhas.py -a ${SAIDA_CSV}/folhas.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} > ${LOG}/log_sgaFolhas_${DATA}.log
 	echo "Insercao de folhas no Banco de Dados finalizada"
 
 	#Inclui corretores
 	${HOME}/src/sgaCorretores.py -a ${SAIDA_CSV}/correcoes.csv -c ${CALENDARIO} -t ${TIPO_PROVA} > ${LOG}/log_sgaCorretores_${DATA}.log
+	${HOME}/src/sgaCorretores.py -a ${SAIDA_CSV}/correcoes.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} > ${LOG}/log_sgaCorretores_${DATA}.log
 	echo "Insercao de corretores no Banco de Dados finalizada"
 
 	#Rotina de atualizacao BaseCorrecoes
@@ -44,6 +46,7 @@ else
 		cat ${SAIDA_CSV}/correcoes.csv > ${SAIDA_CSV}/lista_referencia_liberacao.csv
 		sed -i -e 's/^/X,X,/' ${SAIDA_CSV}/lista_referencia_liberacao.csv
 		${HOME}/src/sgaPresentes.py -a ${SAIDA_CSV}/lista_referencia_liberacao.csv -c ${CALENDARIO} -t ${TIPO_PROVA} -e > ${LOG}/log_sgaPresentes_liberados_${DATA}.log
+		${HOME}/src/sgaPresentes.py -a ${SAIDA_CSV}/lista_referencia_liberacao.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} -e > ${LOG}/log_sgaPresentes_liberados_${DATA}.log
 		#rm ${SAIDA_CSV}/lista_referencia_liberacao.csv
 	fi
 	
