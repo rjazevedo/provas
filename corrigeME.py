@@ -127,6 +127,7 @@ if __name__ == '__main__':
     linhasProvas = [LinhaProva(x) for x in entrada[1:]]
 
     # Lê o gabarito principal
+    print('Lendo gabarito global:', args.gabarito)
     gabaritos = {}
     for l in gabarito:
         g = Gabarito(l)
@@ -134,6 +135,7 @@ if __name__ == '__main__':
         
     # Lê as variações dos gabaritos. As variações tem o código do polo junto com a prova
     for arquivo in variacoesGabarito:
+        print('Lendo gabarito:', arquivo)
         for l in csv.reader(open(arquivo)):
             g = Gabarito(l)
             gabaritos[g.Nome()] = g
