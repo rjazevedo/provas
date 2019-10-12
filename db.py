@@ -186,7 +186,14 @@ class ActivityRecordSubmissionCorrections(Base):
 
     activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
     activity_test_question = relationship('ActivityTestQuestions', uselist = False)
+    
+    def __repr__(self):
+        return '{0} - {1} - {2} - Q{3}'.format(self.activity_record_submission.activity_record.code, 
+                                        self.activity_record_submission.activity_record.student.academic_record, 
+                                        self.activity_test_question.activity_test.code,
+                                        self.activity_test_question.number)
 
+    
 # Corretores das provas
 class ActivityRecordSubmissionCorrectors(Base):
     __tablename__ = 'activity_record_submission_correctors'
@@ -200,6 +207,9 @@ class ActivityRecordSubmissionCorrectors(Base):
 
     activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
     internal_user = relationship('InternalUsers', uselist = False)
+
+    def __repr__(self):
+        return '{0} - {1} - {2}'.format(self.activity_record_submission.activity_record.code, self.activity_record_submission.activity_record.student.academic_record, self.internal_user.email)
 
 # Oferta de Disciplina
 class ActivityOffers(Base):

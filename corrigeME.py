@@ -131,7 +131,6 @@ if __name__ == '__main__':
     gabaritos = {}
     for l in gabarito:
         g = Gabarito(l)
-        print('*', g.Nome())
         gabaritos[g.Nome()] = g
         
     # Lê as variações dos gabaritos. As variações tem o código do polo junto com a prova
