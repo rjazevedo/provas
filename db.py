@@ -168,7 +168,7 @@ class ActivityRecordSubmissions(Base):
 
     activity_record = relationship('ActivityRecords', uselist = False)
     activity_test = relationship('ActivityTests', uselist = False)
-    activity_record_submission_corrections = relationship('ActivityRecordSubmissionCorrections')
+#    corrections = relationship('ActivityRecordSubmissionCorrections', back_populates='activity_record_submission')
 
     def __repr__(self):
         return self.submission_type + ' - ' + str(self.grade)
