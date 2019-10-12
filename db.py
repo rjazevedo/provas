@@ -188,7 +188,7 @@ class ActivityRecordSubmissionCorrections(Base):
     activity_test_question = relationship('ActivityTestQuestions', uselist = False)
     
     def __repr__(self):
-        return '{0} - {1} - {2} - Q{3}'.format(self.activity_record_submission.activity_record.code, 
+        return '{0} - {1} - {2} - Q{3}'.format(self.activity_record_submission.activity_record.curricular_activity.code, 
                                         self.activity_record_submission.activity_record.student.academic_record, 
                                         self.activity_test_question.activity_test.code,
                                         self.activity_test_question.number)

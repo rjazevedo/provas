@@ -237,9 +237,6 @@ def MultiplaEscolha(myCanvas, nQuestoes):
     margin = 2 * cm
     marginleft = margin
     marginright = width - margin
-    margintop = height - 1.1 * margin
-    marginbottom = margin
-    offset = (width - 500) / 2
 
     # Instruções
     myCanvas.line(marginleft, 22.6 * cm, marginright, 22.6 * cm)
@@ -371,7 +368,6 @@ def BordaCodificada(myCanvas, xi, yi, xf, yf, ra):
             i = 0
 
     myCanvas.setStrokeColorRGB(1, 1, 1)
-
 
 
 def FolhaResposta(myCanvas, dados, objetivas, dissertativas):
