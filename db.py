@@ -210,8 +210,8 @@ class ActivityRecordSubmissionCorrectors(Base):
 
     def __repr__(self):
         return '{0} - {1} - {2}'.format(self.activity_record_submission.activity_record.curricular_activity.code, 
-                                        self.activity_record_submission.activity_record.student.academic_record, s
-                                        elf.internal_user.email)
+                                        self.activity_record_submission.activity_record.student.academic_record,
+                                        self.internal_user.email)
 
 # Oferta de Disciplina
 class ActivityOffers(Base):
