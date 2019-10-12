@@ -168,13 +168,14 @@ class ActivityRecordSubmissions(Base):
 
     activity_record = relationship('ActivityRecords', uselist = False)
     activity_test = relationship('ActivityTests', uselist = False)
+    activity_record_submission_corrections = relationship('ActivityRecordSubmissionCorrections')
 
     def __repr__(self):
         return self.submission_type + ' - ' + str(self.grade)
 
 # Correções das questões
 class ActivityRecordSubmissionCorrections(Base):
-    __tablename__ = 'activity_record_submission_corrections'
+    __tablename__ = 'activity_record_submission_kc'
 
     id = Column(Integer, primary_key = True)
     grade = Column(String)
@@ -268,7 +269,10 @@ class ActivityTests(Base):
     questions = relationship('ActivityTestQuestions')
 
     def __repr__(self):
-        return self.curricular_activity.code + ' - ' + self.curricular_activity.name + ' - ' + self.code + '(' + str(self.total_pages) + ')'
+        return '{0} - {1} - {2} ({3})'.format(self.curricular_activity.code, 
+                                              self.curricular_activity.name,
+                                              self.code,
+                                              str(self.total_pages))
 
 class Users(Base):
     __tablename__ = 'users'
