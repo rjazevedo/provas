@@ -189,7 +189,7 @@ class ActivityRecordSubmissionCorrections(Base):
     
     def __repr__(self):
         return '{0} - {1} - {2} - Q{3}'.format(self.activity_record_submission.activity_record.curricular_activity.code, 
-                                        self.activity_record_submission.activity_record.student.academic_record, 
+                                        self.activity_record_submission.activity_record.student.academic_register, 
                                         self.activity_test_question.activity_test.code,
                                         self.activity_test_question.number)
 
@@ -210,7 +210,7 @@ class ActivityRecordSubmissionCorrectors(Base):
 
     def __repr__(self):
         return '{0} - {1} - {2}'.format(self.activity_record_submission.activity_record.curricular_activity.code, 
-                                        self.activity_record_submission.activity_record.student.academic_record,
+                                        self.activity_record_submission.activity_record.student.academic_register,
                                         self.internal_user.email)
 
 # Oferta de Disciplina
