@@ -168,14 +168,14 @@ class ActivityRecordSubmissions(Base):
 
     activity_record = relationship('ActivityRecords', uselist = False)
     activity_test = relationship('ActivityTests', uselist = False)
-#    corrections = relationship('ActivityRecordSubmissionCorrections', back_populates='activity_record_submission')
+    corrections = relationship('ActivityRecordSubmissionCorrections', back_populates='activity_record_submission')
 
     def __repr__(self):
         return self.submission_type + ' - ' + str(self.grade)
 
 # Correções das questões
 class ActivityRecordSubmissionCorrections(Base):
-    __tablename__ = 'activity_record_submission_kc'
+    __tablename__ = 'activity_record_submission_corrections'
 
     id = Column(Integer, primary_key = True)
     grade = Column(String)
@@ -185,7 +185,7 @@ class ActivityRecordSubmissionCorrections(Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
-    activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
+    activity_record_submission = relationship('ActivityRecordSubmissions', back_populates='corrections', uselist = False)
     activity_test_question = relationship('ActivityTestQuestions', uselist = False)
     
     def __repr__(self):
@@ -345,6 +345,9 @@ class InternalUsers(Base):
     updated_at = Column(DateTime)
     status = Column(String)
     role = Column(String)
+
+    # Correções a fazer -> Apontando para ActivityRecordSubmissionCorrectors
+    tasks = relationship('ActivityRecordSubmissionCorrectors', back_populates='internal_user')
 
     def __repr__(self):
         return self.email + ' - ' + self.role
