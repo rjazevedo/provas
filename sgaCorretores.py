@@ -164,7 +164,7 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV com os emails dos corretores')
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
-    parser.add_argument('-i', '--incremental', required=False, default=False, help='Faz uma inserção incremental dos dados, sem sobrepor mais de um corretor por prova')
+    parser.add_argument('-i', '--incremental', action='store_true', required=False, default=False, help='Faz uma inserção incremental dos dados, sem sobrepor mais de um corretor por prova')
 
     args = parser.parse_args()
 
