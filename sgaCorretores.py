@@ -48,7 +48,7 @@ def associaCorretor(
     """Associa um corretor a uma prova, de um aluno, no SGA"""
 
     print(  
-            "Tenta associar corretor: ",
+            "Corretor: ",
              ac,  # activity_code
              tc,  # test_code
              ar,  # academic_register
@@ -143,7 +143,7 @@ def associaCorretor(
                   .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader') \
                   .first()
 
-        if not submission_corrector or incremental:
+        if not submission_corrector or not incremental:
           submission_corrector = db.ActivityRecordSubmissionCorrectors(
                                                       activity_record_submission_id = submission.id,
                                                       role = 'grader',
@@ -153,6 +153,10 @@ def associaCorretor(
                                                     )
           sess.add(submission_corrector)
           print('Adicionado')
+        else:
+          print('Já existente')
+    else:
+      print('Adicionado anteriormente')
 
     sess.commit()
 
