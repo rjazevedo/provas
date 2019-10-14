@@ -152,10 +152,11 @@ def associaCorretor(
                                                       updated_at = func.now()
                                                     )
           sess.add(submission_corrector)
+          print('Adicionado')
 
     sess.commit()
 
-    print( "Sucesso!" )
+    # print( "Sucesso!" )
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Associa corretores (internal_users) a provas de alunos'
