@@ -58,16 +58,19 @@ def RemoveDuplicado(forca):
               
             for c in corretores:
                 if not c.internal_user_id in corrigiram:
-                    print('Corrigida. Deveria apagar:', c.internal_user)
+                    print('Corrigida. Remover:', c.internal_user)
+                else:
+                    print('Corrigida. Manter:', c.internal_user)
           
         else:
             # Prova não corrigida, mantem o primeiro corretor que não esteja inativo
             primeiro = True
             for c in corretores:
                 if c.internal_user.status == 'active' and primeiro:
+                    print('Não corrigida. Manter:', c.internal_user)
                     primeiro = False
                 else:
-                    print('Não corrigida. Deveria apagar:', c.internal_user)
+                    print('Não corrigida. Remover:', c.internal_user)
         
 
 if __name__ == '__main__':
