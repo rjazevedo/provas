@@ -39,7 +39,7 @@ def RemoveDuplicado(forca):
     """ Remove corretores duplicados para uma mesma prova """
         
     # Para cada Activity Record Submission (atividade que precisa de avaliação)
-    todasProvas = sess.query(db.ActivityRecordSubmissions).all()
+    todasProvas = sess.query(db.ActivityRecordSubmissions)[-200:]
     
     for prova in todasProvas:
         corretores = [x for x in prova.correctors if x.role == 'grader']
@@ -60,7 +60,7 @@ def RemoveDuplicado(forca):
                 if not c.internal_user_id in corrigiram:
                     print('Corrigida. Remover:', c.internal_user)
                     if forca:
-                        db.session.delete(c)
+                        sess.delete(c)
                 else:
                     print('Corrigida. Manter:', c.internal_user)
           
@@ -74,9 +74,9 @@ def RemoveDuplicado(forca):
                 else:
                     print('Não corrigida. Remover:', c.internal_user)
                     if forca:
-                        db.session.delete(c)
+                        sess.delete(c)
 
-        db.session.commit()        
+        sess.commit()        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Remove múltiplos corretores duplicados para a mesma prova deixando apenas um')
