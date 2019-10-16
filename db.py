@@ -171,6 +171,9 @@ class ActivityRecordSubmissions(Base):
     corrections = relationship('ActivityRecordSubmissionCorrections', back_populates='activity_record_submission')
     correctors = relationship('ActivityRecordSubmissionCorrectors', back_populates='activity_record_submission')
 
+    def Corrigida(self):
+        return len(self.activity_test.questions) == len(self.corrections)
+
     def __repr__(self):
         return '({0}) - {1} - {2} - Anulada: {3} - Corretores: {4} - Correções: {5} - Nota: {6}'.format(
             self.id,
