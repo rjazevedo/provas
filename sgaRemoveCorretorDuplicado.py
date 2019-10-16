@@ -39,7 +39,7 @@ def RemoveDuplicado(forca):
     """ Remove corretores duplicados para uma mesma prova """
         
     # Para cada Activity Record Submission (atividade que precisa de avaliação)
-    todasProvas = sess.query(db.ActivityRecordSubmissions)[-200:]
+    todasProvas = sess.query(db.ActivityRecordSubmissions).all()
     
     for prova in todasProvas:
         corretores = [x for x in prova.correctors if x.role == 'grader']
