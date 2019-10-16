@@ -169,6 +169,7 @@ class ActivityRecordSubmissions(Base):
     activity_record = relationship('ActivityRecords', uselist = False)
     activity_test = relationship('ActivityTests', uselist = False)
     corrections = relationship('ActivityRecordSubmissionCorrections', back_populates='activity_record_submission')
+    correctors = relationship('ActivityRecordSubmissionCorrectors', back_populates='activity_record_submission')
 
     def __repr__(self):
         return self.submission_type + ' - ' + str(self.grade)
@@ -206,7 +207,7 @@ class ActivityRecordSubmissionCorrectors(Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
-    activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
+    activity_record_submission = relationship('ActivityRecordSubmissions', back_populates='correctors', uselist = False)
     internal_user = relationship('InternalUsers', uselist = False)
 
     def __repr__(self):
@@ -249,7 +250,7 @@ class ActivityTestQuestions(Base):
     updated_at = Column(DateTime)
     annulled = Column(Boolean)
 
-    activity_test = relationship('ActivityTests', backref = 'activity_tests')
+    activity_test = relationship('ActivityTests', back_populates = 'questions')
 
     def __repr__(self):
         return str(self.number) + ' - ' + self.question_type
@@ -266,7 +267,7 @@ class ActivityTests(Base):
     updated_at = Column(DateTime)
 
     curricular_activity = relationship('CurricularActivities', uselist = False)
-    questions = relationship('ActivityTestQuestions')
+    questions = relationship('ActivityTestQuestions', back_populates='activity_test')
 
     def __repr__(self):
         return '{0} - {1} - {2} ({3})'.format(self.curricular_activity.code, 
