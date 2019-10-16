@@ -172,7 +172,12 @@ class ActivityRecordSubmissions(Base):
     correctors = relationship('ActivityRecordSubmissionCorrectors', back_populates='activity_record_submission')
 
     def __repr__(self):
-        return self.submission_type + ' - ' + str(self.grade)
+        return '{0} - {1} - Anulada: {2} - Corretores: {3} - Correções: {4} - Nota: {5}'.format(self.activity_record_submission.activity_record.curricular_activity.code, 
+                                        self.activity_test.code,
+                                        self.annulled, 
+                                        len(self.correctors),
+                                        len(self.corrections),
+                                        self.grade)
 
 # Correções das questões
 class ActivityRecordSubmissionCorrections(Base):
