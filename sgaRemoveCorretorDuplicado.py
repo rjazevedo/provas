@@ -19,6 +19,7 @@ import sys
 import argparse
 import db
 import csv
+import json
 
 args = None
 
@@ -36,85 +37,34 @@ def erro( str ):
 
 def RemoveDuplicado(calendario, tipo):
     """ Remove corretores duplicados para uma mesma prova """
-    
+        
     # Para cada Activity Record Submission (atividade que precisa de avaliação)
+    todasProvas = sess.query(db.ActivityRecordSubmissions)[-1000:]
     
-    
-    # Para todas as disciplinas
-    disciplinas = sess.query(db.CurricularActivities).all()                
+    for prova in todasProvas:
+        corretores = [x for x in prova.correctors if x.role == 'grader']
         
-    for disciplina in disciplinas:
-        # Busca as ofertas do período de avaliação atual
-        oferta = sess.query(db.ActivityOffers) \
-                     .filter(db.ActivityOffers.curricular_activity_id == disciplina.id) \
-                     .filter(db.ActivityOffers.offer_type == offer_types[tipo]) \
-                     .filter(db.ActivityOffers.calendar_id == calendario).first()
-                    
-        if not oferta:
+        if len(corretores) <= 1:
             continue
-        
-        print(disciplina)
-        
-        # Busca cada prova
-        provas = sess.query(db.ActivityTests) \
-                     .filter(db.ActivityTests.curricular_activity_id == disciplina.id).all()
-
-        for prova in provas:
-            
-            # Encontra os alunos matriculados
-            matriculados = sess.query(db.ActivityRecords) \
-                            .filter(db.ActivityRecords.curricular_activity_id == disciplina.id) \
-                            .filter(db.ActivityRecords.activity_offer_id == oferta.id) \
-                            .first()
-                           
-                       
-                        
-            
-
-    if not test:
-      erro( "Missing ActivityTests: %s, %d" % (tc, activity.id) )
-      return
-
-    # submissão
-    submission = sess.query(db.ActivityRecordSubmissions) \
-                     .filter(db.ActivityRecordSubmissions.activity_record_id == record.id) \
-                     .filter(db.ActivityRecordSubmissions.submission_type == st) \
-                     .first()
-
-    if not submission:
-      erro( "Missing ActivityRecordSubmissions: %d, %s, %d" % (record.id, st, test.id) )
-      return
-
-    submission_corrector = sess.query(db.ActivityRecordSubmissionCorrectors) \
-                    .filter(db.ActivityRecordSubmissionCorrectors.activity_record_submission_id == submission.id) \
-                    .filter(db.ActivityRecordSubmissionCorrectors.internal_user_id == corrector.id) \
-                    .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader') \
-                    .first()
-
-    if not submission_corrector:
-        submission_corrector = sess.query(db.ActivityRecordSubmissionCorrectors) \
-                  .filter(db.ActivityRecordSubmissionCorrectors.activity_record_submission_id == submission.id) \
-                  .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader') \
-                  .first()
-
-        if not submission_corrector or not incremental:
-          submission_corrector = db.ActivityRecordSubmissionCorrectors(
-                                                      activity_record_submission_id = submission.id,
-                                                      role = 'grader',
-                                                      internal_user_id = corrector.id,
-                                                      created_at = func.now(),
-                                                      updated_at = func.now()
-                                                    )
-          sess.add(submission_corrector)
-          print('Adicionado')
+          
+        print('-----')
+        print(prova, len(corretores))
+        # Trata separadamente os casos corrigidos dos não corrigidos
+        if len(prova.activity_test.questions) == len(prova.corrections):
+            # Prova corrigida, mantem o(s) corretores que corrigiram
+            corrigiram = {}
+            for x in prova.corrections:
+              corrigiram[x.corrector_data.get('corrector_id', 0)] = True
+              
+            for c in corretores:
+                if not c.internal_user_id in corrigiram:
+                    print('Corrigida. Deveria apagar:', c.internal_user)
+          
         else:
-          print('Já existente')
-    else:
-      print('Adicionado anteriormente')
-
-    sess.commit()
-
-    # print( "Sucesso!" )
+            # Prova não corrigida, mantem o primeiro corretor
+            for c in corretores[1:]:
+                print('Não corrigida. Deveria apagar:', c.internal_user)
+        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Remove múltiplos corretores duplicados para a mesma prova deixando apenas um')
