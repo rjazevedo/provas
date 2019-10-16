@@ -35,7 +35,7 @@ sess.autoflush = True  # default
 def erro( str ):
     print( "Erro: " + str )
 
-def RemoveDuplicado(calendario, tipo):
+def RemoveDuplicado(forca):
     """ Remove corretores duplicados para uma mesma prova """
         
     # Para cada Activity Record Submission (atividade que precisa de avaliação)
@@ -68,19 +68,9 @@ def RemoveDuplicado(calendario, tipo):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Remove múltiplos corretores duplicados para a mesma prova deixando apenas um')
-    parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
-    parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
+    parser.add_argument('-f', '--forca', action='store_true', required=False, help='Força a execução. É obrigatório para evitar problemas')
 
     args = parser.parse_args()
 
-    calendario = args.calendario
-    tipo = args.tipo
-
-    if args.tipo is not None:
-        if args.tipo not in ['regular','dp','exam']:#acrescimo de exam
-            print( 'Tipo de submissão deve ser regular, exam ou dp' )
-            sys.exit(1)
-        tipo = args.tipo
-
-    RemoveDuplicado(calendario, tipo)
+    RemoveDuplicado(args.forca)
 
