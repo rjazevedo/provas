@@ -351,7 +351,7 @@ class InternalUsers(Base):
     tasks = relationship('ActivityRecordSubmissionCorrectors', back_populates='internal_user')
 
     def __repr__(self):
-        return self.email + ' - ' + self.role
+        return self.email + ' - ' + self.status
 
 class Courses(Base):
     __tablename__ = 'courses'

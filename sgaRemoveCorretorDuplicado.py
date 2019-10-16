@@ -61,9 +61,13 @@ def RemoveDuplicado(forca):
                     print('Corrigida. Deveria apagar:', c.internal_user)
           
         else:
-            # Prova não corrigida, mantem o primeiro corretor
-            for c in corretores[1:]:
-                print('Não corrigida. Deveria apagar:', c.internal_user)
+            # Prova não corrigida, mantem o primeiro corretor que não esteja inativo
+            primeiro = True
+            for c in corretores:
+                if c.internal_user.status == 'active' and primeiro:
+                    primeiro = False
+                else:
+                    print('Não corrigida. Deveria apagar:', c.internal_user)
         
 
 if __name__ == '__main__':
