@@ -29,7 +29,6 @@ else
 	#Esse passo é necessário para não sobrescrever correcoes de Notas manuais
 	awk '!/em branco/' ${SAIDA_CSV}/notas.csv > ${SAIDA_CSV}/nota_filtrada.csv
 
-
 	#*************Modulo de backup ************************#
 	cat ${SAIDA_CSV}/nota_filtrada.csv > ${BACKUP_CSV}/${DATA}_nota_filtrada.csv
 	cat ${SAIDA_CSV}/notas.csv > ${BACKUP_CSV}/${DATA}_nota_raw.csv
