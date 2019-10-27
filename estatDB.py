@@ -293,7 +293,7 @@ def ListaCatalogo(c):
                            
     print('Disciplinas no Catálogo')
     for d in curriculum:
-        print('{0} - {1} - S{2} - B{3} - CH {4}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload))
+        print('S{2:2d}B{3} - CH{4:3d} - {0}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload))
 
     # print('Catálogo:', c)
     # for l in lista:
