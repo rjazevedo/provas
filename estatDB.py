@@ -257,7 +257,7 @@ def TodasDisciplinas():
 
 
 def ListaCursos():
-    cursos = db.session.query(db.Courses)
+    cursos = db.session.query(db.Courses).order_by(db.Courses.created_at).all()
 
     for curso in cursos:
         if curso.level in ['degree', 'engineering', 'technologist']:
