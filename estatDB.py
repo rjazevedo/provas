@@ -431,7 +431,10 @@ def ListaDPs(codigo):
                            .filter(db.CourseCurriculums.course_catalog_id == catalogo.id) \
                            .order_by(db.CourseCurriculums.semester, db.CourseCurriculums.period).all()
                            
-    disciplinas = [d.curricular_activity for d in curriculum]                    
+    disciplinas = [d.curricular_activity for d in curriculum]
+    
+    for d in disciplinas:
+        print(d)                    
     
     # Todos os alunos matriculados e ativos ainda neste catálogo
     alunos = db.session.query(db.AcademicRecords, db.Students) \
