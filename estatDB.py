@@ -182,7 +182,7 @@ def AprovadoDisciplina(st):
         return False
     
     
-def ReprovadoDisciplian(st):
+def ReprovadoDisciplina(st):
     if st == 4:
         return True
     else:
@@ -385,7 +385,7 @@ def ListaDisciplinas(ra):
     for (disciplina, _) in ar:
         print(disciplina.curricular_activity.code, disciplina.curricular_activity.name)
         if AprovadoDisciplina(disciplina.status):
-            aprovado.append(disciplina.code)
+            aprovado.append(disciplina.curricular_activity.code)
         elif ReprovadoDisciplina(disciplina.status):
             reprovado.append(disciplina)
         else:
