@@ -476,7 +476,7 @@ def ListaDPs(codigo):
                 if r.curricular_activity.code in dps:
                     dps[r.curricular_activity.code] += 1
                 else:
-                    print(r.cuirricular_activity.code, end='')
+                    print(r.curricular_activity.code, end='')
         
     print('\nDisciplinas que precisam de oferta de DPs')
     for d in curriculum:
