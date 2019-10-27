@@ -286,6 +286,9 @@ def ListaCatalogo(c):
     data = []
     idades = []
     for (ar, st) in ars:
+        if ar is None or ars is None: 
+            continue
+        
         if ar.student.user.birth_date != None:
             idades.append(datetime.date.today().year - ar.student.user.birth_date.year)
         ch = 0
@@ -327,6 +330,16 @@ def ListaCatalogo(c):
         print(p, '-', n)
 
 
+def ListaDisciplinas(ra):
+    ar = db.session.query(db.ActivityRecords, db.Students) \
+                   .filter(db.ActivityRecords.student_id == db.Students.id,
+                           db.Students.academic_register == ra)\
+                   .all()
+
+    for (disciplina, aluno) in ar:
+        print(disciplina.curricular_activity.code, disciplina.curricular_activity.name)
+        
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Estatística das Notas das Disciplinas.')
     parser.add_argument('-p', '--periodo', type=str, required=False, help='Seleciona apenas um período de oferta das disciplinas')
@@ -336,6 +349,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--minimo', type=int, required=False, help='Número mínimo de alunos para considerar para cada oferta de disciplina')
     parser.add_argument('-c', '--catalogo', type=str, required=False, help='Seleciona um catálogo específico')
     parser.add_argument('-d', '--disciplinas', type=int, required=False, help='Imprime as disciplinas do histórico de um aluno, dado o RA')
+    parser.add_argument('-dp', '--dps', type=str, required=False, help='Lista as DPs pendentes para os alunos de um catálogo')
 
     args = parser.parse_args()
 
@@ -356,3 +370,6 @@ if __name__ == '__main__':
 
     if args.catalogo is not None:
         ListaCatalogo(args.catalogo)
+
+    if args.disciplinas is not None:
+        ListaDisciplinas(args.disciplinas)
