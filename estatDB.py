@@ -472,7 +472,7 @@ def ListaDPs(codigo):
                 reprovado.append(disciplina)
 
         for r in reprovado:
-            if r.curricular_activity.code not in aprovado
+            if r.curricular_activity.code not in aprovado:
                 if r.curricular_activity.code in dps:
                     dps[r.curricular_activity.code] += 1
                 else:
