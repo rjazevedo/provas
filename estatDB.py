@@ -434,7 +434,7 @@ def ListaDPs(codigo):
     disciplinas = [d.curricular_activity for d in curriculum]                    
     
     # Todos os alunos matriculados e ativos ainda neste catálogo
-    (alunos, _) = db.session.query(db.AcademicRecords, db.Students) \
+    alunos = db.session.query(db.AcademicRecords, db.Students) \
                        .filter(db.AcademicRecords.course_catalog_id == catalogo.id) \
                        .filter(db.AcademicRecords.date_conclusion == None) \
                        .filter(db.AcademicRecords.date_graduation == None) \
@@ -444,6 +444,7 @@ def ListaDPs(codigo):
                        .filter(or_(db.Students.current_status == 'enrolled', db.Students.current_status == 'enrolled_dp')) \
                        .all()
 
+    alunos = [x for (x, y) in alunos]
     # zera contagem de dps
     dps = {}
     for d in disciplinas:
