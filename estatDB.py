@@ -260,15 +260,16 @@ def ListaCursos():
     cursos = db.session.query(db.Courses)
 
     for curso in cursos:
-        print(curso)
-        for catalog in curso.catalogs:
-            q1 = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalog.id).count()
-            q2 = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalog.id) \
-                    .filter(db.AcademicRecords.date_conclusion == None) \
-                    .filter(db.AcademicRecords.date_graduation == None) \
-                    .filter(db.AcademicRecords.date_complete_withdrawal == None) \
-                    .filter(db.AcademicRecords.date_deregistration == None).count()
-            print(' -', catalog, '(', q1, ',', q2, ')')
+        if curso.level in ['degree', 'engineering', 'technologist']:
+            print(curso, curso.level)
+            for catalog in curso.catalogs:
+                q1 = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalog.id).count()
+                q2 = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalog.id) \
+                        .filter(db.AcademicRecords.date_conclusion == None) \
+                        .filter(db.AcademicRecords.date_graduation == None) \
+                        .filter(db.AcademicRecords.date_complete_withdrawal == None) \
+                        .filter(db.AcademicRecords.date_deregistration == None).count()
+                print(' -', catalog, '(', q1, ',', q2, ')')
 
 
 def ListaCatalogo(c):
@@ -293,7 +294,7 @@ def ListaCatalogo(c):
                            
     print('Disciplinas no Catálogo')
     for d in curriculum:
-        print('S{2:02d}B{3} - CH{4:3d} - {0} - {1}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload))
+        print('S{2}B{3} - CH{4:3d} - {0} - {1}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload))
 
     # print('Catálogo:', c)
     # for l in lista:
@@ -404,7 +405,6 @@ def ListaDisciplinas(ra):
         if d.curricular_activity.code not in aprovado:
             print(d.curricular_activity.code, d.curricular_activity.name)
 
-        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Estatística das Notas das Disciplinas.')
