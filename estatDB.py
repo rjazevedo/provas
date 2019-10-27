@@ -144,10 +144,7 @@ def PorPeriodo(periodo):
 
     pdf3.close()
 
-
-def TodasDisciplinas():
 # Seguem os status da tabela activity_records (Registros de disciplina):
-
 # 0 = matriculado
 # 1 = aguardando nota (caiu em desuso nesse 1º semestre/2019)
 # 2 = nota recebida (em desuso)
@@ -156,6 +153,50 @@ def TodasDisciplinas():
 # 5 = trancado
 # 6 = aproveitamento de estudo
 # 7 = exame de proficiência (basicamente, Aproveitamento de Estudo para disciplinas de Inglês)
+
+def StatusDisciplina(st):
+    if st == 0:
+        return 'matriculado'
+    elif st == 1:
+        return 'aguardando nota'
+    elif st == 2:
+        return 'nota recebida'
+    elif st == 3:
+        return 'aprovado'
+    elif st == 4:
+        return 'reprovado'
+    elif st == 5:
+        return 'trancado'
+    elif st == 6:
+        return 'aproveitamento de estudo'
+    elif st == 7:
+        return 'exame de proficiência'
+    else:
+        return 'status inválido'
+    
+    
+def AprovadoDisciplina(st):
+    if st == 3 or st == 6 or st == 7:
+        return True
+    else:
+        return False
+    
+    
+def ReprovadoDisciplian(st):
+    if st == 4:
+        return True
+    else:
+        return False
+    
+    
+def CompletouDisciplina(st):
+    if st == 3 or st == 4 or st == 6 or st == 7:
+        return True
+    else:
+        return False
+
+
+def TodasDisciplinas():
     ca = db.session.query(db.CurricularActivities).all()
 
     dados = []
@@ -334,10 +375,27 @@ def ListaDisciplinas(ra):
     ar = db.session.query(db.ActivityRecords, db.Students) \
                    .filter(db.ActivityRecords.student_id == db.Students.id,
                            db.Students.academic_register == ra)\
+                   .order_by(db.ActivityRecords.created_at) \
                    .all()
 
-    for (disciplina, aluno) in ar:
+    print('Disciplinas cursadas')
+    aprovado = []
+    reprovado = []
+    semStatus = []
+    for (disciplina, _) in ar:
         print(disciplina.curricular_activity.code, disciplina.curricular_activity.name)
+        if AprovadoDisciplina(disciplina.status):
+            aprovado.append(disciplina.code)
+        elif ReprovadoDisciplina(disciplina.status):
+            reprovado.append(disciplina)
+        else:
+            semStatus.append(disciplina)
+            
+    print('DPs pendentes:')
+    for d in reprovado:
+        if d.code not in aprovado:
+            print(d.curricular_activity.code, d.curricular_activity.name)
+
         
 
 if __name__ == '__main__':
