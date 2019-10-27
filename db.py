@@ -395,7 +395,7 @@ class CourseCatalogs(Base):
     duration_semesters = Column(Integer)
     regulation = Column(String)
 
-    curriculums = relationship('CourseCurriculums', back_populates = 'course_catalog')
+    curriculums = relationship('CourseCurriculums', back_populates = 'course_catalog', order_by('semester', 'period'))
     activities = relationship('CourseActivities', back_populates = 'course_catalog')
     course = relationship('Courses', uselist = False)
 

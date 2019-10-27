@@ -286,6 +286,14 @@ def ListaCatalogo(c):
         nomes[atividade.curricular_activity_id] = str(atividade)
 
     lista.sort()
+    
+    curriculum = db.session.query(db.CourseCurriculums) \ 
+                           .filter(db.CourseCurriculums.course_catalog_id == catalogo.id) \
+                           .order_by(db.CourseCurriculums.semester, db.CourseCurriculums.period).all()
+                           
+    print('Disciplinas no Catálogo')
+    for d in curriculum:
+        print(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period)
 
     # print('Catálogo:', c)
     # for l in lista:
@@ -363,12 +371,12 @@ def ListaCatalogo(c):
     pdfIdade.savefig()
     plt.close()
 
-    pdfIdade.close()
+    pdfIdade.close()    
     
-    ordenado = sorted([[pendencias[k], nomes[k]] for k in pendencias.keys()])
+    # ordenado = sorted([[pendencias[k], nomes[k]] for k in pendencias.keys()])
 
-    for [p, n] in ordenado:
-        print(p, '-', n)
+    # for [p, n] in ordenado:
+    #     print(p, '-', n)
 
 
 def ListaDisciplinas(ra):
