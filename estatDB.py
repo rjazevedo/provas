@@ -287,7 +287,7 @@ def ListaCatalogo(c):
 
     lista.sort()
     
-    curriculum = db.session.query(db.CourseCurriculums) \ 
+    curriculum = db.session.query(db.CourseCurriculums) \
                            .filter(db.CourseCurriculums.course_catalog_id == catalogo.id) \
                            .order_by(db.CourseCurriculums.semester, db.CourseCurriculums.period).all()
                            
