@@ -393,7 +393,7 @@ def ListaDisciplinas(ra):
             
     print('DPs pendentes:')
     for d in reprovado:
-        if d.code not in aprovado:
+        if d.curricular_activity.code not in aprovado:
             print(d.curricular_activity.code, d.curricular_activity.name)
 
         
