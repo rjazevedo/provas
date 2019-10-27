@@ -323,7 +323,7 @@ def ListaCatalogo(c):
                             or_(db.Students.current_status == 'enrolled', db.Students.current_status == 'enrolled_dp')) \
                     .all()
 
-    print('Lista de alunos matriculados mas com Carga Horária 0:')
+    # print('Lista de alunos matriculados mas com Carga Horária 0:')
     data = []
     idades = []
     for (ar, st) in ars:
@@ -338,8 +338,8 @@ def ListaCatalogo(c):
                 ch += disciplinas[activity.curricular_activity_id]
                 pendencias[activity.curricular_activity_id] -= 1
         data.append(ch)
-        if ch == 0:
-            print(st)
+        # if ch == 0:
+        #     print(st)
 
     pdfCatalogo = PdfPages('estatistica-catalogo-' + c + '.pdf')
 
