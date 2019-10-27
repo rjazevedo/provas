@@ -472,10 +472,13 @@ def ListaDPs(codigo):
                 reprovado.append(disciplina)
 
         for r in reprovado:
-            if (r.curricular_activity.code not in aprovado) and (r.curricular_activity.code in dps):
-                dps[r.curricular_activity.code] += 1
+            if r.curricular_activity.code not in aprovado
+                if r.curricular_activity.code in dps:
+                    dps[r.curricular_activity.code] += 1
+                else:
+                    print(r.cuirricular_activity.code, end='')
         
-    print('Disciplinas que precisam de oferta de DPs')
+    print('\nDisciplinas que precisam de oferta de DPs')
     for d in curriculum:
         # if dps[d.curricular_activity.code] > 0:
         print('S{2}B{3} - CH{4:3d} - {0} - {1} -> {5}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload, dps[d.curricular_activity.code]))
