@@ -441,7 +441,7 @@ def ListaDPs(codigo):
                        .filter(db.AcademicRecords.date_complete_withdrawal == None) \
                        .filter(db.AcademicRecords.date_deregistration == None) \
                        .filter(db.AcademicRecords.student_id == db.Students.id) \
-                       .filter(or_(db.Students.current_status == 'enrolled', db.Students.current_status == 'enrolled_dp'))
+                       .filter(or_(db.Students.current_status == 'enrolled', db.Students.current_status == 'enrolled_dp')) \
                        .all()
 
     # zera contagem de dps
