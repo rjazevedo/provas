@@ -264,11 +264,15 @@ def ListaCursos():
             print(curso, curso.level)
             for catalog in curso.catalogs:
                 q1 = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalog.id).count()
-                q2 = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalog.id) \
-                        .filter(db.AcademicRecords.date_conclusion == None) \
-                        .filter(db.AcademicRecords.date_graduation == None) \
-                        .filter(db.AcademicRecords.date_complete_withdrawal == None) \
-                        .filter(db.AcademicRecords.date_deregistration == None).count()
+                q2 = db.session.query(db.AcademicRecords, db.Students) \
+                        .filter(db.AcademicRecords.course_catalog_id == catalog.id,
+                                db.AcademicRecords.date_conclusion == None,
+                                db.AcademicRecords.date_graduation == None,
+                                db.AcademicRecords.date_complete_withdrawal == None,
+                                db.AcademicRecords.date_deregistration == None,
+                                db.AcademicRecords.student_id == db.Students.id,
+                                or_(db.Students.current_status == 'enrolled', db.Students.current_status == 'enrolled_dp')) \
+                        .count()
                 print('{0} ({1}, {2})'.format(catalog, q1, q2))
 
 
