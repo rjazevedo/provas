@@ -261,7 +261,7 @@ def ListaCursos():
 
     for curso in cursos:
         if curso.level in ['degree', 'engineering', 'technologist', 'sequential']:
-            print(curso, curso.level)
+            print(curso, '-', curso.level)
             for catalog in curso.catalogs:
                 q1 = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalog.id).count()
                 q2 = db.session.query(db.AcademicRecords, db.Students) \
@@ -277,7 +277,10 @@ def ListaCursos():
 
 
 def ListaCatalogo(c):
-    catalogo = db.session.query(db.CourseCatalogs).filter(db.CourseCatalogs.code == c).one()
+    catalogo = db.session.query(db.CourseCatalogs).filter(db.CourseCatalogs.code == c).first()
+    if catalogo is None:
+        print('Catálogo não existe:', c)
+        return
 
     lista = []
     disciplinas = {}
@@ -311,12 +314,20 @@ def ListaCatalogo(c):
 
 
     enrolled = db.session.query(db.AcademicRecords, db.Students) \
-                 .filter(db.AcademicRecords.course_catalog_id == catalogo.id, \
-                         db.Students.current_status == 'enrolled', \
+                 .filter(db.AcademicRecords.course_catalog_id == catalogo.id,
+                         db.AcademicRecords.date_conclusion == None,
+                         db.AcademicRecords.date_graduation == None,
+                         db.AcademicRecords.date_complete_withdrawal == None,
+                         db.AcademicRecords.date_deregistration == None,
+                         db.Students.current_status == 'enrolled',
                          db.AcademicRecords.student_id == db.Students.id) \
                  .count()
     enrolled_dp = db.session.query(db.AcademicRecords, db.Students) \
                     .filter(db.AcademicRecords.course_catalog_id == catalogo.id, \
+                            db.AcademicRecords.date_conclusion == None,
+                            db.AcademicRecords.date_graduation == None,
+                            db.AcademicRecords.date_complete_withdrawal == None,
+                            db.AcademicRecords.date_deregistration == None,
                             db.Students.current_status == 'enrolled_dp', \
                             db.AcademicRecords.student_id == db.Students.id) \
                     .count()
@@ -340,10 +351,10 @@ def ListaCatalogo(c):
     data = []
     idades = []
     for (ar, st) in ars:
-        if ar is None or ars is None: 
+        if ar is None or ars is None or ar.student is None or ar.student.user is None: 
             continue
         
-        if ar.student.user.birth_date != None:
+        if ar.student.user.birth_date is not None:
             idades.append(datetime.date.today().year - ar.student.user.birth_date.year)
         ch = 0
         for activity in ar.student.activity_records:
