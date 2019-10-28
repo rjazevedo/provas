@@ -531,7 +531,7 @@ def ListaOfertas(nomeArquivo):
     todasOfertas = {}
     
     for catalogo in vestibulares:
-        dbCatalogo = db.session.query(db.CourseCatalogs).filter(db.CourseCatalogs.code == c).first()
+        dbCatalogo = db.session.query(db.CourseCatalogs).filter(db.CourseCatalogs.code == catalogo).first()
         if dbCatalogo is None:
             print('Catálogo inválido:', catalogo)
             continue
