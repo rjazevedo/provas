@@ -405,7 +405,13 @@ def ListaDisciplinas(ra):
             semStatus.append(disciplina)
             
     print('DPs pendentes:')
+    jaContou = []
     for d in reprovado:
+        if d.curricular_activity.code in jaContou:
+            continue
+        else:
+            jaContou.append(d.curricular_activity.code)
+            
         if d.curricular_activity.code not in aprovado:
             print(d.curricular_activity.code, d.curricular_activity.name)
 
@@ -454,10 +460,11 @@ def ListaDPs(codigo):
     for d in disciplinas:
         dps[d.code] = 0
         
-    print('Catálogo:', catalogo.code, '.', len(alunos), 'alunos considerados.')
+    print('Catálogo:', catalogo.code, '-', len(alunos), 'alunos considerados.')
     for aluno in alunos:
         aprovado = []
         reprovado = []
+        jaContou = []
         
         # Pega o histórico do aluno
         ar = db.session.query(db.ActivityRecords) \
@@ -473,6 +480,9 @@ def ListaDPs(codigo):
                 reprovado.append(disciplina)
 
         for r in reprovado:
+            if r.curricular_activituy.code in jaContou:
+                continue
+            jaContou.append(r.curricular_activity.code)
             if r.curricular_activity.code not in aprovado:
                 if r.curricular_activity.code in dps:
                     dps[r.curricular_activity.code] += 1
@@ -491,7 +501,7 @@ def ListaTodasDPs():
 
     for curso in cursos:
         if curso.level in ['degree', 'engineering', 'technologist', 'sequential']:
-            print(curso, curso.level)
+            print(curso)
             for catalog in curso.catalogs:
                 ListaDPs(catalog.code)
 
