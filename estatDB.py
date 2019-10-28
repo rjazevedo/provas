@@ -16,6 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import datetime
+import yaml
 
 args = None
 
@@ -277,6 +278,8 @@ def ListaCursos():
 
 
 def ListaCatalogo(c):
+    """ Lista as disciplinas de um catálogo com detalhes de carga horária e semestralidade.
+        Informa também estatísticas de alunos cursando este catálogo e gera gráficos com estas estatísticas. """
     catalogo = db.session.query(db.CourseCatalogs).filter(db.CourseCatalogs.code == c).first()
     if catalogo is None:
         print('Catálogo não existe:', c)
@@ -396,6 +399,8 @@ def ListaCatalogo(c):
 
 
 def ListaDisciplinas(ra):
+    """ Lista as disciplinas de um RA. É uma versão simplificada do histórico que completa com as DPs pendentes"""
+    
     ar = db.session.query(db.ActivityRecords, db.Students) \
                    .filter(db.ActivityRecords.student_id == db.Students.id,
                            db.Students.academic_register == ra)\
@@ -427,18 +432,8 @@ def ListaDisciplinas(ra):
             print(d.curricular_activity.code, d.curricular_activity.name)
 
 
-def Bimestres(inicio, quantidade):
-    ano = int(inicio[0:4])
-    bimestre = int(inicio[5])
-    
-    for _ in range(0, quantidade):
-        print('{0}b{1}'.format(ano, bimestre))
-        bimestre += 1
-        if bimestre > 4:
-            bimestre = 1
-            ano += 1
-
 def ListaDPs(codigo):
+    """ Lista as DPs que os alunos matriculados num catálogo precisam cursar ainda."""
     # Pega o catálogo do curso
     catalogo = db.session.query(db.CourseCatalogs).filter(db.CourseCatalogs.code == codigo).first()
     if catalogo is None:
@@ -504,10 +499,11 @@ def ListaDPs(codigo):
     print('S|B|CH|Código|Nome|Alunos com DP')
     for d in curriculum:
         # if dps[d.curricular_activity.code] > 0:
-        print('{2}|{3}|{4:3d}|{0}|{1}|{5}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload, dps[d.curricular_activity.code]))
+        print('{2}|{3}|{4}|{0}|{1}|{5}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload, dps[d.curricular_activity.code]))
 
 
 def ListaTodasDPs():
+    """ Para cada curso de graduação, lista as DPS de todos os seus catálogos."""
     cursos = db.session.query(db.Courses).order_by(db.Courses.created_at).all()
 
     for curso in cursos:
@@ -516,6 +512,45 @@ def ListaTodasDPs():
             for catalog in curso.catalogs:
                 ListaDPs(catalog.code)
 
+
+def Bimestres(inicio, quantidade):
+    ano = int(inicio[0:4])
+    bimestre = int(inicio[5])
+    
+    for _ in range(0, quantidade):
+        print('{0}b{1}'.format(ano, bimestre))
+        bimestre += 1
+        if bimestre > 4:
+            bimestre = 1
+            ano += 1
+
+
+def ListaOfertas(nomeArquivo):
+    vestibulares = yaml.safe_load(open(nomeArquivo))
+    
+    todasOfertas = {}
+    
+    for catalogo in vestibulares:
+        dbCatalogo = db.session.query(db.CourseCatalogs).filter(db.CourseCatalogs.code == c).first()
+        if dbCatalogo is None:
+            print('Catálogo inválido:', catalogo)
+            continue
+        
+        for inicio in vestibulares[catalogo]:
+            bimestres = Bimestres(inicio, dbCatalogo.duration_semesters * 2)
+            for atividade in catalogo.curriculums:
+                bim = bimestres[(atividade.semester - 1) * 2 + atividade.period - 1]
+                if not bim in todasOfertas:
+                    todasOfertas[bim] = {}
+                    
+                todasOfertas[bim]{atividade.curricular_activity.code} = atividade.curricular_activity
+    
+    print('Bimestre|Código|Nome|CH')
+    for bimestre in sorted(todasOfertas.keys()):
+        ofertasBimestre = todasOfertas[bimestre]
+        for codigoDisciplina in sorted(ofertasBimestre.keys())
+            print('{0}|{1}|{2}|{3}'.format(bimestre, codigoDisciplina, ofertasBimestre[codigoDisciplina].name, ofertasBimestre[codigoDisciplina].workload))     
+                                
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Estatística das Notas das Disciplinas.')
@@ -528,6 +563,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--disciplinas', type=int, required=False, help='Imprime as disciplinas do histórico de um aluno, dado o RA')
     parser.add_argument('-dp', '--dps', type=str, required=False, help='Lista as DPs pendentes para os alunos de um catálogo')
     parser.add_argument('-tdp', '--todasdps', action='store_true', required=False, help='Lista todas as DPs pendentes em todos os catálogos')
+    parser.add_argument('-o', '--ofertas', type=str, required=False, help='Lista as ofertas dos currículos baseada na lista de ingressos (arquivo .yml)')
 
     args = parser.parse_args()
 
@@ -557,3 +593,6 @@ if __name__ == '__main__':
         
     if args.todasdps:
         ListaTodasDPs()
+        
+    if args.ofertas:
+        ListaOfertas(args.ofertas)
