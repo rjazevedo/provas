@@ -537,7 +537,7 @@ def ListaOfertas(nomeArquivo):
         
         for inicio in vestibulares[catalogo]:
             bimestres = Bimestres(inicio, dbCatalogo.duration_semesters * 2)
-            for atividade in catalogo.curriculums:
+            for atividade in dbCatalogo.curriculums:
                 bim = bimestres[(atividade.semester - 1) * 2 + atividade.period - 1]
                 if not bim in todasOfertas:
                     todasOfertas[bim] = {}
