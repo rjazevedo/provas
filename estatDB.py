@@ -543,7 +543,7 @@ def ListaOfertas(nomeArquivo):
                 if not bim in todasOfertas:
                     todasOfertas[bim] = {}
                     
-                todasOfertas[bim]{atividade.curricular_activity.code} = atividade.curricular_activity
+                todasOfertas[bim][atividade.curricular_activity.code] = atividade.curricular_activity
     
     print('Bimestre|Código|Nome|CH')
     for bimestre in sorted(todasOfertas.keys()):
