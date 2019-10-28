@@ -428,7 +428,6 @@ def ListaDPs(codigo):
         print('Catálogo não existe:', codigo)
         return
     
-    print('Catálogo:', catalogo.code)
     
     # Todas as disciplinas existentes estão mapeadas aqui neste relacionamento
     curriculum = db.session.query(db.CourseCurriculums) \
@@ -455,7 +454,7 @@ def ListaDPs(codigo):
     for d in disciplinas:
         dps[d.code] = 0
         
-    print(len(alunos), 'alunos considerados.')
+    print('Catálogo:', catalogo.code, '.', len(alunos), 'alunos considerados.')
     for aluno in alunos:
         aprovado = []
         reprovado = []
@@ -480,11 +479,21 @@ def ListaDPs(codigo):
                 else:
                     outras[r.curricular_activity.code] = True
         
-    print('\nDisciplinas que precisam de oferta de DPs')
+    print('Disciplinas que precisam de oferta de DPs')
+    print('S|B|CH|Código|Nome|Alunos com DP')
     for d in curriculum:
         # if dps[d.curricular_activity.code] > 0:
-        print('S{2}B{3} - CH{4:3d} - {0} - {1} -> {5}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload, dps[d.curricular_activity.code]))
+        print('{2}|{3}|{4:3d}|{0}|{1}|{5}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload, dps[d.curricular_activity.code]))
 
+
+def ListaTodasDPs():
+    cursos = db.session.query(db.Courses).order_by(db.Courses.created_at).all()
+
+    for curso in cursos:
+        if curso.level in ['degree', 'engineering', 'technologist', 'sequential']:
+            print(curso, curso.level)
+            for catalog in curso.catalogs:
+                ListaDPs(catalog.code)
 
 
 if __name__ == '__main__':
@@ -497,6 +506,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--catalogo', type=str, required=False, help='Seleciona um catálogo específico')
     parser.add_argument('-d', '--disciplinas', type=int, required=False, help='Imprime as disciplinas do histórico de um aluno, dado o RA')
     parser.add_argument('-dp', '--dps', type=str, required=False, help='Lista as DPs pendentes para os alunos de um catálogo')
+    parser.add_argument('-tdp', '--todasdps', action='store_true', required=False, help='Lista todas as DPs pendentes em todos os catálogos')
 
     args = parser.parse_args()
 
@@ -523,3 +533,6 @@ if __name__ == '__main__':
         
     if args.dps is not None:
         ListaDPs(args.dps)
+        
+    if args.tdps:
+        ListaTodasDPs()
