@@ -516,7 +516,7 @@ def ListaTodasDPs():
 def Bimestres(inicio, quantidade):
     ano = int(inicio[0:4])
     bimestre = int(inicio[5])
-    returno = []
+    retorno = []
     
     for _ in range(0, quantidade):
         retorno.append('{0}b{1}'.format(ano, bimestre))
