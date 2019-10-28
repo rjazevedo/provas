@@ -548,7 +548,7 @@ def ListaOfertas(nomeArquivo):
     print('Bimestre|Código|Nome|CH')
     for bimestre in sorted(todasOfertas.keys()):
         ofertasBimestre = todasOfertas[bimestre]
-        for codigoDisciplina in sorted(ofertasBimestre.keys())
+        for codigoDisciplina in sorted(ofertasBimestre.keys()):
             print('{0}|{1}|{2}|{3}'.format(bimestre, codigoDisciplina, ofertasBimestre[codigoDisciplina].name, ofertasBimestre[codigoDisciplina].workload))     
                                 
 
