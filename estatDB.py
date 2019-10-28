@@ -457,13 +457,12 @@ def ListaDPs(codigo):
         
     print(len(alunos), 'alunos considerados.')
     for aluno in alunos:
-        print(aluno.academic_register, end=' ')
         aprovado = []
         reprovado = []
         
         # Pega o histórico do aluno
         ar = db.session.query(db.ActivityRecords) \
-                .filter(db.ActivityRecords.student_id == aluno.id)\
+                .filter(db.ActivityRecords.student_id == aluno.student_id)\
                 .order_by(db.ActivityRecords.created_at) \
                 .all()
         
@@ -485,10 +484,6 @@ def ListaDPs(codigo):
     for d in curriculum:
         # if dps[d.curricular_activity.code] > 0:
         print('S{2}B{3} - CH{4:3d} - {0} - {1} -> {5}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload, dps[d.curricular_activity.code]))
-
-    print('Outras disciplinas')
-    for k in outras.keys():
-        print(k)
 
 
 
