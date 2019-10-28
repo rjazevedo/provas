@@ -499,7 +499,7 @@ def ListaDPs(codigo):
     print('S|B|CH|Código|Nome|Alunos com DP')
     for d in curriculum:
         # if dps[d.curricular_activity.code] > 0:
-        print('{2}|{3}|{4}|{0}|{1}|{5}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload, dps[d.curricular_activity.code]))
+        print('{6}|{2}|{3}|{4}|{0}|{1}|{5}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload, dps[d.curricular_activity.code], codigo))
 
 
 def ListaTodasDPs():
