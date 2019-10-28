@@ -433,9 +433,6 @@ def ListaDPs(codigo):
                            
     disciplinas = [d.curricular_activity for d in curriculum]
     
-    for d in disciplinas:
-        print(d)                    
-    
     # Todos os alunos matriculados e ativos ainda neste catálogo
     alunos = db.session.query(db.AcademicRecords, db.Students) \
                        .filter(db.AcademicRecords.course_catalog_id == catalogo.id) \
@@ -456,6 +453,7 @@ def ListaDPs(codigo):
         
     print(len(alunos), 'alunos considerados.')
     for aluno in alunos:
+        print(aluno.academic_register, end=' ')
         aprovado = []
         reprovado = []
         
