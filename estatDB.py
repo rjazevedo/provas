@@ -534,5 +534,5 @@ if __name__ == '__main__':
     if args.dps is not None:
         ListaDPs(args.dps)
         
-    if args.tdps:
+    if args.tdp:
         ListaTodasDPs()
