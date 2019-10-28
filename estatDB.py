@@ -480,7 +480,7 @@ def ListaDPs(codigo):
                 reprovado.append(disciplina)
 
         for r in reprovado:
-            if r.curricular_activituy.code in jaContou:
+            if r.curricular_activity.code in jaContou:
                 continue
             jaContou.append(r.curricular_activity.code)
             if r.curricular_activity.code not in aprovado:
