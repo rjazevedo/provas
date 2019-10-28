@@ -518,7 +518,6 @@ def Bimestres(inicio, quantidade):
     bimestre = int(inicio[5])
     
     for _ in range(0, quantidade):
-        print('{0}b{1}'.format(ano, bimestre))
         bimestre += 1
         if bimestre > 4:
             bimestre = 1
