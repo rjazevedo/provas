@@ -450,6 +450,7 @@ def ListaDPs(codigo):
     alunos = [x for (x, y) in alunos]
     # zera contagem de dps
     dps = {}
+    outras = {}
     for d in disciplinas:
         dps[d.code] = 0
         
@@ -476,14 +477,16 @@ def ListaDPs(codigo):
                 if r.curricular_activity.code in dps:
                     dps[r.curricular_activity.code] += 1
                 else:
-                    print(r.curricular_activity.code, end='')
+                    outras[r.curricular_activity.code] = True
         
     print('\nDisciplinas que precisam de oferta de DPs')
     for d in curriculum:
         # if dps[d.curricular_activity.code] > 0:
         print('S{2}B{3} - CH{4:3d} - {0} - {1} -> {5}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload, dps[d.curricular_activity.code]))
 
-    
+    print('Outras disciplinas')
+    for k in outras.keys():
+        print(k)
 
 
 
