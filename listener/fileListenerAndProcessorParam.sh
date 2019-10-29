@@ -55,6 +55,9 @@ copy_file_and_execute_decodeqr()
   
   #Nova rotina que coloca os arquivos no local correto
    /home/provas/src/listener/move_arquivos.sh "${HOME}/${SAVEDIR}/${polo}" "${polo}"
+  #Assim que copia os arquivos processados já remove
+   rm ${HOME}/${SAVEDIR}/${polo}/*.png
+   
   #
   ##################
 }
