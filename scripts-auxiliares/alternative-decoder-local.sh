@@ -17,8 +17,7 @@ echo "Quebrando os PDFs..."
 #Busca os arquivos PDFs efetua a quebra depois os remove
 #find -iname \*.pdf -exec pdfimages {} {} -png \; -exec rm {} \; -exec echo "Pdf desmembrado: "{} \;
 find -iname "*.pdf" | parallel -I% --max-args 1 pdfimages % % -png
-rm *.pdf
-rm *.PDF
+find -iname "*.pdf" -exec rm {} \;
 
 #Melhora imagem
 #find -iname \*.png -exec 
