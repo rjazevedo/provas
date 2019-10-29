@@ -22,7 +22,7 @@ ESTRUTURA_CORRETORES="csv/2019e1/corretores.csv"
 #Caminho do arquivo de estrutura Provas
 ESTRUTURA_CSV="csv/2019e1"
 #Caminho do arquivo de estrutura de Provas Dashboad (Normalmente é igual estrutura provas)
-ESTRUTURA_DASHBOARD="csv/2019e1/todasProvasJuntas.csv"
+ESTRUTURA_DASHBOARD="csv/2019e1/dashboard.csv"
 #Caminho estrutura de guias
 ESTRUTURA_GUIAS="SGA/2019e1/guias"
 #Caminho do arquivo de estrutura Provas
