@@ -22,6 +22,11 @@ import csv
 args = None
 
 offer_types = { 'regular': 1, 'dp': 2, 'exam': 1 } #acrescentado o exam
+####################
+# Inicia Sessão 
+####################
+sess = db.Session()
+sess.autoflush = True  # default
 
 def erro( str ):
     print( "Erro: " + str )
@@ -31,7 +36,8 @@ def marcaAluno(
                 tc,  # test_code
                 ar,  # academic_register
                 st,  # submission_type
-                cid  # calendar_id
+                cid,  # calendar_id
+                polo  # número do polo
               ):
 
     """Marca um aluno como ausente em uma prova, no SGA"""
@@ -42,14 +48,15 @@ def marcaAluno(
             tc,  # test_code
             ar,  # academic_register
             st,  # submission_type
-            cid  # calendar_id
+            cid, # calendar_id
+            polo # número do polo
           )
 
-    ####################
-    # Inicia Sessão 
-    ####################
-    sess = db.Session()
-    sess.autoflush = True  # default
+    # ####################
+    # # Inicia Sessão 
+    # ####################
+    # sess = db.Session()
+    # sess.autoflush = True  # default
 
     # disciplina
     activity = sess.query(db.CurricularActivities) \
@@ -96,8 +103,13 @@ def marcaAluno(
                .first()
 
     if not test:
-      erro( "Missing ActivityTests: %s, %d" % (tc, activity.id) )
-      return
+      test = sess.query(db.ActivityTests) \
+            .filter(db.ActivityTests.code == tc + '-'+ polo) \
+            .filter(db.ActivityTests.curricular_activity_id == activity.id) \
+            .first()
+      if not test:
+        erro( "Missing ActivityTests: %s, %d" % (tc, activity.id) )
+        return
 
     # submissão (cria uma caso não exista)
     submission = sess.query(db.ActivityRecordSubmissions) \
@@ -119,6 +131,7 @@ def marcaAluno(
     submission.absent = True
 
     sess.commit()
+    # sess.close()
 
     print( "Sucesso!" )
 
@@ -161,5 +174,6 @@ if __name__ == '__main__':
                         row[3],      # str, Cód. da prova
                         row[4],      # str, RA do aluno
                         tipo,        ### str, Tipo da submissão
-                        calendario   ### int, ID do calendário
+                        calendario,  ### int, ID do calendário
+                        row[1]       # str, código do polo
                       )

@@ -26,6 +26,12 @@ args = None
 
 offer_types = { 'regular': 1, 'dp': 2, 'exam': 1 } #acrescentado o exam
 
+####################
+# Inicia Sessão 
+####################
+sess = db.Session()
+sess.autoflush = True  # default
+
 def erro( str ):
     print( "Erro: " + str )
 
@@ -54,11 +60,11 @@ def carregaNota(
             cid  # calendar_id
           )
 
-    ####################
-    # Inicia Sessão 
-    ####################
-    sess = db.Session()
-    sess.autoflush = True  # default
+    # ####################
+    # # Inicia Sessão 
+    # ####################
+    # sess = db.Session()
+    # sess.autoflush = True  # default
 
     # disciplina
     activity = sess.query(db.CurricularActivities) \
@@ -160,6 +166,7 @@ def carregaNota(
     flag_modified(correction, "corrector_data")  # Sqlalchemy JSON é imutável por default
 
     sess.commit()
+    # sess.close()
 
     print( "Sucesso!" )
 

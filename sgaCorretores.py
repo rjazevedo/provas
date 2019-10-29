@@ -25,6 +25,13 @@ args = None
 
 offer_types = { 'regular': 1, 'dp': 2, 'exam': 1 } #acrescentado o exam
 
+####################
+# Inicia Sessão 
+####################
+sess = db.Session()
+sess.autoflush = True  # default
+
+
 def erro( str ):
     print( "Erro: " + str )
 
@@ -34,26 +41,28 @@ def associaCorretor(
                      ar,  # academic_register
                      ce,  # corrector_email
                      st,  # submission_type
-                     cid  # calendar_id
+                     cid,  # calendar_id
+                     incremental # Só inclui se não houver corretor.
                    ):
 
     """Associa um corretor a uma prova, de um aluno, no SGA"""
 
     print(  
-            "Tenta associar corretor: ",
+            "Corretor: ",
              ac,  # activity_code
              tc,  # test_code
              ar,  # academic_register
              ce,  # corrector_email
              st,  # submission_type
-             cid  # calendar_id
+             cid,  # calendar_id
+             incremental
           )
 
-    ####################
-    # Inicia Sessão 
-    ####################
-    sess = db.Session()
-    sess.autoflush = True  # default
+    # ####################
+    # # Inicia Sessão 
+    # ####################
+    # sess = db.Session()
+    # sess.autoflush = True  # default
 
     # corretor (internal_user)
     corrector = sess.query(db.InternalUsers) \
@@ -129,18 +138,29 @@ def associaCorretor(
                     .first()
 
     if not submission_corrector:
-        submission_corrector = db.ActivityRecordSubmissionCorrectors(
-                                                    activity_record_submission_id = submission.id,
-                                                    role = 'grader',
-                                                    internal_user_id = corrector.id,
-                                                    created_at = func.now(),
-                                                    updated_at = func.now()
-                                                   )
-        sess.add(submission_corrector)
+        submission_corrector = sess.query(db.ActivityRecordSubmissionCorrectors) \
+                  .filter(db.ActivityRecordSubmissionCorrectors.activity_record_submission_id == submission.id) \
+                  .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader') \
+                  .first()
+
+        if not submission_corrector or not incremental:
+          submission_corrector = db.ActivityRecordSubmissionCorrectors(
+                                                      activity_record_submission_id = submission.id,
+                                                      role = 'grader',
+                                                      internal_user_id = corrector.id,
+                                                      created_at = func.now(),
+                                                      updated_at = func.now()
+                                                    )
+          sess.add(submission_corrector)
+          print('Adicionado')
+        else:
+          print('Já existente')
+    else:
+      print('Adicionado anteriormente')
 
     sess.commit()
 
-    print( "Sucesso!" )
+    # print( "Sucesso!" )
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Associa corretores (internal_users) a provas de alunos'
@@ -149,6 +169,7 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV com os emails dos corretores')
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
+    parser.add_argument('-i', '--incremental', action='store_true', required=False, default=False, help='Faz uma inserção incremental dos dados, sem sobrepor mais de um corretor por prova')
 
     args = parser.parse_args()
 
@@ -179,5 +200,6 @@ if __name__ == '__main__':
                              row[2],      # str, RA do aluno
                              row[3],      # str, Email do corretor (internal_user)
                              tipo,        ### str, Tipo da submissão
-                             calendario   ### int, ID do calendário
+                             calendario,   ### int, ID do calendário
+                             args.incremental # Somente adiciona corretores das provas que não tem ainda
                            )

@@ -9,6 +9,7 @@ BASE_STRING="Dashboard Provas UNIVESP"
 BIMESTRE_CONSOLIDADO=""
 #Calendario SGA
 CALENDARIO="44"
+CALENDARIO_DP="46"
 #Data
 DATA=$(date +%Y%m%d_%H-%M-%S)
 #Destino de Dashboad
@@ -59,5 +60,6 @@ SAIDA_CSV="/home/provas/dados/SGA/2019b3/provas/Saida"
 SUBSTITUI_STRING=" - 3o Bimestre 2019"
 #Indicacao do tipo de prova (regular,dp)
 TIPO_PROVA="regular"
+TIPO_PROVA_DP="dp"
 #Nome da pasta temporaria de trabalho
 TRABALHO_TMP="d3BIM2019"

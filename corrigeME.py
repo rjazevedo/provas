@@ -7,6 +7,7 @@ import csv
 import sys
 import argparse
 import os
+import utils
 
 # Cabeçalho
 # 0 Nome
@@ -87,7 +88,7 @@ class Gabarito:
             return False
         
     def Comentario(self, questao, resposta):
-        if self.respostas[questao - 1] == resposta:
+        if resposta in self.respostas[questao - 1]:
             return 'Resposta Correta (gabarito = ' + self.respostas[questao - 1] + ')'
         elif resposta == '_':
             return 'Resposta em branco (gabarito = ' + self.respostas[questao - 1] + ')'
@@ -101,7 +102,7 @@ class Gabarito:
             print('Questão fora do intervalo de respostas:', self.disciplina, self.prova, questao)
             sys.exit(1)
 
-        if self.respostas[questao - 1] == resposta:
+        if resposta in self.respostas[questao - 1]:
             return 10
         else:
             return 0
@@ -118,15 +119,27 @@ if __name__ == '__main__':
     print('Lendo entrada...')
     entrada = list(csv.reader(open(args.entrada)))
     gabarito = list(csv.reader(open(args.gabarito)))[1:] # Pula cabeçalho
+    # Pasta onde estão os gabaritos
+    baseGabarito = os.path.dirname(args.gabarito)
+    variacoesGabarito = utils.BuscaArquivos(baseGabarito, tipo = '.csv', prefixo = 'gabarito-')
 
     print('Processando dados...')
     linhasProvas = [LinhaProva(x) for x in entrada[1:]]
 
+    # Lê o gabarito principal
+    print('Lendo gabarito global:', args.gabarito)
     gabaritos = {}
     for l in gabarito:
         g = Gabarito(l)
         gabaritos[g.Nome()] = g
-
+        
+    # Lê as variações dos gabaritos. As variações tem o código do polo junto com a prova
+    for arquivo in variacoesGabarito:
+        print('Lendo gabarito:', arquivo)
+        for l in csv.reader(open(arquivo)):
+            g = Gabarito(l)
+            gabaritos[g.Nome()] = g
+    
     notas = []
     quantidade = 0
     semGabarito = 0
@@ -135,11 +148,18 @@ if __name__ == '__main__':
     for p in linhasProvas:
         respostas = p.LeNotas(args.arquivos)
         if len(respostas) != 0:
-            token = p.disciplina + p.prova
+            # Primeiro testa os tokens completos com o número do polo
+            token = p.disciplina + p.prova + '-' + p.polo
             if token not in gabaritos:
-                print('Gabarito não encontrado:', p.disciplina, p.prova)
-                semGabarito += 1
-                continue
+                # Se não achar, testa sem o número do polo
+                token = p.disciplina + p.prova
+                if token not in gabaritos:
+                    print('Gabarito não encontrado:', p.disciplina, p.prova)
+                    semGabarito += 1
+                    continue
+            else:
+                p.prova = p.prova + '-' + p.polo
+                
             g = gabaritos[token]
             if g.Verifica(respostas):
                 for i in range(0, g.nQuestoes):

@@ -27,7 +27,6 @@ import random
 def DataInvertida(dataStr):
     return dataStr[6:10] + dataStr[3:5] + dataStr[0:2]
 
-
 class LinhaProva:
     def __init__(self, campos):
         self.nomeAluno = campos[0]
@@ -46,6 +45,7 @@ class LinhaProva:
         self.dataStr = DataInvertida(self.data)
         self.novo = False
         self.codigo = ''
+        self.provaPolo = self.prova + '-' + self.polo
         self.GeraCodigo()
         return
 
@@ -58,6 +58,9 @@ class LinhaProva:
 
     def idProva(self):
         return self.disciplina + '-' + self.prova
+    
+    def idProvaPolo(self):
+        return self.disciplina + '-' + self.provaPolo
 
     def EncontraArquivo(self, prefixo):
         arquivo = os.path.join(prefixo, self.polo, self.codigo)
@@ -66,14 +69,13 @@ class LinhaProva:
         for i in range(1, nFolhas + 1):
             a = arquivo + '-' + format(i, '02d') + '.png'
             if os.path.isfile(a):
-                retorno.append([self.disciplina, self.prova, self.ra, i, a])
-        # return retorno
+                retorno.append([self.disciplina, self.provaPolo, self.ra, i, a])
+        return retorno
 # Alterado por Guilherme em 14/8, 12:16
-# Retornando ao modelo inicial. Somente envia para correção provas completas
-        if len(retorno) == nFolhas:
-            return retorno
-        else: 
-            return []
+#        if len(retorno) == nFolhas:
+#            return retorno
+#        else: 
+#            return []
 
 class CorretorDisciplina:
     def __init__(self, nome, corretor):
@@ -85,7 +87,7 @@ class CorretorDisciplina:
         self.lista.append(corretor)
 
     def Proximo(self):
-    	return random.choice(self.lista)
+        return random.choice(self.lista)
         # self.proximo += 1
         # return self.lista[self.proximo % len(self.lista)]
 
@@ -104,7 +106,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    print('Lendo entrada...')
+    print('[populaDB] Lendo entrada...')
     entrada = list(csv.reader(open(args.entrada)))
     corretores = list(csv.reader(open(args.corretores)))
 
@@ -117,34 +119,40 @@ if __name__ == '__main__':
     for base in baseCorrecoes:
         temCorretor[base[0] + base[1] + base[2]] = True
 
-    print('Processando dados...')
+    print('[populaDB] Processando dados...')
     linhasProvas = [LinhaProva(x) for x in entrada[1:]]
 
     provas = {}
     for l in linhasProvas:
-        provas[l.idProva()] = l
+        provas[l.idProvaPolo()] = l
 
     saida = []
     questoes = []
     guias = []
+    # Processa uma vez cada prova distinta. Estamos olhando as variações dos polos aqui também.
     for prova in sorted(provas.keys()):
         p = provas[prova]
-        saida.append([p.disciplina, p.prova, p.folhasDissertativas + 1])
+        saida.append([p.disciplina, p.provaPolo, p.folhasDissertativas + 1])
 
         for q in range(1, p.questoesObjetivas + 1):
             if q < 5:
-                questoes.append([p.disciplina, p.prova, q, 'Objetiva', 1.5])
+                questoes.append([p.disciplina, p.provaPolo, q, 'Objetiva', 1.5])
             else:
-                questoes.append([p.disciplina, p.prova, q, 'Objetiva', 2.0])
+                questoes.append([p.disciplina, p.provaPolo, q, 'Objetiva', 2.0])
+                
         if p.folhasDissertativas != 0:
-            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 1, 'Dissertativa', 2.0])
-            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
+            questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 1, 'Dissertativa', 2.0])
+            questoes.append([p.disciplina, p.provaPolo, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
 
-        guia = os.path.join(args.guias, p.idProva() + '.pdf')
+        guia = os.path.join(args.guias, p.idProvaPolo() + '.pdf')
         if os.path.isfile(guia):
-            guias.append([p.disciplina, p.prova, p.folhasDissertativas + 1, guia])
+            guias.append([p.disciplina, p.provaPolo, p.folhasDissertativas + 1, guia])
         else:
-            print('Arquivo não encontrado:', guia)
+            guia = os.path.join(args.guias, p.idProva() + '.pdf')
+            if os.path.isfile(guia):
+                guias.append([p.disciplina, p.prova, p.folhasDissertativas + 1, guia])
+            else:
+                print('[populaDB] Arquivo não encontrado:', guia)
 
     disciplinas = {}
     for c in corretores:
@@ -160,21 +168,17 @@ if __name__ == '__main__':
         if len(a) != 0:
             if f.disciplina in disciplinas:
                 if (f.disciplina + f.prova + f.ra) not in temCorretor:
-                    correcoes.append([f.disciplina, f.prova, f.ra, disciplinas[f.disciplina].Proximo()])
+                    correcoes.append([f.disciplina, f.provaPolo, f.ra, disciplinas[f.disciplina].Proximo()])
                     folhas.extend(a)
-
             else:
-                print('Disciplina sem corretor:', f.disciplina)
+                print('[populaDB] Disciplina sem corretor:', f.disciplina)
 
-
-    print('Gravando saída...')
+    print('[populaDB] Gravando saída...')
 
     csv.writer(open(os.path.join(args.saida, 'provas.csv'), 'wt')).writerows(saida)
     csv.writer(open(os.path.join(args.saida, 'questoes.csv'), 'wt')).writerows(questoes)
     csv.writer(open(os.path.join(args.saida, 'guias.csv'), 'wt')).writerows(guias)
     csv.writer(open(os.path.join(args.saida, 'folhas.csv'), 'wt')).writerows(folhas)
     csv.writer(open(os.path.join(args.saida, 'correcoes.csv'), 'wt')).writerows(correcoes)
-
-    sys.exit(0)
 
 

@@ -183,7 +183,7 @@ def FolhaRespostaBase(myCanvas, pagina, totalPaginas):
     myCanvas.drawString(marginleft + 8 * cm, 24.2 * cm, 'TURMA:')
     myCanvas.drawString(marginleft + 13 * cm, 24.2 * cm, 'BIM:')
     myCanvas.drawString(marginleft, 23.6 * cm, 'DISCIPLINA:')
-    myCanvas.drawString(marginleft, 23 * cm, 'CÓDIGO DA PROVA:')
+    myCanvas.drawString(marginleft, 23 * cm, 'CÓDIGO:')
  
     # Rodapé
     myCanvas.setLineWidth(1)
@@ -206,6 +206,8 @@ def Identificacao(myCanvas, dados, pagina):
 
     myCanvas.setStrokeColorRGB(0, 0, 0)
     myCanvas.setFillColorRGB(0, 0, 0)
+    
+    codigo = dados.codigo + '-' + format(pagina, '02d')
 
     # Dados do aluno e da prova
     myCanvas.setFont('Helvetica-Bold', 12)
@@ -217,10 +219,10 @@ def Identificacao(myCanvas, dados, pagina):
     myCanvas.drawString(marginleft + 9.3 * cm, 24.2 * cm, dados.turma)
     myCanvas.drawString(marginleft + 13.7 * cm, 24.2 * cm, dados.bimestre)
     myCanvas.drawString(marginleft + 2 * cm, 23.6 * cm, dados.disciplina + ' - ' + dados.nomeDisciplina)
-    myCanvas.drawString(marginleft + 3.2 * cm, 23 * cm, dados.codigo)
+    myCanvas.drawString(marginleft + 1.5 * cm, 23 * cm, codigo)
 
     # Coloca QR-Code no canto superior direito
-    qrw = QrCodeWidget(dados.codigo + '-' + format(pagina, '02d'))
+    qrw = QrCodeWidget(codigo)
     qrsize = 100.0
     b = qrw.getBounds()
     w = b[2] - b[0]
@@ -235,9 +237,6 @@ def MultiplaEscolha(myCanvas, nQuestoes):
     margin = 2 * cm
     marginleft = margin
     marginright = width - margin
-    margintop = height - 1.1 * margin
-    marginbottom = margin
-    offset = (width - 500) / 2
 
     # Instruções
     myCanvas.line(marginleft, 22.6 * cm, marginright, 22.6 * cm)
@@ -371,7 +370,6 @@ def BordaCodificada(myCanvas, xi, yi, xf, yf, ra):
     myCanvas.setStrokeColorRGB(1, 1, 1)
 
 
-
 def FolhaResposta(myCanvas, dados, objetivas, dissertativas):
 
     if objetivas != 0:
@@ -414,12 +412,13 @@ def ListaPresencaBase(myCanvas, pagina, totalPaginas):
     myCanvas.drawString(8.3 * cm, margintop + 12, 'LISTA DE PRESENÇA')
 
     # Linha
-    myCanvas.line(marginleft, 26 * cm, 15.8 * cm, 26 * cm)
+    myCanvas.line(marginleft, 26.6 * cm, 15.8 * cm, 26.6 * cm)
 
     # Texto de identificação
     # Disciplina
     myCanvas.setFont('Helvetica', 9)
-    myCanvas.drawString(marginleft, 25.4 * cm, 'POLO:')
+    myCanvas.drawString(marginleft, 26 * cm, 'POLO:')
+    myCanvas.drawString(marginleft, 25.4 * cm, 'CÓDIGO:')
     myCanvas.drawString(marginleft + 10.5 * cm, 25.4 * cm, 'DATA:')
     myCanvas.drawString(marginleft, 24.8 * cm, 'DISCIPLINA:')
 
@@ -466,15 +465,16 @@ def IdentificaListaPresenca(myCanvas, disciplina, pagina):
     marginleft = margin
     margintop = height - 1.1 * margin
 
-    # Dados do aluno e da prova
-    myCanvas.setFont('Helvetica-Bold', 12)
-    myCanvas.drawString(marginleft + 1.1 * cm, 25.4 * cm, disciplina.nomePolo)
-    myCanvas.drawString(marginleft + 11.6 * cm, 25.4 * cm, disciplina.data)
-    myCanvas.drawString(marginleft + 2 * cm, 24.8 * cm, disciplina.disciplina + ' - ' + disciplina.nomeDisciplina)
-
     codigo = DataInvertida(disciplina.data) + '-' + disciplina.polo + \
              '-' + disciplina.disciplina + '-' + disciplina.prova + '-' + \
              'presenca' + '-' + format(pagina, '02d')
+
+    # Dados do aluno e da prova
+    myCanvas.setFont('Helvetica-Bold', 12)
+    myCanvas.drawString(marginleft + 1.1 * cm, 26 * cm, disciplina.nomePolo)
+    myCanvas.drawString(marginleft + 1.6 * cm, 25.4 * cm, codigo)
+    myCanvas.drawString(marginleft + 11.6 * cm, 25.4 * cm, disciplina.data)
+    myCanvas.drawString(marginleft + 2 * cm, 24.8 * cm, disciplina.disciplina + ' - ' + disciplina.nomeDisciplina)
 
     # Coloca QR-Code no canto superior direito
     qrw = QrCodeWidget(codigo)

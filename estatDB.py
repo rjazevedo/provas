@@ -16,6 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import datetime
+import yaml
 
 args = None
 
@@ -144,10 +145,7 @@ def PorPeriodo(periodo):
 
     pdf3.close()
 
-
-def TodasDisciplinas():
 # Seguem os status da tabela activity_records (Registros de disciplina):
-
 # 0 = matriculado
 # 1 = aguardando nota (caiu em desuso nesse 1º semestre/2019)
 # 2 = nota recebida (em desuso)
@@ -156,6 +154,50 @@ def TodasDisciplinas():
 # 5 = trancado
 # 6 = aproveitamento de estudo
 # 7 = exame de proficiência (basicamente, Aproveitamento de Estudo para disciplinas de Inglês)
+
+def StatusDisciplina(st):
+    if st == 0:
+        return 'matriculado'
+    elif st == 1:
+        return 'aguardando nota'
+    elif st == 2:
+        return 'nota recebida'
+    elif st == 3:
+        return 'aprovado'
+    elif st == 4:
+        return 'reprovado'
+    elif st == 5:
+        return 'trancado'
+    elif st == 6:
+        return 'aproveitamento de estudo'
+    elif st == 7:
+        return 'exame de proficiência'
+    else:
+        return 'status inválido'
+    
+    
+def AprovadoDisciplina(st):
+    if st == 3 or st == 6 or st == 7:
+        return True
+    else:
+        return False
+    
+    
+def ReprovadoDisciplina(st):
+    if st == 4:
+        return True
+    else:
+        return False
+    
+    
+def CompletouDisciplina(st):
+    if st == 3 or st == 4 or st == 6 or st == 7:
+        return True
+    else:
+        return False
+
+
+def TodasDisciplinas():
     ca = db.session.query(db.CurricularActivities).all()
 
     dados = []
@@ -216,22 +258,32 @@ def TodasDisciplinas():
 
 
 def ListaCursos():
-    cursos = db.session.query(db.Courses)
+    cursos = db.session.query(db.Courses).order_by(db.Courses.created_at).all()
 
     for curso in cursos:
-        print(curso)
-        for catalog in curso.catalogs:
-            q1 = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalog.id).count()
-            q2 = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalog.id) \
-                    .filter(db.AcademicRecords.date_conclusion == None) \
-                    .filter(db.AcademicRecords.date_graduation == None) \
-                    .filter(db.AcademicRecords.date_complete_withdrawal == None) \
-                    .filter(db.AcademicRecords.date_deregistration == None).count()
-            print(' -', catalog, '(', q1, ',', q2, ')')
+        if curso.level in ['degree', 'engineering', 'technologist', 'sequential']:
+            print(curso, '-', curso.level)
+            for catalog in curso.catalogs:
+                q1 = db.session.query(db.AcademicRecords).filter(db.AcademicRecords.course_catalog_id == catalog.id).count()
+                q2 = db.session.query(db.AcademicRecords, db.Students) \
+                        .filter(db.AcademicRecords.course_catalog_id == catalog.id,
+                                db.AcademicRecords.date_conclusion == None,
+                                db.AcademicRecords.date_graduation == None,
+                                db.AcademicRecords.date_complete_withdrawal == None,
+                                db.AcademicRecords.date_deregistration == None,
+                                db.AcademicRecords.student_id == db.Students.id,
+                                or_(db.Students.current_status == 'enrolled', db.Students.current_status == 'enrolled_dp')) \
+                        .count()
+                print('{0} ({1}, {2})'.format(catalog, q1, q2))
 
 
 def ListaCatalogo(c):
-    catalogo = db.session.query(db.CourseCatalogs).filter(db.CourseCatalogs.code == c).one()
+    """ Lista as disciplinas de um catálogo com detalhes de carga horária e semestralidade.
+        Informa também estatísticas de alunos cursando este catálogo e gera gráficos com estas estatísticas. """
+    catalogo = db.session.query(db.CourseCatalogs).filter(db.CourseCatalogs.code == c).first()
+    if catalogo is None:
+        print('Catálogo não existe:', c)
+        return
 
     lista = []
     disciplinas = {}
@@ -245,6 +297,14 @@ def ListaCatalogo(c):
         nomes[atividade.curricular_activity_id] = str(atividade)
 
     lista.sort()
+    
+    curriculum = db.session.query(db.CourseCurriculums) \
+                           .filter(db.CourseCurriculums.course_catalog_id == catalogo.id) \
+                           .order_by(db.CourseCurriculums.semester, db.CourseCurriculums.period).all()
+                           
+    print('Disciplinas no Catálogo')
+    for d in curriculum:
+        print('S{2}B{3} - CH{4:3d} - {0} - {1}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload))
 
     # print('Catálogo:', c)
     # for l in lista:
@@ -257,12 +317,20 @@ def ListaCatalogo(c):
 
 
     enrolled = db.session.query(db.AcademicRecords, db.Students) \
-                 .filter(db.AcademicRecords.course_catalog_id == catalogo.id, \
-                         db.Students.current_status == 'enrolled', \
+                 .filter(db.AcademicRecords.course_catalog_id == catalogo.id,
+                         db.AcademicRecords.date_conclusion == None,
+                         db.AcademicRecords.date_graduation == None,
+                         db.AcademicRecords.date_complete_withdrawal == None,
+                         db.AcademicRecords.date_deregistration == None,
+                         db.Students.current_status == 'enrolled',
                          db.AcademicRecords.student_id == db.Students.id) \
                  .count()
     enrolled_dp = db.session.query(db.AcademicRecords, db.Students) \
                     .filter(db.AcademicRecords.course_catalog_id == catalogo.id, \
+                            db.AcademicRecords.date_conclusion == None,
+                            db.AcademicRecords.date_graduation == None,
+                            db.AcademicRecords.date_complete_withdrawal == None,
+                            db.AcademicRecords.date_deregistration == None,
                             db.Students.current_status == 'enrolled_dp', \
                             db.AcademicRecords.student_id == db.Students.id) \
                     .count()
@@ -282,11 +350,14 @@ def ListaCatalogo(c):
                             or_(db.Students.current_status == 'enrolled', db.Students.current_status == 'enrolled_dp')) \
                     .all()
 
-    print('Lista de alunos matriculados mas com Carga Horária 0:')
+    # print('Lista de alunos matriculados mas com Carga Horária 0:')
     data = []
     idades = []
     for (ar, st) in ars:
-        if ar.student.user.birth_date != None:
+        if ar is None or ars is None or ar.student is None or ar.student.user is None: 
+            continue
+        
+        if ar.student.user.birth_date is not None:
             idades.append(datetime.date.today().year - ar.student.user.birth_date.year)
         ch = 0
         for activity in ar.student.activity_records:
@@ -294,8 +365,8 @@ def ListaCatalogo(c):
                 ch += disciplinas[activity.curricular_activity_id]
                 pendencias[activity.curricular_activity_id] -= 1
         data.append(ch)
-        if ch == 0:
-            print(st)
+        # if ch == 0:
+        #     print(st)
 
     pdfCatalogo = PdfPages('estatistica-catalogo-' + c + '.pdf')
 
@@ -319,13 +390,170 @@ def ListaCatalogo(c):
     pdfIdade.savefig()
     plt.close()
 
-    pdfIdade.close()
+    pdfIdade.close()    
     
-    ordenado = sorted([[pendencias[k], nomes[k]] for k in pendencias.keys()])
+    # ordenado = sorted([[pendencias[k], nomes[k]] for k in pendencias.keys()])
 
-    for [p, n] in ordenado:
-        print(p, '-', n)
+    # for [p, n] in ordenado:
+    #     print(p, '-', n)
 
+
+def ListaDisciplinas(ra):
+    """ Lista as disciplinas de um RA. É uma versão simplificada do histórico que completa com as DPs pendentes"""
+    
+    ar = db.session.query(db.ActivityRecords, db.Students) \
+                   .filter(db.ActivityRecords.student_id == db.Students.id,
+                           db.Students.academic_register == ra)\
+                   .order_by(db.ActivityRecords.created_at) \
+                   .all()
+
+    print('Disciplinas cursadas')
+    aprovado = []
+    reprovado = []
+    semStatus = []
+    for (disciplina, _) in ar:
+        print(disciplina.curricular_activity.code, disciplina.curricular_activity.name)
+        if AprovadoDisciplina(disciplina.status):
+            aprovado.append(disciplina.curricular_activity.code)
+        elif ReprovadoDisciplina(disciplina.status):
+            reprovado.append(disciplina)
+        else:
+            semStatus.append(disciplina)
+            
+    print('DPs pendentes:')
+    jaContou = []
+    for d in reprovado:
+        if d.curricular_activity.code in jaContou:
+            continue
+        else:
+            jaContou.append(d.curricular_activity.code)
+            
+        if d.curricular_activity.code not in aprovado:
+            print(d.curricular_activity.code, d.curricular_activity.name)
+
+
+def ListaDPs(codigo):
+    """ Lista as DPs que os alunos matriculados num catálogo precisam cursar ainda."""
+    # Pega o catálogo do curso
+    catalogo = db.session.query(db.CourseCatalogs).filter(db.CourseCatalogs.code == codigo).first()
+    if catalogo is None:
+        print('Catálogo não existe:', codigo)
+        return
+    
+    
+    # Todas as disciplinas existentes estão mapeadas aqui neste relacionamento
+    curriculum = db.session.query(db.CourseCurriculums) \
+                           .filter(db.CourseCurriculums.course_catalog_id == catalogo.id) \
+                           .order_by(db.CourseCurriculums.semester, db.CourseCurriculums.period).all()
+                           
+    disciplinas = [d.curricular_activity for d in curriculum]
+    
+    # Todos os alunos matriculados e ativos ainda neste catálogo
+    alunos = db.session.query(db.AcademicRecords, db.Students) \
+                       .filter(db.AcademicRecords.course_catalog_id == catalogo.id) \
+                       .filter(db.AcademicRecords.date_conclusion == None) \
+                       .filter(db.AcademicRecords.date_graduation == None) \
+                       .filter(db.AcademicRecords.date_complete_withdrawal == None) \
+                       .filter(db.AcademicRecords.date_deregistration == None) \
+                       .filter(db.AcademicRecords.student_id == db.Students.id) \
+                       .filter(or_(db.Students.current_status == 'enrolled', db.Students.current_status == 'enrolled_dp')) \
+                       .all()
+
+    alunos = [x for (x, y) in alunos]
+    # zera contagem de dps
+    dps = {}
+    outras = {}
+    for d in disciplinas:
+        dps[d.code] = 0
+        
+    print('Catálogo:', catalogo.code, '-', len(alunos), 'alunos considerados.')
+    for aluno in alunos:
+        aprovado = []
+        reprovado = []
+        jaContou = []
+        
+        # Pega o histórico do aluno
+        ar = db.session.query(db.ActivityRecords) \
+                .filter(db.ActivityRecords.student_id == aluno.student_id)\
+                .order_by(db.ActivityRecords.created_at) \
+                .all()
+        
+        # Anota as disciplinas aprovadas e reprovadas 
+        for disciplina in ar:
+            if AprovadoDisciplina(disciplina.status):
+                aprovado.append(disciplina.curricular_activity.code)
+            elif ReprovadoDisciplina(disciplina.status):
+                reprovado.append(disciplina)
+
+        for r in reprovado:
+            if r.curricular_activity.code in jaContou:
+                continue
+            jaContou.append(r.curricular_activity.code)
+            if r.curricular_activity.code not in aprovado:
+                if r.curricular_activity.code in dps:
+                    dps[r.curricular_activity.code] += 1
+                else:
+                    outras[r.curricular_activity.code] = True
+        
+    print('Disciplinas que precisam de oferta de DPs')
+    print('S|B|CH|Código|Nome|Alunos com DP')
+    for d in curriculum:
+        # if dps[d.curricular_activity.code] > 0:
+        print('{6}|{2}|{3}|{4}|{0}|{1}|{5}'.format(d.curricular_activity.code, d.curricular_activity.name, d.semester, d.period, d.curricular_activity.workload, dps[d.curricular_activity.code], codigo))
+
+
+def ListaTodasDPs():
+    """ Para cada curso de graduação, lista as DPS de todos os seus catálogos."""
+    cursos = db.session.query(db.Courses).order_by(db.Courses.created_at).all()
+
+    for curso in cursos:
+        if curso.level in ['degree', 'engineering', 'technologist', 'sequential']:
+            print(curso)
+            for catalog in curso.catalogs:
+                ListaDPs(catalog.code)
+
+
+def Bimestres(inicio, quantidade):
+    ano = int(inicio[0:4])
+    bimestre = int(inicio[5])
+    retorno = []
+    
+    for _ in range(0, quantidade):
+        retorno.append('{0}b{1}'.format(ano, bimestre))
+        bimestre += 1
+        if bimestre > 4:
+            bimestre = 1
+            ano += 1
+            
+    return retorno
+
+
+def ListaOfertas(nomeArquivo):
+    vestibulares = yaml.safe_load(open(nomeArquivo))
+    
+    todasOfertas = {}
+    
+    for catalogo in vestibulares:
+        dbCatalogo = db.session.query(db.CourseCatalogs).filter(db.CourseCatalogs.code == catalogo).first()
+        if dbCatalogo is None:
+            print('Catálogo inválido:', catalogo)
+            continue
+        
+        for inicio in vestibulares[catalogo]:
+            bimestres = Bimestres(inicio, dbCatalogo.duration_semesters * 2)
+            for atividade in dbCatalogo.curriculums:
+                bim = bimestres[(atividade.semester - 1) * 2 + atividade.period - 1]
+                if not bim in todasOfertas:
+                    todasOfertas[bim] = {}
+                    
+                todasOfertas[bim][atividade.curricular_activity.code] = atividade.curricular_activity
+    
+    print('Bimestre|Código|Nome|CH')
+    for bimestre in sorted(todasOfertas.keys()):
+        ofertasBimestre = todasOfertas[bimestre]
+        for codigoDisciplina in sorted(ofertasBimestre.keys()):
+            print('{0}|{1}|{2}|{3}'.format(bimestre, codigoDisciplina, ofertasBimestre[codigoDisciplina].name, ofertasBimestre[codigoDisciplina].workload))     
+                                
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Estatística das Notas das Disciplinas.')
@@ -336,6 +564,9 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--minimo', type=int, required=False, help='Número mínimo de alunos para considerar para cada oferta de disciplina')
     parser.add_argument('-c', '--catalogo', type=str, required=False, help='Seleciona um catálogo específico')
     parser.add_argument('-d', '--disciplinas', type=int, required=False, help='Imprime as disciplinas do histórico de um aluno, dado o RA')
+    parser.add_argument('-dp', '--dps', type=str, required=False, help='Lista as DPs pendentes para os alunos de um catálogo')
+    parser.add_argument('-tdp', '--todasdps', action='store_true', required=False, help='Lista todas as DPs pendentes em todos os catálogos')
+    parser.add_argument('-o', '--ofertas', type=str, required=False, help='Lista as ofertas dos currículos baseada na lista de ingressos (arquivo .yml)')
 
     args = parser.parse_args()
 
@@ -356,3 +587,15 @@ if __name__ == '__main__':
 
     if args.catalogo is not None:
         ListaCatalogo(args.catalogo)
+
+    if args.disciplinas is not None:
+        ListaDisciplinas(args.disciplinas)
+        
+    if args.dps is not None:
+        ListaDPs(args.dps)
+        
+    if args.todasdps:
+        ListaTodasDPs()
+        
+    if args.ofertas:
+        ListaOfertas(args.ofertas)

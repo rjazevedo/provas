@@ -18,7 +18,7 @@ if not os.path.isfile(fileName):
 
 dbpass = open(fileName).readlines()[0][:-1]
 # print(dbpass)
-engine = create_engine(dbpass)
+engine = create_engine(dbpass, pool_size=10, max_overflow=20)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -168,9 +168,21 @@ class ActivityRecordSubmissions(Base):
 
     activity_record = relationship('ActivityRecords', uselist = False)
     activity_test = relationship('ActivityTests', uselist = False)
+    corrections = relationship('ActivityRecordSubmissionCorrections', back_populates='activity_record_submission')
+    correctors = relationship('ActivityRecordSubmissionCorrectors', back_populates='activity_record_submission')
+
+    def Corrigida(self):
+        return len(self.activity_test.questions) == len(self.corrections)
 
     def __repr__(self):
-        return self.submission_type + ' - ' + str(self.grade)
+        return '({0}) - {1} - {2} - Anulada: {3} - Corretores: {4} - Correções: {5} - Nota: {6}'.format(
+            self.id,
+            self.activity_record.curricular_activity.code, 
+            self.activity_test.code,
+            self.annulled, 
+            len(self.correctors),
+            len(self.corrections),
+            self.grade)
 
 # Correções das questões
 class ActivityRecordSubmissionCorrections(Base):
@@ -184,9 +196,16 @@ class ActivityRecordSubmissionCorrections(Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
-    activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
+    activity_record_submission = relationship('ActivityRecordSubmissions', back_populates='corrections', uselist = False)
     activity_test_question = relationship('ActivityTestQuestions', uselist = False)
+    
+    def __repr__(self):
+        return '{0} - {1} - {2} - Q{3}'.format(self.activity_record_submission.activity_record.curricular_activity.code, 
+                                        self.activity_record_submission.activity_record.student.academic_register, 
+                                        self.activity_test_question.activity_test.code,
+                                        self.activity_test_question.number)
 
+    
 # Corretores das provas
 class ActivityRecordSubmissionCorrectors(Base):
     __tablename__ = 'activity_record_submission_correctors'
@@ -198,8 +217,13 @@ class ActivityRecordSubmissionCorrectors(Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
-    activity_record_submission = relationship('ActivityRecordSubmissions', uselist = False)
+    activity_record_submission = relationship('ActivityRecordSubmissions', back_populates='correctors', uselist = False)
     internal_user = relationship('InternalUsers', uselist = False)
+
+    def __repr__(self):
+        return '{0} - {1} - {2}'.format(self.activity_record_submission.activity_record.curricular_activity.code, 
+                                        self.activity_record_submission.activity_record.student.academic_register,
+                                        self.internal_user.email)
 
 # Oferta de Disciplina
 class ActivityOffers(Base):
@@ -236,7 +260,7 @@ class ActivityTestQuestions(Base):
     updated_at = Column(DateTime)
     annulled = Column(Boolean)
 
-    activity_test = relationship('ActivityTests', backref = 'activity_tests')
+    activity_test = relationship('ActivityTests', back_populates = 'questions')
 
     def __repr__(self):
         return str(self.number) + ' - ' + self.question_type
@@ -253,10 +277,13 @@ class ActivityTests(Base):
     updated_at = Column(DateTime)
 
     curricular_activity = relationship('CurricularActivities', uselist = False)
-    questions = relationship('ActivityTestQuestions')
+    questions = relationship('ActivityTestQuestions', back_populates='activity_test')
 
     def __repr__(self):
-        return self.curricular_activity.code + ' - ' + self.curricular_activity.name + ' - ' + self.code + '(' + str(self.total_pages) + ')'
+        return '{0} - {1} - {2} ({3})'.format(self.curricular_activity.code, 
+                                              self.curricular_activity.name,
+                                              self.code,
+                                              str(self.total_pages))
 
 class Users(Base):
     __tablename__ = 'users'
@@ -330,8 +357,11 @@ class InternalUsers(Base):
     status = Column(String)
     role = Column(String)
 
+    # Correções a fazer -> Apontando para ActivityRecordSubmissionCorrectors
+    tasks = relationship('ActivityRecordSubmissionCorrectors', back_populates='internal_user')
+
     def __repr__(self):
-        return self.email + ' - ' + self.role
+        return self.email + ' - ' + self.status
 
 class Courses(Base):
     __tablename__ = 'courses'

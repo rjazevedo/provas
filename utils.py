@@ -5,10 +5,10 @@
 
 import os
 
-def BuscaArquivos(p, recursivo = False, tipo = '', nomeCompleto = True):
+def BuscaArquivos(p, recursivo = False, tipo = '', nomeCompleto = True, prefixo = ''):
     resposta = []
     for arquivo in os.scandir(p):
-        if not arquivo.name.startswith('.') and arquivo.name.endswith(tipo):
+        if not arquivo.name.startswith('.') and arquivo.name.endswith(tipo) and arquivo.name.startswith(prefixo):
             if arquivo.is_file():
                 if nomeCompleto:
                     resposta.append(os.path.join(p, arquivo.name))
