@@ -41,6 +41,7 @@ def RemoveDuplicado(forca):
     # Para cada Activity Record Submission (atividade que precisa de avaliação)
     todasProvas = sess.query(db.ActivityRecordSubmissions).all()
     apagar = []
+    quantidade = 0
     
     for prova in todasProvas:
         corretores = [x for x in prova.correctors if x.role == 'grader']
@@ -82,13 +83,17 @@ def RemoveDuplicado(forca):
         if len(apagar) > 100:
             for c in apagar:
                 sess.delete(c)
+                quantidade += 1
                 apagar = []
             sess.commit()
             
     for c in apagar:
         sess.delete(c)
+        quantidade += 1
         apagar = []
-    sess.commit()        
+    sess.commit()   
+    
+    print(quantidade, 'tarefas de correção removidas de corretores.')     
   
 
 if __name__ == '__main__':
