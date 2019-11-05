@@ -35,8 +35,8 @@ else
 	#******Modulo de Insercao de Banco de dados*****#
 	#Incluindo folhas
 	echo "Iniciando insercao no Banco de Dados"
-	${HOME}/src/sgaFolhas.py -a ${SAIDA_CSV}/folhas.csv -c ${CALENDARIO} -t ${TIPO_PROVA} > ${LOG}/log_full-insertion_sgaFolhas_${DATA}.log
-	${HOME}/src/sgaFolhas.py -a ${SAIDA_CSV}/folhas.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} > ${LOG}/log_full-insertion_sgaFolhas_${DATA}.log
+	${HOME}/src/sgaFolhas.py -a ${SAIDA_CSV}/folhas.csv -c ${CALENDARIO} -t ${TIPO_PROVA} > ${LOG}/log_full-insertion_sgaFolhas_regular_${DATA}.log
+	${HOME}/src/sgaFolhas.py -a ${SAIDA_CSV}/folhas.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} > ${LOG}/log_full-insertion_sgaFolhas_DP_${DATA}.log
 	echo "Insercao de folhas no Banco de Dados finalizada"
 	echo ${MSG_FULLINSERTION_FIM}
 fi

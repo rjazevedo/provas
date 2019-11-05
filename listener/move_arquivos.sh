@@ -10,7 +10,7 @@ PATH_PROVAS_3BIM="/home/provas/dados/SGA/2019b3/provas"
 PATH_PROVAS_1DP="/home/provas/dados/SGA/2019dp1/provas"
 PATH_PROVAS_EXAME_1BIM="/home/provas/dados/SGA/2019e1/provas"
 PATH_PROVAS_EXAME_2BIM="/home/provas/dados/SGA/2019e2/provas"
-PATH_LIMBO="/home/provas/dados/tmp/Limbo"
+PATH_LIMBO="/home/provas/dados/gdrive_rclone/Nucleo-Processamento-Provas/Verifica-Thales"
 
 #Opcoes de comando
 ACTION="cp -n"
@@ -35,6 +35,11 @@ else
 	for lista in $( find ${PATH_ORIGEM} -iname '*png' );
 	do
 		case "${lista}" in
+			*XXXXXXX*|*YYYYYYY*|*ZZZZZZZ*)
+				#Limbo eh um problema, quando aparece sempre deve ser reportado
+				echo "Prova - ${lista} - movida para o Limbo."
+				${ACTION} "${lista}" ${PATH_LIMBO}
+				;;
 			*20190417*|*20190418*|*20190422*|*20190423*|*20190424*|*20190425*|*20190426*|*20190427*|*20190429*|*20190502*|*20190509*)
 				
 				#if [ "$VERBOSE_MODE" == "yes" ]; then
