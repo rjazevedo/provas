@@ -42,7 +42,7 @@ def associaCorretor(
                      ce,  # corrector_email
                      st,  # submission_type
                      cid,  # calendar_id
-                     incremental # Só inclui se não houver corretor.
+                     forca # Só inclui se não houver corretor.
                    ):
 
     """Associa um corretor a uma prova, de um aluno, no SGA"""
@@ -55,7 +55,7 @@ def associaCorretor(
              ce,  # corrector_email
              st,  # submission_type
              cid,  # calendar_id
-             incremental
+             forca
           )
 
     # ####################
@@ -143,7 +143,7 @@ def associaCorretor(
                   .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader') \
                   .first()
 
-        if not submission_corrector or not incremental:
+        if not submission_corrector or forca:
           submission_corrector = db.ActivityRecordSubmissionCorrectors(
                                                       activity_record_submission_id = submission.id,
                                                       role = 'grader',
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV com os emails dos corretores')
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
-    parser.add_argument('-i', '--incremental', action='store_true', required=False, default=False, help='Faz uma inserção incremental dos dados, sem sobrepor mais de um corretor por prova')
+    parser.add_argument('-f', '--forca', action='store_true', required=False, default=False, help='Força a inclusão de outros corretores, mesmo que já haja corretor para a prova')
 
     args = parser.parse_args()
 
@@ -201,5 +201,5 @@ if __name__ == '__main__':
                              row[3],      # str, Email do corretor (internal_user)
                              tipo,        ### str, Tipo da submissão
                              calendario,   ### int, ID do calendário
-                             args.incremental # Somente adiciona corretores das provas que não tem ainda
+                             args.forca # Somente adiciona corretores das provas que não tem ainda
                            )

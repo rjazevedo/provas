@@ -33,8 +33,8 @@ else
 	echo "Insercao de folhas no Banco de Dados finalizada"
 
 	#Inclui corretores
-	${HOME}/src/sgaCorretores.py -i -a ${SAIDA_CSV}/correcoes.csv -c ${CALENDARIO} -t ${TIPO_PROVA} > ${LOG}/log_sgaCorretores_regular_${DATA}.log
-	${HOME}/src/sgaCorretores.py -i -a ${SAIDA_CSV}/correcoes.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} > ${LOG}/log_sgaCorretores_DP_${DATA}.log
+	${HOME}/src/sgaCorretores.py -a ${SAIDA_CSV}/correcoes.csv -c ${CALENDARIO} -t ${TIPO_PROVA} > ${LOG}/log_sgaCorretores_regular_${DATA}.log
+	${HOME}/src/sgaCorretores.py -a ${SAIDA_CSV}/correcoes.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} > ${LOG}/log_sgaCorretores_DP_${DATA}.log
 	echo "Insercao de corretores no Banco de Dados finalizada"
 
 	#Rotina de atualizacao BaseCorrecoes
