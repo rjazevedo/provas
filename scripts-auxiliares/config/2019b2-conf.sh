@@ -14,21 +14,21 @@ DATA=$(date +%Y%m%d_%H-%M-%S)
 #Destino de Dashboad 2 bimestre
 DESTINO_DASHBOARD="SGA/dashboard/2bim"
 #Caminho do arquivo de estrutura Ausentes
-ESTRUTURA_AUSENTES="dados/csv/2019b2/ausentes.csv"
+ESTRUTURA_AUSENTES="csv/2019b2/ausentes.csv"
 #Caminho do arquivo de estrutura Corretores
-ESTRUTURA_BASE_CORRECOES="dados/csv/2019b2/baseCorrecoes-2BIM-2019.csv"
+ESTRUTURA_BASE_CORRECOES="csv/2019b2/baseCorrecoes-2BIM-2019.csv"
 #Caminho do arquivo de estrutura Corretores
-ESTRUTURA_CORRETORES="dados/csv/2019b2/corretores-2BIM-2019.csv"
+ESTRUTURA_CORRETORES="csv/2019b2/corretores-2BIM-2019.csv"
 #Caminho do arquivo de estrutura Provas
-ESTRUTURA_CSV="dados/csv/2019b2/"
+ESTRUTURA_CSV="csv/2019b2/"
 #Caminho do arquivo de estrutura Dashboad
-ESTRUTURA_DASHBOARD="dados/csv/2019b2/todasProvasJuntas.csv"
+ESTRUTURA_DASHBOARD="csv/2019b2/todasProvasJuntas.csv"
 #Caminho estrutura de guias
 ESTRUTURA_GUIAS="SGA/guias_2_bimestre_2019"
 #Caminho do arquivo de estrutura Provas
-ESTRUTURA_PROVAS="dados/csv/2019b2/todasProvasJuntas.csv"
+ESTRUTURA_PROVAS="csv/2019b2/todasProvasJuntas.csv"
 #Caminho do arquivo de gabaritos
-GABARITO_PROVAS="dados/csv/2019b2/GabaritoMultiplasEscolhas-2BIM-2019.csv"
+GABARITO_PROVAS="csv/2019b2/GabaritoMultiplasEscolhas-2BIM-2019.csv"
 #Diretorio de NFS
 HOME_NFS="/home/provas/dados"
 #Path para Home
