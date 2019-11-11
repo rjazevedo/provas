@@ -471,6 +471,8 @@ def ListaDPs(codigo):
     for d in disciplinas:
         dps[d.code] = 0
         
+    quantidade = 0
+        
     print('Catálogo:', catalogo.code, '-', len(alunos), 'alunos considerados.')
     for aluno in alunos:
         aprovado = []
@@ -498,6 +500,9 @@ def ListaDPs(codigo):
             print(aluno.student.academic_register)
             continue
         
+        if len(reprovado) > 0:
+            quantidade += 1
+            
         for r in reprovado:
             if r.curricular_activity.code not in aprovado:
                 if r.curricular_activity.code in dps:
@@ -505,6 +510,7 @@ def ListaDPs(codigo):
                 else:
                     outras[r.curricular_activity.code] = True
         
+    print(quantidade, 'alunos com menos de', chMinimo, 'horas a cursar de DPs.')
     print('Disciplinas que precisam de oferta de DPs')
     print('S|B|CH|Código|Nome|Alunos com DP')
     for d in curriculum:
