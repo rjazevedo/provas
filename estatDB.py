@@ -495,6 +495,7 @@ def ListaDPs(codigo):
                     ch += disciplina.curricular_activity.workload
 
         if ch > chMinimo: # se tem muita carga horária de DP, não contabiliza
+            print(aluno.student.academic_register)
             continue
         
         for r in reprovado:
