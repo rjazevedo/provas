@@ -471,6 +471,7 @@ def ListaDPs(codigo):
         aprovado = []
         reprovado = []
         jaContou = []
+        ch = 0
         
         # Pega o histórico do aluno
         ar = db.session.query(db.ActivityRecords) \
@@ -483,12 +484,12 @@ def ListaDPs(codigo):
             if AprovadoDisciplina(disciplina.status):
                 aprovado.append(disciplina.curricular_activity.code)
             elif ReprovadoDisciplina(disciplina.status):
-                reprovado.append(disciplina)
+                if disciplina.curricular_activity.code not in jaContou:
+                    reprovado.append(disciplina)
+                    jaContou.append(disciplina.curricular_activity.code)
+                    ch += disciplina.curricular_activity.workload
 
         for r in reprovado:
-            if r.curricular_activity.code in jaContou:
-                continue
-            jaContou.append(r.curricular_activity.code)
             if r.curricular_activity.code not in aprovado:
                 if r.curricular_activity.code in dps:
                     dps[r.curricular_activity.code] += 1
