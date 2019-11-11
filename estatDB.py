@@ -497,7 +497,6 @@ def ListaDPs(codigo):
                     ch += disciplina.curricular_activity.workload
 
         if ch > chMinimo: # se tem muita carga horária de DP, não contabiliza
-            print(aluno.student.academic_register)
             continue
         
         if len(reprovado) > 0:
@@ -510,7 +509,7 @@ def ListaDPs(codigo):
                 else:
                     outras[r.curricular_activity.code] = True
         
-    print(quantidade, 'alunos com menos de', chMinimo, 'horas a cursar de DPs.')
+    print(quantidade, 'alunos com menos de', chMinimo, 'horas a cursar em DPs.')
     print('Disciplinas que precisam de oferta de DPs')
     print('S|B|CH|Código|Nome|Alunos com DP')
     for d in curriculum:
