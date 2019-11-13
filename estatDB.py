@@ -463,14 +463,22 @@ def ListaDPs(codigo):
     # zera contagem de dps
     dps = {}
     outras = {}
+    if args.minimo == 1: # este é o default abaixo
+        chMinimo = 10000  # número bem grande para não ser limitante
+    else:
+        chMinimo = args.minimo
+        
     for d in disciplinas:
         dps[d.code] = 0
+        
+    quantidade = 0
         
     print('Catálogo:', catalogo.code, '-', len(alunos), 'alunos considerados.')
     for aluno in alunos:
         aprovado = []
         reprovado = []
         jaContou = []
+        ch = 0
         
         # Pega o histórico do aluno
         ar = db.session.query(db.ActivityRecords) \
@@ -478,23 +486,30 @@ def ListaDPs(codigo):
                 .order_by(db.ActivityRecords.created_at) \
                 .all()
         
-        # Anota as disciplinas aprovadas e reprovadas 
+        # Anota as disciplinas aprovadas e reprovadas
         for disciplina in ar:
             if AprovadoDisciplina(disciplina.status):
                 aprovado.append(disciplina.curricular_activity.code)
             elif ReprovadoDisciplina(disciplina.status):
-                reprovado.append(disciplina)
+                if disciplina.curricular_activity.code not in jaContou:
+                    reprovado.append(disciplina)
+                    jaContou.append(disciplina.curricular_activity.code)
+                    ch += disciplina.curricular_activity.workload
 
+        if ch > chMinimo: # se tem muita carga horária de DP, não contabiliza
+            continue
+        
+        if len(reprovado) > 0:
+            quantidade += 1
+            
         for r in reprovado:
-            if r.curricular_activity.code in jaContou:
-                continue
-            jaContou.append(r.curricular_activity.code)
             if r.curricular_activity.code not in aprovado:
                 if r.curricular_activity.code in dps:
                     dps[r.curricular_activity.code] += 1
                 else:
                     outras[r.curricular_activity.code] = True
         
+    print(quantidade, 'alunos com menos de', chMinimo, 'horas a cursar em DPs.')
     print('Disciplinas que precisam de oferta de DPs')
     print('S|B|CH|Código|Nome|Alunos com DP')
     for d in curriculum:
