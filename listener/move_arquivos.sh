@@ -51,8 +51,8 @@ else
 				if [[ "$3" == "-f" ]]; then
 					temp="${lista##*/}"
 					temp="${temp%.*}"
-					rm ${PATH_PROVAS_1BIM}/${2}/${temp}.csv 2> /dev/null
 					rm ${PATH_PROVAS_1BIM}/${2}/result/${temp}.txt 2> /dev/null
+					rm ${PATH_PROVAS_1BIM}/${2}/${temp}.csv 2> /dev/null
 				fi
 				
 				;;
@@ -65,9 +65,9 @@ else
 				#Limpa os arquivos do servidor para que seja novamente corrigido
 				if [[ "$3" == "-f" ]]; then
 					temp="${lista##*/}"
-					temp="${temp%.*}"
-					rm ${PATH_PROVAS_2BIM}/${2}/${temp}.csv 2> /dev/null
+					temp="${temp%.*}"					
 					rm ${PATH_PROVAS_2BIM}/${2}/result/${temp}.txt 2> /dev/null
+					rm ${PATH_PROVAS_2BIM}/${2}/${temp}.csv 2> /dev/null
 				fi
 				
 				;;
@@ -80,9 +80,9 @@ else
 				#Limpa os arquivos do servidor para que seja novamente corrigido
 				if [[ "$3" == "-f" ]]; then
 					temp="${lista##*/}"
-					temp="${temp%.*}"
-					rm ${PATH_PROVAS_1DP}/${2}/${temp}.csv 2> /dev/null
+					temp="${temp%.*}"					
 					rm ${PATH_PROVAS_1DP}/${2}/result/${temp}.txt 2> /dev/null
+					rm ${PATH_PROVAS_1DP}/${2}/${temp}.csv 2> /dev/null
 				fi	
 				
 				;;
@@ -95,9 +95,9 @@ else
 				#Limpa os arquivos do servidor para que seja novamente corrigido
 				if [[ "$3" == "-f" ]]; then
 					temp="${lista##*/}"
-					temp="${temp%.*}"
-					rm ${PATH_PROVAS_EXAME_1BIM}/${2}/${temp}.csv 2> /dev/null
+					temp="${temp%.*}"					
 					rm ${PATH_PROVAS_EXAME_1BIM}/${2}/result/${temp}.txt 2> /dev/null
+					rm ${PATH_PROVAS_EXAME_1BIM}/${2}/${temp}.csv 2> /dev/null
 				fi		
 				
 				;;
@@ -110,9 +110,9 @@ else
 				#Limpa os arquivos do servidor para que seja novamente corrigido
 				if [[ "$3" == "-f" ]]; then
 					temp="${lista##*/}"
-					temp="${temp%.*}"
-					rm ${PATH_PROVAS_EXAME_2BIM}/${2}/${temp}.csv 2> /dev/null
+					temp="${temp%.*}"					
 					rm ${PATH_PROVAS_EXAME_2BIM}/${2}/result/${temp}.txt 2> /dev/null
+					rm ${PATH_PROVAS_EXAME_2BIM}/${2}/${temp}.csv 2> /dev/null
 				fi				
 				
 				;;
@@ -125,9 +125,9 @@ else
 				#Limpa os arquivos do servidor para que seja novamente corrigido
 				if [[ "$3" == "-f" ]]; then
 					temp="${lista##*/}"
-					temp="${temp%.*}"
-					rm ${PATH_PROVAS_3BIM}/${2}/${temp}.csv 2> /dev/null
+					temp="${temp%.*}"					
 					rm ${PATH_PROVAS_3BIM}/${2}/result/${temp}.txt 2> /dev/null
+					rm ${PATH_PROVAS_3BIM}/${2}/${temp}.csv 2> /dev/null
 				fi
 				
 				;;
