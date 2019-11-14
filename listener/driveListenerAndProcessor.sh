@@ -3,7 +3,7 @@
 #Esse script depende de move_arquivos.sh e alternative-decoder-local.sh
 #Autor: Daniel Consiglieri
 #Data Criacao:Out 2019
-#Revisao:04-out-2019
+#Revisao:14-nov-2019
 
 #Data
 DATA=$(date +%Y%m%d_%H-%M-%S)
@@ -54,6 +54,8 @@ do
 				cp -n "${i}" "${ESTRUTURA_PROCESSAMENTO}"/Saida
 				
 				cd	 ${ESTRUTURA_PROCESSAMENTO}/Saida
+				
+				convert -quality 100 -density 150 -fill white -fuzz 80% +opaque black -antialias ${ESTRUTURA_PROCESSAMENTO}/Saida/${b} ${ESTRUTURA_PROCESSAMENTO}/Saida/${b}
 
 				#Move os arquivos dentro das sub-pastas
 				for a in `seq -f "%04.0f" 0 336`
@@ -77,6 +79,10 @@ do
 				
 				#Copia para a pasta de referencia
 				cp -p "${PATH_MONITORAMENTO_PNG}/${b}" "${PATH_DESTINO_PNG}/${b}"
+				
+				#Teste
+				#b="${b%.*}"
+				#echo "Eh necessario atualizar os arquivos ${b}.txt e ${b}.csv"
 				
 			fi
 		fi
