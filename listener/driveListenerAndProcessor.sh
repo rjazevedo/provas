@@ -80,10 +80,6 @@ do
 				#Copia para a pasta de referencia
 				cp -p "${PATH_MONITORAMENTO_PNG}/${b}" "${PATH_DESTINO_PNG}/${b}"
 				
-				#Teste
-				#b="${b%.*}"
-				#echo "Eh necessario atualizar os arquivos ${b}.txt e ${b}.csv"
-				
 			fi
 		fi
 	done
