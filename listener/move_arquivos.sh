@@ -68,10 +68,13 @@ else
 					temp="${temp%.*}"
 					rm ${PATH_PROVAS_1BIM}/${2}/result/${temp}.txt 2> /dev/null
 					rm ${PATH_PROVAS_1BIM}/${2}/${temp}.csv 2> /dev/null
-					#reverte o status de ausente e de ilegível
-					echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
-					~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 37 -e
-					rm ${WORKING_FOLDER}/reverte_status.csv
+					
+					if [[ $temp != *"ocorrencia"* ]] && [[ $temp != *"presenca"* ]] && [[ $temp != *"oficio"* ]];then
+						#reverte o status de ausente, anulada e ilegível
+						echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
+						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 37 -e
+						rm ${WORKING_FOLDER}/reverte_status.csv
+					fi
 				fi
 				
 				;;
@@ -87,10 +90,13 @@ else
 					temp="${temp%.*}"					
 					rm ${PATH_PROVAS_2BIM}/${2}/result/${temp}.txt 2> /dev/null
 					rm ${PATH_PROVAS_2BIM}/${2}/${temp}.csv 2> /dev/null
-					#reverte o status de ausente e de ilegível
-					echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
-					~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 38 -e
-					rm ${WORKING_FOLDER}/reverte_status.csv
+					
+					if [[ $temp != *"ocorrencia"* ]] && [[ $temp != *"presenca"* ]] && [[ $temp != *"oficio"* ]];then
+						#reverte o status de ausente, anulada e ilegível
+						echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
+						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 38 -e
+						rm ${WORKING_FOLDER}/reverte_status.csv
+					fi
 				fi
 				
 				;;
@@ -106,10 +112,13 @@ else
 					temp="${temp%.*}"					
 					rm ${PATH_PROVAS_1DP}/${2}/result/${temp}.txt 2> /dev/null
 					rm ${PATH_PROVAS_1DP}/${2}/${temp}.csv 2> /dev/null
-					#reverte o status de ausente e de ilegível
-					echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
-					~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 39 -t dp -e
-					rm ${WORKING_FOLDER}/reverte_status.csv
+					
+					if [[ $temp != *"ocorrencia"* ]] && [[ $temp != *"presenca"* ]] && [[ $temp != *"oficio"* ]];then
+						#reverte o status de ausente, anulada e ilegível
+						echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
+						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 39 -t dp -e
+						rm ${WORKING_FOLDER}/reverte_status.csv
+					fi
 				fi	
 				
 				;;
@@ -125,10 +134,13 @@ else
 					temp="${temp%.*}"					
 					rm ${PATH_PROVAS_EXAME_1BIM}/${2}/result/${temp}.txt 2> /dev/null
 					rm ${PATH_PROVAS_EXAME_1BIM}/${2}/${temp}.csv 2> /dev/null
-					#reverte o status de ausente e de ilegível
-					echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
-					~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 37 -t exam -e
-					rm ${WORKING_FOLDER}/reverte_status.csv
+					
+					if [[ $temp != *"ocorrencia"* ]] && [[ $temp != *"presenca"* ]] && [[ $temp != *"oficio"* ]];then
+						#reverte o status de ausente, anulada e ilegível
+						echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
+						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 37 -t exam -e
+						rm ${WORKING_FOLDER}/reverte_status.csv
+					fi
 				fi		
 				
 				;;
@@ -144,10 +156,13 @@ else
 					temp="${temp%.*}"					
 					rm ${PATH_PROVAS_EXAME_2BIM}/${2}/result/${temp}.txt 2> /dev/null
 					rm ${PATH_PROVAS_EXAME_2BIM}/${2}/${temp}.csv 2> /dev/null
-					#reverte o status de ausente e de ilegível
-					echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
-					~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 38 -t exam -e
-					rm ${WORKING_FOLDER}/reverte_status.csv					
+					
+					if [[ $temp != *"ocorrencia"* ]] && [[ $temp != *"presenca"* ]] && [[ $temp != *"oficio"* ]];then
+						#reverte o status de ausente, anulada e ilegível
+						echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
+						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 38 -t exam -e
+						rm ${WORKING_FOLDER}/reverte_status.csv	
+					fi
 				fi				
 				
 				;;
@@ -163,13 +178,16 @@ else
 					temp="${temp%.*}"					
 					rm ${PATH_PROVAS_3BIM}/${2}/result/${temp}.txt 2> /dev/null
 					rm ${PATH_PROVAS_3BIM}/${2}/${temp}.csv 2> /dev/null
-					#reverte o status de ausente e de ilegível
-					echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4}-${temp:9:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
-					#como regular e DP estão misturadas é necessário chutar qual é o registro correto
-					#echo "Atencao! Como os registros de DP e regular do 3BIM2019 estao misturados eh normal que um dos procedimentos falhe e o outro funcione"
-					~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 44 -e 2> /dev/null
-					~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 46 -t dp -e 2> /dev/null
-					rm ${WORKING_FOLDER}/reverte_status.csv
+					
+					if [[ $temp != *"ocorrencia"* ]] && [[ $temp != *"presenca"* ]] && [[ $temp != *"oficio"* ]];then					
+						#reverte o status de ausente, anulada e ilegível
+						echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4}-${temp:9:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
+						#como regular e DP estão misturadas é necessário chutar qual é o registro correto
+						#echo "Atencao! Como os registros de DP e regular do 3BIM2019 estao misturados eh normal que um dos procedimentos falhe e o outro funcione"
+						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 44 -e 2> /dev/null
+						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 46 -t dp -e 2> /dev/null
+						rm ${WORKING_FOLDER}/reverte_status.csv					
+					fi
 				fi
 				
 				;;

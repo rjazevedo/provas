@@ -125,7 +125,7 @@ def marcaAluno(
 
     submission.activity_test_id = test.id
     submission.absent = False
-	submission.annulled = False
+    submission.annulled = False
     campo_editavel = {'editable': 'true'}
     if editavel:
         submission.complementary_data = campo_editavel
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
     parser.add_argument('-e', '--editavel', action='store_true', help='Habilita para correção um registro que tenha sido bloqueado')
-	
+    
     args = parser.parse_args()
 
     arquivo = args.arquivo
