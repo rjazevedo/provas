@@ -166,9 +166,9 @@ else
 					#reverte o status de ausente e de ilegível
 					echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4}-${temp:9:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
 					#como regular e DP estão misturadas é necessário chutar qual é o registro correto
-					echo "Atencao! Como os registros de DP e regular do 3BIM2019 estao misturados eh normal que um dos procedimentos falhe e o outro funcione"
-					~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 44 -e
-					~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 46 -t dp -e
+					#echo "Atencao! Como os registros de DP e regular do 3BIM2019 estao misturados eh normal que um dos procedimentos falhe e o outro funcione"
+					~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 44 -e 2> /dev/null
+					~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 46 -t dp -e 2> /dev/null
 					rm ${WORKING_FOLDER}/reverte_status.csv
 				fi
 				

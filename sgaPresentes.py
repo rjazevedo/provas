@@ -125,6 +125,7 @@ def marcaAluno(
 
     submission.activity_test_id = test.id
     submission.absent = False
+	submission.annulled = False
     campo_editavel = {'editable': 'true'}
     if editavel:
         submission.complementary_data = campo_editavel
