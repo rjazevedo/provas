@@ -90,9 +90,11 @@ class Gabarito:
     def Comentario(self, questao, resposta):
         if resposta in self.respostas[questao - 1]:
             return 'Resposta Correta (gabarito = ' + self.respostas[questao - 1] + ')'
+        elif self.respostas[questao - 1] == '*':
+            return 'Questão anulada'
         elif resposta == '_':
             return 'Resposta em branco (gabarito = ' + self.respostas[questao - 1] + ')'
-        elif resposta == '+':
+        elif resposta == '+' or resposta == 'X':
             return 'Múltiplas respostas lidas (gabarito = ' + self.respostas[questao - 1] + ')'
         else:
             return 'Aluno respondeu errado (' + resposta + ') (gabarito = ' + self.respostas[questao - 1] + ')'
@@ -104,8 +106,11 @@ class Gabarito:
 
         if resposta in self.respostas[questao - 1]:
             return 10
+        elif self.respostas[questao - 1] == '*':
+            return 10
         else:
             return 0
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Corrige questões de Múltipla Escolha')
