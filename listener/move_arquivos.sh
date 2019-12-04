@@ -9,7 +9,7 @@ Regulares:
 1BIM2019 - 20190512
 2BIM2019 - 20190714
 3BIM2019 - 20191024
-4BIM2019 - 
+4BIM2019 - 20191222
 Exames:
 E1BIM2019 - 20190901
 E2BIM2019 - 20190922
@@ -189,6 +189,31 @@ else
 						rm ${WORKING_FOLDER}/reverte_status.csv					
 					fi
 				fi
+				
+				;;
+			20191204*|*20191205*|*20191207*|*20191209*|*20191210*|*20191211*|*20191212*|*20191213*|*20191214*|*20191218*|*20191219*|*20191220*|*20191222)
+				
+				echo "Detectei prova do 4o bimestre 2019 - ${ACTION} ${lista} ${PATH_PROVAS_4BIM}/${2}"
+
+				${ACTION} "${lista}" ${PATH_PROVAS_4BIM}/${2}
+				
+				#Limpa os arquivos do servidor para que seja novamente corrigido
+				if [[ "$3" == "-f" ]]; then
+					temp="${lista##*/}"
+					temp="${temp%.*}"					
+					rm ${PATH_PROVAS_4BIM}/${2}/result/${temp}.txt 2> /dev/null
+					rm ${PATH_PROVAS_4BIM}/${2}/${temp}.csv 2> /dev/null
+					
+					if [[ $temp != *"ocorrencia"* ]] && [[ $temp != *"presenca"* ]] && [[ $temp != *"oficio"* ]];then					
+						#reverte o status de ausente, anulada e ilegível
+						echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4}-${temp:9:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
+						#como regular e DP estão misturadas é necessário chutar qual é o registro correto
+						#echo "Atencao! Como os registros de DP e regular do 3BIM2019 estao misturados eh normal que um dos procedimentos falhe e o outro funcione"
+						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 45 -e 2> /dev/null
+						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 47 -t dp -e 2> /dev/null
+						rm ${WORKING_FOLDER}/reverte_status.csv					
+					fi
+				fi			
 				
 				;;
 			*)
