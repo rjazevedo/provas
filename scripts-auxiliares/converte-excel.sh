@@ -9,9 +9,9 @@
 FORMATO_ENTRADA="utf-8"
 FORMATO_SAIDA="iso-8859-1"
 
+cp ${1} ${1}.bkp
 sed -i "s#,#;#g" ${1}
 iconv -f ${FORMATO_ENTRADA} -t ${FORMATO_SAIDA} ${1} > tmp_${1}
-cp ${1} ${1}.bkp
 mv tmp_${1} ${1}
 
 
