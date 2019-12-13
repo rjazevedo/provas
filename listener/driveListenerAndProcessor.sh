@@ -3,7 +3,8 @@
 #Esse script depende de move_arquivos.sh e alternative-decoder-local.sh
 #Autor: Daniel Consiglieri
 #Data Criacao:Out 2019
-#Revisao:14-nov-2019
+#Revisao:13-dez-2019
+#Observacao: Caso alterar numero de polos, repreparar a estrutura e alterar os loops
 
 #Data
 DATA=$(date +%Y%m%d_%H-%M-%S)
@@ -12,7 +13,8 @@ ESTRUTURA_PROCESSAMENTO="/home/provas/dados/DriveListener/png_renomeados"
 HOME_NFS="/home/provas/dados"
 #Path para Home
 HOME="/home/provas"
-PATH_MONITORAMENTO_PNG="/home/provas/dados/gdrive_rclone/Nucleo-Processamento-Provas/Png-Remomeados-COPIA-FORCADA"
+#PATH_MONITORAMENTO_PNG="/home/provas/dados/gdrive_rclone/Nucleo-Processamento-Provas/Png-Remomeados-COPIA-FORCADA"
+PATH_MONITORAMENTO_PNG="/home/provas/dados/tmp/w08"
 PATH_MONITORAMENTO_PDF_PASSIVO="/home/provas/dados/gdrive_rclone/Nucleo-Processamento-Provas/Pdf-COPIA-PASSIVA"
 PATH_MONITORAMENTO_PDF_FORCADO="/home/provas/dados/gdrive_rclone/Nucleo-Processamento-Provas/Pdf-COPIA-FORCADA"
 PATH_LOG="/home/provas/dados/gdrive_rclone/Nucleo-Processamento-Provas"
@@ -30,7 +32,8 @@ echo "Iniciando ..."
 while true
 do
 	echo $(date)
-	for i in $( find ${PATH_MONITORAMENTO_PNG} -type f -iname '*.png' ) ; do
+	find ${PATH_MONITORAMENTO_PNG} -type f -iname '*.png' | while read i
+	do
 		
 		if [[ ! -z "$i" ]]
 		then	
@@ -55,7 +58,11 @@ do
 				
 				cd	 ${ESTRUTURA_PROCESSAMENTO}/Saida
 				
-				convert -quality 100 -density 150 -fill white -fuzz 80% +opaque black -antialias ${ESTRUTURA_PROCESSAMENTO}/Saida/${b} ${ESTRUTURA_PROCESSAMENTO}/Saida/${b}
+				normaliza=${b// /_}
+				
+				convert -quality 100 -density 150 -fill white -fuzz 80% +opaque black -antialias ${ESTRUTURA_PROCESSAMENTO}/Saida/"${b}" ${ESTRUTURA_PROCESSAMENTO}/Saida/"${normaliza}"
+				
+				rm ${ESTRUTURA_PROCESSAMENTO}/Saida/"${b}"
 
 				#Move os arquivos dentro das sub-pastas
 				for a in `seq -f "%04.0f" 0 336`
@@ -66,7 +73,7 @@ do
 				#Organiza arquivos processados por data de upload
 				DATA_BACKUP=$(date +%Y%m%d)
 				mkdir -p ${ESTRUTURA_PROCESSAMENTO}/Processado/${DATA_BACKUP}
-				
+
 				#Move arquivos no local de provas correspondente
 				for a in 0*;
 				do
@@ -76,18 +83,19 @@ do
 					[ "$( ls -A ${ESTRUTURA_PROCESSAMENTO}/Saida/${a} )" ] && \
 					mv ${ESTRUTURA_PROCESSAMENTO}/Saida/${a}/* ${ESTRUTURA_PROCESSAMENTO}/Processado/${DATA_BACKUP}
 				done
-				
+
 				#Copia para a pasta de referencia
 				cp -p "${PATH_MONITORAMENTO_PNG}/${b}" "${PATH_DESTINO_PNG}/${b}"
 				
 			fi
 		fi
 	done
-	
+
 #Verificacao da Pasta PDF Passivo
 
-	for i in $( find ${PATH_MONITORAMENTO_PDF_PASSIVO} -type f -iname '*.pdf' )
+	find ${PATH_MONITORAMENTO_PDF_PASSIVO} -type f -iname '*.pdf' | while read i
 	do
+	
 		if [[ ! -z "$i" ]]
 		then
 			
@@ -147,7 +155,7 @@ do
 
 #Verificacao da Pasta PDF Ativo
 
-	for i in $( find ${PATH_MONITORAMENTO_PDF_FORCADO} -type f -iname '*.pdf' )
+	find ${PATH_MONITORAMENTO_PDF_FORCADO} -type f -iname '*.pdf' | while read i
 	do
 		if [[ ! -z "$i" ]]
 		then
@@ -167,11 +175,11 @@ do
 				DATA=$(date +%Y%m%d)
 				
 				#arquivo de log de processados
-				cat ${PATH_LOG}/log_copiaForcadaPDF.csv > ${ESTRUTURA_PROCESSAMENTO}/tmp_log_copiaForcadaPDF.csv				
+				cat ${PATH_LOG}/log_copiaForcadaPDF.csv > ${ESTRUTURA_PROCESSAMENTO}/tmp_log_copiaForcadaPDF.csv
 				for j in $( find ${ESTRUTURA_PROCESSAMENTO}/Saida -maxdepth 1 -iname '*.png' ) ; do
 					bj="${j##*/}"
-					echo "Copiando o arquivo  : $j"					
-					echo -e "$b,$bj,Processado,$DATA" >> ${ESTRUTURA_PROCESSAMENTO}/tmp_log_copiaForcadaPDF.csv					
+					echo "Copiando o arquivo  : $j"
+					echo -e "$b,$bj,Processado,$DATA" >> ${ESTRUTURA_PROCESSAMENTO}/tmp_log_copiaForcadaPDF.csv
 				done
 				#Salva o log no Drive
 				mv ${ESTRUTURA_PROCESSAMENTO}/tmp_log_copiaForcadaPDF.csv ${PATH_LOG}/log_copiaForcadaPDF.csv
@@ -205,7 +213,7 @@ do
 			fi
 		fi
 	done
-	
+
 	echo "************** dormindo *****************"
 	sleep ${TEMPO_PAUSA}
 done
