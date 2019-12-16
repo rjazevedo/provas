@@ -36,6 +36,9 @@ else
 
 	#Concatena o ausentes manual e automatico
 	cat ${SAIDA_CSV}/ausentes.csv ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual.csv | sort | uniq > ${SAIDA_CSV}/ausentes_tmp.csv
+	#comm -23 <(sort ausentes_anterior.csv) <(sort ausentes_manual.csv) > saida_presentes.csv
+	#${HOME}/src/sgaPresentes.py -a ${SAIDA_CSV}/ausentes.csv -c ${CALENDARIO} -t ${TIPO_PROVA} > ${LOG}/log_sgaPresentes_${DATA}.log
+	#depois copia o ausentes_manual para o ausentes_anterior
 
 	cat ${SAIDA_CSV}/ausentes_tmp.csv > ${SAIDA_CSV}/ausentes.csv
 	cat ${SAIDA_CSV}/ausentes.csv > ${BACKUP_CSV}/${DATA}_ausentes.csv
