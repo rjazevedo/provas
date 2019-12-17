@@ -61,8 +61,11 @@ do
 				
 				convert -quality 100 -density 150 -fill white -fuzz 80% +opaque black -antialias ${ESTRUTURA_PROCESSAMENTO}/Saida/"${b}" ${ESTRUTURA_PROCESSAMENTO}/Saida/"${normaliza}"
 				
-				rm ${ESTRUTURA_PROCESSAMENTO}/Saida/"${b}"
-
+				if [[ "${normaliza}" != "${b}" ]]
+				then
+					rm ${ESTRUTURA_PROCESSAMENTO}/Saida/"${b}"
+				fi
+				
 				#Move os arquivos dentro das sub-pastas
 				for a in `seq -f "%04.0f" 0 336`
 				do 
