@@ -3,7 +3,7 @@
 #Esse script depende de move_arquivos.sh e alternative-decoder-local.sh
 #Autor: Daniel Consiglieri
 #Data Criacao:Out 2019
-#Revisao:13-dez-2019
+#Revisao:03-jan-2020
 #Observacao: Caso alterar numero de polos, repreparar a estrutura e alterar os loops
 
 #Data

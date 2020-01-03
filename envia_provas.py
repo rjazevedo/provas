@@ -107,7 +107,7 @@ if __name__ == '__main__':
             if os.path.isfile( os.path.join(args.origem, x + "-prova.pdf" ) ):
                 print("Arquivo " + x + "-prova.pdf encontrado - Progresso " + str(contador) + " de " + str(itens) )
             else:
-                print("Erro, arquivo: " + os.path.join(args.origem, x + "-prova.pdf" ) + "não encontrado" )
+                print("Erro, arquivo: " + os.path.join(args.origem, x + "-prova.pdf" ) + " não encontrado" )
                 regulares.write("Erro no arquivo : " + os.path.join(args.origem, x + "-prova.pdf" + "\n" ) )
             contador += 1
         
