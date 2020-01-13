@@ -3,7 +3,7 @@
 
 """ Automatiza o envio de provas
 Criado em: 10-dez-2019
-Modificado: 11-dez-2019
+Modificado: 13-jan-2020
 """
 
 import csv
@@ -31,7 +31,8 @@ import datetime
 #Arquivo datas
 # Cabeçalho
 # 0 Data (DD/MM/AAAA)
-# 1 Caminho da pasta (Inciar sem barra)
+# 1 Caminho da pasta de Cadernos (Inciar sem barra)
+# 2 Caminho da pasta de Upload (Inciar sem barra)
 
 def DataInvertida(dataStr):
     return dataStr[6:10] + dataStr[3:5] + dataStr[0:2]
@@ -44,13 +45,14 @@ class LinhaProva:
         self.prova = campos[10]
         self.dataStr = DataInvertida(self.data)
         self.indice = self.dataStr + '-' + self.disciplina + '-' + self.prova + '-' + self.polo
+        self.indiceDataPolo = self.dataStr + '-' + self.polo
         return
-    def idProva(self):
-        return self.dataStr + '-' + self.disciplina + '-' + self.prova + '-' + self.polo
     def mostraPolo(self):
         return self.polo
     def mostraIndice(self):
         return self.indice
+    def mostraIndiceDataPolo(self):
+        return self.indiceDataPolo        
     def mostraData(self):
         return self.data
         
@@ -58,12 +60,15 @@ class LinhaPastaDrive:
     def __init__(self,campos):
         self.data=campos[0]
         self.pasta=campos[1]
+        self.pastaUpload=campos[2]
         self.dataStr = DataInvertida(self.data)
         return
     def mostraData(self):
         return self.data
     def mostraPasta(self):
         return self.pasta
+    def mostraPastaUpload(self):
+        return self.pastaUpload
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Le arquivo de provas para popular o DB')
@@ -73,6 +78,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--saida', type=str, required=True, help='Raiz da saida no Drive')
     parser.add_argument('-p', '--periodo', type=str, required=True, help='Data formato DD/MM/AAAA de referencia para mover provas')
     parser.add_argument('-t', '--testa', action='store_true', help='Testa se arquivos existem, sem enviar ao destino')
+
 
     args = parser.parse_args()
     
@@ -87,17 +93,53 @@ if __name__ == '__main__':
     linhasDatas = [LinhaPastaDrive(x) for x in datas[1:]]
         
     provas = {}
+    provas_reduzido = {}
     pastas = {}
+    pastasUpload = {}
     
     for l in linhasProvas:
         if l.mostraData() == args.periodo:
-            provas[l.idProva()] = l.mostraData()
+            provas[l.mostraIndice()] = l.mostraData()
+            provas_reduzido[l.mostraIndiceDataPolo()] = l.mostraData()
         
     for p in linhasDatas:
         pastas[p.mostraData()] = p.mostraPasta()
- 
+        pastasUpload[p.mostraData()] = p.mostraPastaUpload()
+        
     itens = len(provas)
     contador = 1
+    
+    verificacao_pastas = open( datetime.datetime.now().strftime("%d%m%Y_%H-%M") + "_Erros-geracao" + "_pastas" + ".txt", "a")
+    
+    erro_verifica_pastas = False
+    
+    for x, y in provas_reduzido.items():
+        #Upload
+        if os.system ("cd " + os.path.join(args.saida, x[9:] + "*/" + " ; mkdir -p " + pastasUpload[y])) == 0 :
+            print("A pasta de Upload: " + pastasUpload[y] + " foi verificada" + "\n")
+        else:
+            print("Erro na criação de pasta de upload: " + pastasUpload[y] + "\n")
+            verificacao_pastas.write("Erro na criação de pasta de upload: " + pastasUpload[y] + "\n")
+            erro_verifica_pastas = True
+        print("Verificando pastas - Progresso " + str(contador) + " de " + str(itens*2) )
+        contador += 1
+        #Cadernos
+        if os.system ( "cd " + os.path.join(args.saida, x[9:] + "*/" + " ; mkdir -p " + pastas[y])) == 0 :
+            print("A pasta de Cadernos: " + pastas[y] + " foi verificada" + "\n")
+        else:
+            print("Erro na criação de pasta de cadernos: " + pastas[y] + "\n")
+            verificacao_pastas.write("Erro na criação de pasta de cadernos: " + pastas[y] + "\n")
+            erro_verifica_pastas = True
+        print("Verificando pastas - Progresso " + str(contador) + " de " + str(itens*2) )
+        contador += 1
+    
+    if erro_verifica_pastas == False:
+        print("Sem erros na estruturas de pastas \n")
+        verificacao_pastas.write("Sem erros na estruturas de pastas \n")
+    
+    verificacao_pastas.close()
+    contador = 1
+    
 
     if args.testa:
         regulares = open( datetime.datetime.now().strftime("%d%m%Y_%H-%M") + "_Erros-provas-regulares" + "_teste" + ".txt", "a")
@@ -107,7 +149,7 @@ if __name__ == '__main__':
             if os.path.isfile( os.path.join(args.origem, x + "-prova.pdf" ) ):
                 print("Arquivo " + x + "-prova.pdf encontrado - Progresso " + str(contador) + " de " + str(itens) )
             else:
-                print("Erro, arquivo: " + os.path.join(args.origem, x + "-prova.pdf" ) + " não encontrado" )
+                print("Erro, arquivo: " + os.path.join(args.origem, x + "-prova.pdf" ) + "não encontrado" )
                 regulares.write("Erro no arquivo : " + os.path.join(args.origem, x + "-prova.pdf" + "\n" ) )
             contador += 1
         
@@ -150,4 +192,3 @@ if __name__ == '__main__':
 
     regulares.close()
     baixa_visao.close()
-
