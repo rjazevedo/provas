@@ -12,7 +12,7 @@ for att in db.session.query(db.Attachments).all():
     if att.sheets_data is not None:
         modificado = False
         for pageInfo in att.sheets_data:
-            if pageInfo['path'].startswith('/var/data/nfs/provas//home/provas/dados/SGA/2019b3/provas/'): 
+            if pageInfo['path'].startswith('/var/data/nfs/provas//home/provas/dados/SGA/2019b3/provas/') or pageInfo['path'].startswith('/var/data/nfs/provas//home/provas/dados/SGA/2019b4/provas/') : 
                 arquivo = pageInfo['path'].replace('/home/provas/dados/', '')
                 print(pageInfo['path'], '--->', arquivo)
                 pageInfo['path'] = arquivo
