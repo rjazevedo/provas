@@ -4,11 +4,11 @@
 cd ~/src/scripts-auxiliares
 source config/2019b4-conf.sh
 
->${SAIDA_CSV}/base_zero.csv
+
 
 #**********Modulo de geracao de csv*************# #Modifica como base de correcoes para a base zero
 echo ${MSG_FULLINSERTION_INICIO}
-${HOME}/src/populaDB-embaralhado.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${SAIDA_CSV}/base_zero.csv -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${LOG}/log_full-insertion_populaDB_${DATA}.log
+${HOME}/src/populaDB-embaralhado.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${LOG}/log_full-insertion_populaDB_${DATA}.log
 #Correcao de path
 sed -i "s#${HOME_NFS}/##g" ${SAIDA_CSV}/*.csv
 
@@ -68,6 +68,15 @@ ${HOME}/src/sgaNotas.py -a ${SAIDA_CSV}/nota_filtrada.csv -c ${CALENDARIO} -t ${
 ${HOME}/src/sgaNotas.py -a ${SAIDA_CSV}/nota_filtrada.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} > ${LOG}/log_sgaNotas_DP_${DATA}.log
 echo "Insercao de Notas no Banco de Dados finalizada"
 
+#Essa rotina � exclusiva do populaDB, nao deve ser usada em fullInsertion
+if [ "${BIMESTRE_CONSOLIDADO}" == "sim" ]; then
+	cat ${SAIDA_CSV}/correcoes.csv > ${SAIDA_CSV}/lista_referencia_liberacao.csv
+	sed -i -e 's/^/X,X,/' ${SAIDA_CSV}/lista_referencia_liberacao.csv
+	${HOME}/src/sgaPresentes.py -a ${SAIDA_CSV}/lista_referencia_liberacao.csv -c ${CALENDARIO} -t ${TIPO_PROVA} -e > ${LOG}/log_sgaPresentes_liberados_regular_${DATA}.log
+	${HOME}/src/sgaPresentes.py -a ${SAIDA_CSV}/lista_referencia_liberacao.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} -e > ${LOG}/log_sgaPresentes_liberados_DP_${DATA}.log
+	#rm ${SAIDA_CSV}/lista_referencia_liberacao.csv
+fi
+
 #Inclui ausentes
 ${HOME}/src/sgaAusentes.py -a ${SAIDA_CSV}/ausentes.csv -c ${CALENDARIO} -t ${TIPO_PROVA} > ${LOG}/log_sgaAusentes_regular_${DATA}.log
 ${HOME}/src/sgaAusentes.py -a ${SAIDA_CSV}/ausentes.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} > ${LOG}/log_sgaAusentes_DP_${DATA}.log
@@ -87,14 +96,5 @@ echo "Insercao de corretores no Banco de Dados finalizada"
 #Rotina de atualizacao BaseCorrecoes
 cat ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} ${SAIDA_CSV}/correcoes.csv > ${SAIDA_CSV}/correcoes_tmp.csv
 mv ${SAIDA_CSV}/correcoes_tmp.csv ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES}
-
-#Essa rotina � exclusiva do populaDB, nao deve ser usada em fullInsertion
-if [ "${BIMESTRE_CONSOLIDADO}" == "sim" ]; then
-	cat ${SAIDA_CSV}/correcoes.csv > ${SAIDA_CSV}/lista_referencia_liberacao.csv
-	sed -i -e 's/^/X,X,/' ${SAIDA_CSV}/lista_referencia_liberacao.csv
-	${HOME}/src/sgaPresentes.py -a ${SAIDA_CSV}/lista_referencia_liberacao.csv -c ${CALENDARIO} -t ${TIPO_PROVA} -e > ${LOG}/log_sgaPresentes_liberados_regular_${DATA}.log
-	${HOME}/src/sgaPresentes.py -a ${SAIDA_CSV}/lista_referencia_liberacao.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} -e > ${LOG}/log_sgaPresentes_liberados_DP_${DATA}.log
-	#rm ${SAIDA_CSV}/lista_referencia_liberacao.csv
-fi
 
 echo ${MSG_POPULADB_AUTOMATICO_FIM}

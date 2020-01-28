@@ -71,9 +71,9 @@ def GeraDashboard(pasta, provas, arquivos, ausentes, possiveisAusentes, base):
     footer = open(os.path.join(base, 'footer.html')).read()
     saida.write(header)
     saida.write('<h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')
-    saida.write('<h3><a href="resumo.html">Resumo por polo</a></h3>\n')
-    saida.write('<h3><a href="pendencias.html">Pendências por aluno</a></h3>\n')
-    saida.write('<h3><a href="incompletas.html">Provas incompletas</a></h3>\n')
+    #saida.write('<h3><a href="resumo.html">Resumo por polo</a></h3>\n')
+    #saida.write('<h3><a href="pendencias.html">Pendências por aluno</a></h3>\n')
+    #saida.write('<h3><a href="incompletas.html">Provas incompletas</a></h3>\n')
     saida.write('<thead><tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>Ocorrência</th><th>Presença</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr></thead><tbody>\n')
     
     pendencias = open(os.path.join(pasta, 'pendencias.html'), 'wt')
