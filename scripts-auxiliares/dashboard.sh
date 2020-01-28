@@ -14,9 +14,9 @@ else
 	cd ${HOME}/tmp
 	mkdir ${TRABALHO_TMP}
 	echo ${MSG_DASH_INICIO}
-	~/src/dashboard.py -e ${HOME_NFS}/${PATH_PROVAS} -p ${HOME_NFS}/${ESTRUTURA_DASHBOARD} -s ${HOME}/tmp/${TRABALHO_TMP} -a ${HOME_NFS}/${ESTRUTURA_AUSENTES}
+	${HOME}/src/dashboard.py -e ${HOME_NFS}/${PATH_PROVAS} -p ${HOME_NFS}/${ESTRUTURA_DASHBOARD} -s ${HOME}/tmp/${TRABALHO_TMP} -a ${HOME_NFS}/${ESTRUTURA_AUSENTES}	
+	${HOME}/src/dashboard_correcao.py -c ${CALENDARIO} -t ${TIPO_PROVA} -s ${HOME}/tmp/${TRABALHO_TMP}	
 	cd ${HOME}/tmp/${TRABALHO_TMP}
-
 	#Rotina de personalização de HTML
 	sed -i "s/${BASE_STRING}/${BASE_STRING}${SUBSTITUI_STRING}/g" *.html
 

@@ -37,7 +37,7 @@ class ProvasIlegiveis:
 
 if __name__ == '__main__':
         parser = argparse.ArgumentParser(description='Gera um dashboard com status do banco de dados')
-        parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
+        parser.add_argument('-c', '--calendario', type=str , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
         parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
         parser.add_argument('-s', '--saida', type=str, required=True, help='Pasta de saida')
         
@@ -56,9 +56,21 @@ if __name__ == '__main__':
         
         cursor = connection.cursor()
         
-        consulta = open(os.path.join(os.path.dirname(sys.argv[0]), 'query-dashboard.txt')).read()
-        consulta_part = consulta.split("#")       
-        cursor.execute( consulta_part[0] + str(args.calendario) + consulta_part[1] + args.tipo + consulta_part[2] ) 
+        if "," in str(args.calendario) :
+            consulta = open(os.path.join(os.path.dirname(sys.argv[0]), 'query-dashboard-dual.txt')).read()
+            consulta_part = consulta.split("#")
+            entrada_calendario = str(args.calendario)
+            entrada_tipo = str(args.tipo)
+            calendario_part = entrada_calendario.split(",")
+            tipo_part = entrada_tipo.split(",")
+            cursor.execute( consulta_part[0] + calendario_part[0] + consulta_part[1] + tipo_part[0] + consulta_part[2] + calendario_part[1] + consulta_part[3] + tipo_part[1] + consulta_part[4])
+            
+        else:
+        
+            consulta = open(os.path.join(os.path.dirname(sys.argv[0]), 'query-dashboard.txt')).read()
+            consulta_part = consulta.split("#")       
+            cursor.execute( consulta_part[0] + str(args.calendario) + consulta_part[1] + args.tipo + consulta_part[2] )
+            
         record = cursor.fetchall()
         
         disciplinas = {}
@@ -106,8 +118,8 @@ if __name__ == '__main__':
         header = open(os.path.join(os.path.dirname(sys.argv[0]), 'header.html')).read() 
         footer = open(os.path.join(os.path.dirname(sys.argv[0]), 'footer.html')).read()
         saida.write(header)
-        saida.write('<h3>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h3>\n')        
-        saida.write('<h2><a href="ilegiveis.html">Provas ileg&iacuteis;ge</a></h2>')       
+        saida.write('<h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')        
+        saida.write('<h3><a href="ilegiveis.html">Provas ileg&iacuteis;ge</a></h3>')       
         
         saida.write('<thead><tr><th>C&oacute;digo</th><th>Disciplina</th><th>Ausentes</th><th>anuladas</th><th>Ileg&iacute;vel</th><th>Ausente &amp; anulada</th><th>Falta corrigir</th><th>Corrigido</th><th>Total</th><th>Percentual</th></tr></thead><tbody>\n')
         
