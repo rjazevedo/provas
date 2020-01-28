@@ -53,10 +53,12 @@ MSG_POPULADB_AUTOMATICO_INICIO="Inicio da geração do PopulaDB Automatico - 1o 
 MSG_POPULADB_INICIO="Inicio da geração do PopulaDB - 1o Bimestre 2019"
 #Caminho das provas
 PATH_PROVAS="SGA/provas"
+#Agrega dois calendários (regular e dp)? sim ou vazio
+REGULAR_E_DP=""
 #Path Completo de Saida (caminho completo)
 SAIDA_CSV="/home/provas/dados/SGA/provas/Saida"
 #Personaliza com informações relativas ao periodo de referencia
-SUBSTITUI_STRING=" - 1o Bimestre 2019"
+SUBSTITUI_STRING=" - 1° Bimestre 2019"
 #Indicacao do tipo de prova (regular,dp)
 TIPO_PROVA="regular"
 #Nome da pasta temporaria de trabalho

@@ -16,9 +16,9 @@ def DashboardProva(pasta, alunos, arquivos, ausentes, possiveisAusentes, base, p
     saida = open(os.path.join(pasta, nomeArquivo), 'wt')
     header = open(os.path.join(base, 'header.html')).read() 
     footer = open(os.path.join(base, 'footer.html')).read()
-    saida.write(header)
-
-    saida.write('<div class="row"><h3>' + alunos[0].LabelProva() + ' ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '</h3></div>')
+    modificado_header = header.replace("</ul>","<li><li class=\"active\"><a href=\"" + nomeArquivo + "\">" + alunos[0].LabelProva() + "</a></li><li><a href=\"index.html\">Voltar</a></li></ul>")
+    saida.write(modificado_header)
+    saida.write('<div class="row"><br><br><br><h4>' + alunos[0].LabelProva() + ' - Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '</h4></div>')
 
     totalAlunos = 0
     alunosCompletos = 0
@@ -69,18 +69,24 @@ def GeraDashboard(pasta, provas, arquivos, ausentes, possiveisAusentes, base):
     saida = open(os.path.join(pasta, 'index.html'), 'wt')
     header = open(os.path.join(base, 'header.html')).read() 
     footer = open(os.path.join(base, 'footer.html')).read()
-    saida.write(header)
-    saida.write('<h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')
+    saida_header = header.replace("<li><a href=\"index.html\"","<li class=\"active\"><a href=\"index.html\"")
+    saida.write(saida_header)
+    saida.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')
     #saida.write('<h3><a href="resumo.html">Resumo por polo</a></h3>\n')
     #saida.write('<h3><a href="pendencias.html">Pendências por aluno</a></h3>\n')
     #saida.write('<h3><a href="incompletas.html">Provas incompletas</a></h3>\n')
     saida.write('<thead><tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>Ocorrência</th><th>Presença</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr></thead><tbody>\n')
     
     pendencias = open(os.path.join(pasta, 'pendencias.html'), 'wt')
-    pendencias.write(header)
+    pendencias_header = header.replace("<li><a href=\"pendencias.html\"","<li class=\"active\"><a href=\"pendencias.html\"")
+    pendencias.write(pendencias_header)
+    pendencias.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')
     pendencias.write('<tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>RA</th><th>Nome</th><th colspan="5">Folhas</th></tr>\n')
     incompletas = open(os.path.join(pasta, 'incompletas.html'), 'wt')
-    incompletas.write(header)
+    incompletas_header = header.replace("<li><a href=\"incompletas.html\"","<li class=\"active\"><a href=\"incompletas.html\"")
+    incompletas.write(incompletas_header)
+    incompletas.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')
+    
     incompletas.write('<tr><th>Polo</th><th>Nome</th><th>Data</th><th>Disciplina</th><th>Nome</th><th>RA</th><th>Nome</th><th colspan="5">Folhas</th></tr>\n')
 
     for p in sorted(provas.keys()):
@@ -132,7 +138,9 @@ def GeraDashboard(pasta, provas, arquivos, ausentes, possiveisAusentes, base):
     saida.close()
 
     resumo = open(os.path.join(pasta, 'resumo.html'), 'wt')
-    resumo.write(header)
+    resumo_header = header.replace("<li><a href=\"resumo.html\"","<li class=\"active\"><a href=\"resumo.html\"")
+    resumo.write(resumo_header)
+    resumo.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')
     resumo.write('<thead><tr><th>Polo</th><th>Alunos Totais</th><th>Provas Completas</th><th>Provas Incompletas</th><th>Alunos que faltam</th><th>Folhas faltantes</th></tr></thead><tbody>\n')
     for polo in sorted(resumoPolos.keys()):
         provas = resumoPolos[polo]

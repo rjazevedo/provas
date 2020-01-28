@@ -117,9 +117,10 @@ if __name__ == '__main__':
         saida = open(os.path.join(args.saida,'correcao.html'), 'wt')
         header = open(os.path.join(os.path.dirname(sys.argv[0]), 'header.html')).read() 
         footer = open(os.path.join(os.path.dirname(sys.argv[0]), 'footer.html')).read()
-        saida.write(header)
-        saida.write('<h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')        
-        saida.write('<h3><a href="ilegiveis.html">Provas ileg&iacuteis;ge</a></h3>')       
+        correcao_header = header.replace("<li><a href=\"correcao.html\"","<li class=\"active\"><a href=\"correcao.html\"")
+        saida.write(correcao_header)
+        saida.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')        
+        
         
         saida.write('<thead><tr><th>C&oacute;digo</th><th>Disciplina</th><th>Ausentes</th><th>anuladas</th><th>Ileg&iacute;vel</th><th>Ausente &amp; anulada</th><th>Falta corrigir</th><th>Corrigido</th><th>Total</th><th>Percentual</th></tr></thead><tbody>\n')
         
@@ -139,8 +140,9 @@ if __name__ == '__main__':
         saida.close()
         
         ilegiveis = open(os.path.join(args.saida,'ilegiveis.html'), 'wt')
-        ilegiveis.write(header)
-        ilegiveis.write('<h3>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h3>\n')
+        ilegiveis_header = header.replace("<li><a href=\"ilegiveis.html\"","<li class=\"active\"><a href=\"ilegiveis.html\"")
+        ilegiveis.write(ilegiveis_header)
+        ilegiveis.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n') 
         ilegiveis.write('<thead><tr><th>Polo</th><th>Nome</th><th>Disciplina</th><th>Nome</th><th>Prova</th><th>RA</th><th>Nome</th></tr></thead><tbody>\n')
         
         for p in provas_ilegiveis:
