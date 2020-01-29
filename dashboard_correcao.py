@@ -15,7 +15,74 @@ def MostraPolo(codStr):
     return codStr[5:9]
 def MostraCodigoProva(codStr):
     return codStr[0:4]
+class Corretores:
+    def __init__(self, campos):
+        self.email = campos[15]
+        self.disciplina = campos[1]
+        self.aCorrigir = 0
+        self.anulada = 0
+        self.ausente = 0
+        self.anulada_ausente = 0
+        self.corrigida = 0
+        self.ilegiveis = 0
+        self.total = 1
+    def SomaACorrigir(self):
+        self.aCorrigir += 1
+    def SomaAnulada(self):
+        self.anulada += 1
+    def SomaAusente(self):
+        self.ausente += 1
+    def SomaAnuladaAusente(self):
+        self.anulada_ausente += 1
+    def SomaCorrigidas(self):
+        self.corrigida += 1
+    def SomaIlegiveis(self):
+        self.ilegiveis += 1
+    def SomaTotal(self):
+        self.total += 1
+    def ShowDisciplina(self):
+        return self.disciplina
+    def GeraLinha(self):
+        if self.email == None:
+            self.email = "reverificar"            
+        return '<tr><td>' + self.email \
+                + '</td><td>' + str(self.ausente) \
+                + '</td><td>' + str(self.anulada) \
+                + '</td><td>' + str(self.ilegiveis) \
+                + '</td><td>' + str(self.anulada_ausente) \
+                + '</td><td>' + str(self.aCorrigir) \
+                + '</td><td>' + str(self.corrigida) \
+                + '</td><td>' + str(self.total) \
+                + '</td><td>' + '{:05.2f}'.format((1.0 - float(self.aCorrigir/self.total))* 100.0) + '% </td></tr>\n'
+
+def GeraDashboardDisciplinasCorretores(conjuntoCorretor,conjuntoDisciplinas,saida):
+    html_disciplinas = {}
+    html_arquivo = {}
     
+    header = open(os.path.join(os.path.dirname(sys.argv[0]), 'header.html')).read()
+    footer = open(os.path.join(os.path.dirname(sys.argv[0]), 'footer.html')).read()
+    
+    sufixo_arquivos = "-correcoes.html"
+        
+    for d in conjuntoDisciplinas:
+        html_disciplinas[d] = ""
+        html_arquivo[d] = open(os.path.join(saida, d + sufixo_arquivos), 'wt')
+        
+    for c in conjuntoCorretor:
+        html_disciplinas[conjuntoCorretor[c].ShowDisciplina()] += conjuntoCorretor[c].GeraLinha()
+            
+    for d in conjuntoDisciplinas:
+        modificado_header = header.replace("</ul>","<li><li class=\"active\"><a href=\"" + d + sufixo_arquivos +"\">" + d + "-Corre&ccedil;&otilde;es" + "</a></li><li><a href=\"correcao.html\">Voltar</a></li></ul>")
+        html_arquivo[d].write(modificado_header)
+        html_arquivo[d].write('<div class="row"><br><br><br><h4>' + d + "-" + conjuntoDisciplinas[d] + ' - Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '</h4></div>')
+        html_arquivo[d].write('<thead><tr><th>Email</th><th>Ausentes</th><th>Anuladas</th><th>Ileg&iacute;vel</th><th>Ausente &amp; anulada</th><th>Falta corrigir</th><th>Corrigido</th><th>Total</th><th>Percentual</th></tr></thead><tbody>\n')
+        
+        html_arquivo[d].write(html_disciplinas[d])
+        html_arquivo[d].write(footer)
+        html_arquivo[d].close()
+    
+        
+
 class ProvasIlegiveis:
     def __init__(self, campos):
         self.numeroPolo = MostraPolo(campos[2])
@@ -32,8 +99,9 @@ class ProvasIlegiveis:
                 + '</td><td>' + self.nomeDisciplina \
                 + '</td><td>' + self.codigoProva \
                 + '</td><td>' + self.ra \
-                + '</td><td>' + self.aluno \
-                + '</td></tr>\n'
+                + '</td><td>' + self.aluno.title() \
+                + '</td></tr>\n'               
+                
 
 if __name__ == '__main__':
         parser = argparse.ArgumentParser(description='Gera um dashboard com status do banco de dados')
@@ -41,7 +109,7 @@ if __name__ == '__main__':
         parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
         parser.add_argument('-s', '--saida', type=str, required=True, help='Pasta de saida')
         
-        args = parser.parse_args()  
+        args = parser.parse_args()
 
         conn = {}
         fileName = os.path.join(os.path.dirname(sys.argv[0]), 'dbpass-S.txt')
@@ -69,7 +137,7 @@ if __name__ == '__main__':
         
             consulta = open(os.path.join(os.path.dirname(sys.argv[0]), 'query-dashboard.txt')).read()
             consulta_part = consulta.split("#")       
-            cursor.execute( consulta_part[0] + str(args.calendario) + consulta_part[1] + args.tipo + consulta_part[2] )
+            cursor.execute( consulta_part[0] + args.calendario + consulta_part[1] + args.tipo + consulta_part[2] )
             
         record = cursor.fetchall()
         
@@ -84,7 +152,10 @@ if __name__ == '__main__':
         disciplina_ilegiveis = {}
         disciplinas_total = {}
         
-        provas_ilegiveis = []
+        provas_ilegiveis = {}
+        pp_ilegiveis = {}
+        corretores = {}
+        
         
         for r in record:
             disciplinas[r[1]] = r[0]
@@ -96,8 +167,42 @@ if __name__ == '__main__':
             disciplinas_corrigida[r[1]] = 0
             disciplina_ilegiveis[r[1]] = 0
             disciplinas_total[r[1]] = 0
-            if r[12] == "Prova Ilegível":
-                provas_ilegiveis.append(ProvasIlegiveis(r))
+            #Objeto de corretores
+            if r[15] == None:
+                chave_corretores = r[1] + "sem-Corretor"
+            else:
+                chave_corretores = r[1] + r[15]
+                
+            if (chave_corretores in corretores):
+                corretores[chave_corretores].SomaTotal()
+                if r[12] == "A Corrigir":
+                    corretores[chave_corretores].SomaACorrigir()
+                elif r[12] == "Prova anulada":
+                    corretores[chave_corretores].SomaAnulada()
+                elif r[12] == "Aluno ausente":
+                    corretores[chave_corretores].SomaAusente()
+                elif r[12] == "Aluno ausente / Prova anulada":
+                    corretores[chave_corretores].SomaAnuladaAusente()
+                elif r[12] == "Corrigido":
+                    corretores[chave_corretores].SomaCorrigidas()
+                elif r[12] == "Prova Ilegível":
+                    corretores[chave_corretores].SomaIlegiveis()
+                    provas_ilegiveis[r[1] + str(r[3])] = (ProvasIlegiveis(r))
+            else:
+                corretores[chave_corretores] = (Corretores(r))
+                if r[12] == "A Corrigir":
+                    corretores[chave_corretores].SomaACorrigir()
+                elif r[12] == "Prova anulada":
+                    corretores[chave_corretores].SomaAnulada()
+                elif r[12] == "Aluno ausente":
+                    corretores[chave_corretores].SomaAusente()
+                elif r[12] == "Aluno ausente / Prova anulada":
+                    corretores[chave_corretores].SomaAnuladaAusente()
+                elif r[12] == "Corrigido":
+                    corretores[chave_corretores].SomaCorrigidas()
+                elif r[12] == "Prova Ilegível":
+                    corretores[chave_corretores].SomaIlegiveis()
+                    provas_ilegiveis[r[1] + str(r[3])] = (ProvasIlegiveis(r))
 
         for x,y in correcoes.items():
             disciplinas_total[x[:6]] += 1
@@ -119,14 +224,12 @@ if __name__ == '__main__':
         footer = open(os.path.join(os.path.dirname(sys.argv[0]), 'footer.html')).read()
         correcao_header = header.replace("<li><a href=\"correcao.html\"","<li class=\"active\"><a href=\"correcao.html\"")
         saida.write(correcao_header)
-        saida.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')        
-        
-        
-        saida.write('<thead><tr><th>C&oacute;digo</th><th>Disciplina</th><th>Ausentes</th><th>anuladas</th><th>Ileg&iacute;vel</th><th>Ausente &amp; anulada</th><th>Falta corrigir</th><th>Corrigido</th><th>Total</th><th>Percentual</th></tr></thead><tbody>\n')
+        saida.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')
+        saida.write('<thead><tr><th>C&oacute;digo</th><th>Disciplina</th><th>Ausentes</th><th>Anuladas</th><th>Ileg&iacute;vel</th><th>Ausente &amp; anulada</th><th>Falta corrigir</th><th>Corrigido</th><th>Total</th><th>Percentual</th></tr></thead><tbody>\n')
         
         for x, y in disciplinas.items():
-            saida.write('<tr><td>' + x \
-                + '</td><td>' + y \
+            saida.write('<tr><td><a href="' + x + "-correcoes.html" + '">' + x  \
+                + '</td><td>' + y  \
                 + '</td><td>' + str(disciplinas_ausente[x]) \
                 + '</td><td>' + str(disciplinas_anulada[x]) \
                 + '</td><td>' + str(disciplina_ilegiveis[x]) \
@@ -146,7 +249,10 @@ if __name__ == '__main__':
         ilegiveis.write('<thead><tr><th>Polo</th><th>Nome</th><th>Disciplina</th><th>Nome</th><th>Prova</th><th>RA</th><th>Nome</th></tr></thead><tbody>\n')
         
         for p in provas_ilegiveis:
-            ilegiveis.write(p.GeraLinha())
-
+            ilegiveis.write(provas_ilegiveis[p].GeraLinha())
+            
         ilegiveis.write(footer)
         ilegiveis.close()
+        
+        #Gera cada uma das sub-paginas de disciplinas X corretores
+        GeraDashboardDisciplinasCorretores(corretores,disciplinas,args.saida)

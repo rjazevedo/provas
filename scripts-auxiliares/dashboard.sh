@@ -17,7 +17,7 @@ else
 	${HOME}/src/dashboard.py -e ${HOME_NFS}/${PATH_PROVAS} -p ${HOME_NFS}/${ESTRUTURA_DASHBOARD} -s ${HOME}/tmp/${TRABALHO_TMP} -a ${HOME_NFS}/${ESTRUTURA_AUSENTES}
 	
 	if [ "$REGULAR_E_DP" == "sim" ]; then	
-		${HOME}/src/dashboard_correcao.py -c "${CALENDARIO},${CALENDARIO_DP}" -t $"{TIPO_PROVA},${TIPO_PROVA_DP}" -s ${HOME}/tmp/${TRABALHO_TMP}
+		${HOME}/src/dashboard_correcao.py -c "${CALENDARIO},${CALENDARIO_DP}" -t "${TIPO_PROVA},${TIPO_PROVA_DP}" -s ${HOME}/tmp/${TRABALHO_TMP}
 	else
 		${HOME}/src/dashboard_correcao.py -c ${CALENDARIO} -t ${TIPO_PROVA} -s ${HOME}/tmp/${TRABALHO_TMP}
 	fi
