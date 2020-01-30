@@ -42,7 +42,7 @@ class Corretores:
         self.total += 1
     def ShowDisciplina(self):
         return self.disciplina
-    def GeraLinha(self):
+    def GeraLinhaCompleta(self):
         if self.email == None:
             self.email = "reverificar"            
         return '<tr><td>' + self.email \
@@ -53,6 +53,12 @@ class Corretores:
                 + '</td><td>' + str(self.aCorrigir) \
                 + '</td><td>' + str(self.corrigida) \
                 + '</td><td>' + str(self.total) \
+                + '</td><td>' + '{:05.2f}'.format((1.0 - float(self.aCorrigir/self.total))* 100.0) + '% </td></tr>\n'
+    def GeraLinha(self):
+        if self.email == None:
+            self.email = "reverificar"
+        return '<tr><td>' + self.email \
+                + '</td><td>' + str(self.aCorrigir) \
                 + '</td><td>' + '{:05.2f}'.format((1.0 - float(self.aCorrigir/self.total))* 100.0) + '% </td></tr>\n'
 
 def GeraDashboardDisciplinasCorretores(conjuntoCorretor,conjuntoDisciplinas,saida):
@@ -75,8 +81,8 @@ def GeraDashboardDisciplinasCorretores(conjuntoCorretor,conjuntoDisciplinas,said
         modificado_header = header.replace("</ul>","<li><li class=\"active\"><a href=\"" + d + sufixo_arquivos +"\">" + d + "-Corre&ccedil;&otilde;es" + "</a></li><li><a href=\"correcao.html\">Voltar</a></li></ul>")
         html_arquivo[d].write(modificado_header)
         html_arquivo[d].write('<div class="row"><br><br><br><h4>' + d + "-" + conjuntoDisciplinas[d] + ' - Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '</h4></div>')
-        html_arquivo[d].write('<thead><tr><th>Email</th><th>Ausentes</th><th>Anuladas</th><th>Ileg&iacute;vel</th><th>Ausente &amp; anulada</th><th>Falta corrigir</th><th>Corrigido</th><th>Total</th><th>Percentual</th></tr></thead><tbody>\n')
-        
+        #html_arquivo[d].write('<thead><tr><th>Email</th><th>Ausentes</th><th>Anuladas</th><th>Ileg&iacute;vel</th><th>Ausente &amp; anulada</th><th>Falta corrigir</th><th>Corrigido</th><th>Total</th><th>Percentual</th></tr></thead><tbody>\n') - relatorio completo
+        html_arquivo[d].write('<thead><tr><th>Email</th><th>Falta corrigir</th><th>Percentual Corrigido</th></tr></thead><tbody>\n')
         html_arquivo[d].write(html_disciplinas[d])
         html_arquivo[d].write(footer)
         html_arquivo[d].close()
