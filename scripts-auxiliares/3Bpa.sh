@@ -45,8 +45,8 @@ else
 	if [ "${BIMESTRE_CONSOLIDADO}" == "sim" ]; then
 		cat ${SAIDA_CSV}/correcoes.csv > ${SAIDA_CSV}/lista_referencia_liberacao.csv
 		sed -i -e 's/^/X,X,/' ${SAIDA_CSV}/lista_referencia_liberacao.csv
-		${HOME}/src/sgaPresentes.py -a ${SAIDA_CSV}/lista_referencia_liberacao.csv -c ${CALENDARIO} -t ${TIPO_PROVA} -e > ${LOG}/log_sgaPresentes_liberados_regular_${DATA}.log
-		${HOME}/src/sgaPresentes.py -a ${SAIDA_CSV}/lista_referencia_liberacao.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} -e > ${LOG}/log_sgaPresentes_liberados_DP_${DATA}.log
+		${HOME}/src/sgaPresentes.py -a ${SAIDA_CSV}/lista_referencia_liberacao.csv -c ${CALENDARIO} -t ${TIPO_PROVA} -oe > ${LOG}/log_sgaPresentes_liberados_regular_${DATA}.log
+		${HOME}/src/sgaPresentes.py -a ${SAIDA_CSV}/lista_referencia_liberacao.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} -oe > ${LOG}/log_sgaPresentes_liberados_DP_${DATA}.log
 		#rm ${SAIDA_CSV}/lista_referencia_liberacao.csv
 	fi
 	
