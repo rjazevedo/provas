@@ -39,7 +39,8 @@ def marcaAluno(
                 ar,      # academic_register
                 st,      # submission_type
                 cid,     # calendar_id
-                editavel #forca a habilitacao do status corrigível
+                ed,      # forca a habilitacao do status corrigível reverte status de anulada, ausente
+                ae       # não altera status de presença e anulação, apenas torna editavel
               ):
 
     """Marca um aluno como presente em uma prova, no SGA"""
@@ -125,12 +126,12 @@ def marcaAluno(
 
     submission.activity_test_id = test.id
     
-    if apenaseditavel == False:
+    if ae == False:
         submission.absent = False
         submission.annulled = False
     
     campo_editavel = {'editable': 'true'}
-    if editavel:
+    if ed or ae:
         submission.complementary_data = campo_editavel
     flag_modified(submission, "complementary_data")  # Sqlalchemy JSON é imutável por default
     
@@ -154,6 +155,8 @@ if __name__ == '__main__':
     arquivo = args.arquivo
     calendario = args.calendario
     tipo = args.tipo
+    editavel = args.editavel
+    apenaseditavel = args.apenaseditavel
 
     if args.tipo is not None:
         if args.tipo not in ['regular','dp','exam']:#acrescimo de exam
@@ -176,10 +179,11 @@ if __name__ == '__main__':
         reader = csv.reader(f, delimiter=',')
         for row in reader:
             marcaAluno(
-                        row[2],       # str, Cód. da disciplina
-                        row[3],       # str, Cód. da prova
-                        row[4],       # str, RA do aluno
-                        tipo,         ### str, Tipo da submissão
-                        calendario,   ### int, ID do calendário
-                        args.editavel # bool, faz com que uma prova se torne corrigível
+                        row[2],        # str, Cód. da disciplina
+                        row[3],        # str, Cód. da prova
+                        row[4],        # str, RA do aluno
+                        tipo,          ### str, Tipo da submissão
+                        calendario,    ### int, ID do calendário
+                        editavel,      # bool, faz com que uma prova se torne corrigível e reverte todos os status de ausente e anulada
+                        apenaseditavel # bool, apenas libera a edição
                       )
