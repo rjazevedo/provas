@@ -1,7 +1,7 @@
 #!/bin/bash
 #Objetivo: Processamento automatico de provas embaralhadas
 #Data Criacao:06-fev-2020
-#Revisado por: Daniel Consiglieri
+#Autor: Daniel Consiglieri
 #Data Ultima alteracao:06-fev-2020
 
 #Deve ser passado por parametro o arquivo de configuracao
@@ -13,25 +13,25 @@ else
 #Direcionamento do logbest.txt
 cd ${LOG}
 
-#**********Modulo de geracao de csv*************# #Modifica como base de correcoes para a base zero
+#**********Modulo de geracao de csv*************#
 echo ${MSG_FULLINSERTION_INICIO}
 ${HOME}/src/populaDB-embaralhado.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${LOG}/log_full-insertion_populaDB_${DATA}.log
 #Correcao de path
 sed -i "s#${HOME_NFS}/##g" ${SAIDA_CSV}/*.csv
 
 #*************Modulo de backup ************************#
-cp ${SAIDA_CSV}/correcoes.csv ${BACKUP_CSV}/${DATA}-full-insertion_correcoes.csv
-cp ${SAIDA_CSV}/folhas.csv ${BACKUP_CSV}/${DATA}-full-insertion_folhas.csv
-cp ${SAIDA_CSV}/guias.csv ${BACKUP_CSV}/${DATA}-full-insertion_guias.csv
-cp ${SAIDA_CSV}/provas.csv ${BACKUP_CSV}/${DATA}-full-insertion_provas.csv
-cp ${SAIDA_CSV}/questoes.csv ${BACKUP_CSV}/${DATA}-full-insertion_questoes.csv
+cp ${SAIDA_CSV}/correcoes.csv ${BACKUP_CSV}/${DATA}-correcoes.csv
+cp ${SAIDA_CSV}/folhas.csv ${BACKUP_CSV}/${DATA}-folhas.csv
+cp ${SAIDA_CSV}/guias.csv ${BACKUP_CSV}/${DATA}-guias.csv
+cp ${SAIDA_CSV}/provas.csv ${BACKUP_CSV}/${DATA}-provas.csv
+cp ${SAIDA_CSV}/questoes.csv ${BACKUP_CSV}/${DATA}-questoes.csv
 
 #Rotina de atualizacao BaseCorrecoes
 cat ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} ${SAIDA_CSV}/correcoes.csv > ${SAIDA_CSV}/correcoes_tmp.csv
 mv ${SAIDA_CSV}/correcoes_tmp.csv ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES}
 
-${HOME}/src/sgaTestesGuias.py -a ${SAIDA_CSV}/guias.csv
-${HOME}/src/sgaQuestoes.py -a ${SAIDA_CSV}/questoes.csv
+${HOME}/src/sgaTestesGuias.py -a ${SAIDA_CSV}/guias.csv > ${LOG}/log_sgaTestesGuias_${DATA}.log
+${HOME}/src/sgaQuestoes.py -a ${SAIDA_CSV}/questoes.csv > ${LOG}/log_sgaQuestoes_${DATA}.log
 
 #******Modulo de Insercao de Banco de dados*****#
 #Incluindo folhas
