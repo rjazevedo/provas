@@ -24,10 +24,14 @@ else
 	cp ${SAIDA_CSV}/guias.csv ${BACKUP_CSV}/${DATA}-guias.csv
 	cp ${SAIDA_CSV}/provas.csv ${BACKUP_CSV}/${DATA}-provas.csv
 	cp ${SAIDA_CSV}/questoes.csv ${BACKUP_CSV}/${DATA}-questoes.csv
+		
+	#Remove duplicados
+	cat ${SAIDA_CSV}/guias.csv | sort | uniq > ${SAIDA_CSV}/guias_tmp.csv
+	cat ${SAIDA_CSV}/questoes.csv | sort | uniq > ${SAIDA_CSV}/questoes_tmp.csv
 
-	#Rotina de atualizacao BaseCorrecoes
-	cat ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} ${SAIDA_CSV}/correcoes.csv > ${SAIDA_CSV}/correcoes_tmp.csv
-	mv ${SAIDA_CSV}/correcoes_tmp.csv ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES}
+	mv ${SAIDA_CSV}/questoes_tmp.csv ${SAIDA_CSV}/questoes.csv
+	mv ${SAIDA_CSV}/guias_tmp.csv ${SAIDA_CSV}/guias.csv	
+
 
 	${HOME}/src/sgaTestesGuias.py -a ${SAIDA_CSV}/guias.csv > ${LOG}/log_sgaTestesGuias_${DATA}.log
 	${HOME}/src/sgaQuestoes.py -a ${SAIDA_CSV}/questoes.csv > ${LOG}/log_sgaQuestoes_${DATA}.log

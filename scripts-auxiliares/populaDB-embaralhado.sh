@@ -15,4 +15,11 @@ else
 	${HOME}/src/populaDB-embaralhado.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${SAIDA_CSV}/log.txt
 	echo "Tratando dos arquivos csv gerados"
 	sed -i "s#${HOME_NFS}/##g" ${SAIDA_CSV}/*.csv
+	
+	#Remove duplicados
+	cat ${SAIDA_CSV}/guias.csv | sort | uniq > ${SAIDA_CSV}/guias_tmp.csv
+	cat ${SAIDA_CSV}/questoes.csv | sort | uniq > ${SAIDA_CSV}/questoes_tmp.csv
+	mv ${SAIDA_CSV}/questoes_tmp.csv ${SAIDA_CSV}/questoes.csv
+	mv ${SAIDA_CSV}/guias_tmp.csv ${SAIDA_CSV}/guias.csv
+	
 fi
