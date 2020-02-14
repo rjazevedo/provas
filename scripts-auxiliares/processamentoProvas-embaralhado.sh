@@ -2,7 +2,7 @@
 #Objetivo: Processamento automatico de provas embaralhadas
 #Data Criacao:06-fev-2020
 #Autor: Daniel Consiglieri
-#Data Ultima alteracao:06-fev-2020
+#Data Ultima alteracao:14-fev-2020
 
 #Deve ser passado por parametro o arquivo de configuracao
 if [ "$#" -ne 1 ]; then
@@ -14,7 +14,7 @@ else
 
 	#**********Modulo de geracao de csv*************#
 	echo ${MSG_POPULADB_AUTOMATICO_INICIO}
-	${HOME}/src/populaDB-embaralhado.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${LOG}/log_full-insertion_populaDB_${DATA}.log
+	${HOME}/src/populaDB-embaralhado.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${LOG}/log_populaDB_${DATA}.log
 	#Correcao de path
 	sed -i "s#${HOME_NFS}/##g" ${SAIDA_CSV}/*.csv
 
@@ -59,8 +59,8 @@ else
 	echo "Executando corrigeME, aguarde o processamento..."
 	${HOME}/src/corrigeME.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -g ${HOME_NFS}/${GABARITO_PROVAS} -a ${HOME_NFS}/${PATH_PROVAS} -s ${SAIDA_CSV}/notas.csv > ${LOG}/log_corrigeME_${DATA}.log
 	echo "Filtrando arquivo de saida de correcao"
-	#Esse passo é necessário para não sobrescrever correcoes de Notas manuais
-	awk '!/em branco/' ${SAIDA_CSV}/notas.csv > ${SAIDA_CSV}/nota_filtrada.csv
+	#Esse passo é necessário para não sobrescrever correcoes de Notas manuais --segundo awk é um fix para inibir a re-escrita de provas mal escaneadas
+	awk '!/em branco/' ${SAIDA_CSV}/notas.csv | awk '!/respostas/' > ${SAIDA_CSV}/nota_filtrada.csv
 
 	#*************Modulo de backup ************************#
 	cp ${SAIDA_CSV}/nota_filtrada.csv ${BACKUP_CSV}/${DATA}_nota_filtrada.csv
@@ -82,7 +82,7 @@ else
 	${HOME}/src/sgaNotas.py -a ${SAIDA_CSV}/nota_filtrada.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} > ${LOG}/log_sgaNotas_DP_${DATA}.log
 	echo "Insercao de Notas no Banco de Dados finalizada"
 
-	#Essa rotina � exclusiva do populaDB, nao deve ser usada em fullInsertion
+	#Essa rotina é exclusiva do populaDB, nao deve ser usada em fullInsertion
 	if [ "${BIMESTRE_CONSOLIDADO}" == "sim" ]; then
 		cat ${SAIDA_CSV}/correcoes.csv > ${SAIDA_CSV}/lista_referencia_liberacao.csv
 		sed -i -e 's/^/X,X,/' ${SAIDA_CSV}/lista_referencia_liberacao.csv
