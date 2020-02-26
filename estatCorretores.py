@@ -20,16 +20,14 @@ def ColetaDadosCorretores(periodo):
         c = corretores.get(corretor, [0, 0]) # primeira coluna é passado (antigas), segunda é do último período
         c[0] += 1
         corretores[corretor] = c
-        print(corretores[corretor])
         
     # Coleta correções novas = número de questões corrigidas nos últimos período dias
     atuais = db.session.query(db.ActivityRecordSubmissionCorrections).filter(db.ActivityRecordSubmissionCorrections.updated_at >= data)
-    for correcao in antigas:
+    for correcao in atuais:
         corretor = correcao.corrector_data.get('corrector_id', 0)
         c = corretores.get(corretor, [0, 0]) # primeira coluna é passado (antigas), segunda é do último período
         c[1] += 1
         corretores[corretor] = c
-        print(corretores[corretor])
 
     tabela = []
     for corretor in corretores:
