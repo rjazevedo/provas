@@ -54,7 +54,7 @@ class Corretor:
         return self.corrigidas == other.corrigidas
     
     def __repr__(self):
-        return self.nome + ' - ' + str(self.corrigidas)
+        return '{0} <{1}> ({2})'.format(self.nome, self.email, str(self.corrigidas))
     
 class Disciplina:
     def __init__(self, sigla):
@@ -95,9 +95,10 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas):
                 todosCorretores[e].passado = p
                 todosCorretores[e].corrigidas = c
         
-    for d in todasDisciplinas.values():
-        heapq.heapify(d.corretores)
-        print(d.corretores)
+    for d in todasDisciplinas.keys():
+        print(d)
+        heapq.heapify(todasDisciplinas[d].corretores)
+        print(todasDisciplinas[d].corretores)
   
 
 if __name__ == '__main__':
