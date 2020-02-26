@@ -44,6 +44,15 @@ class Corretor:
         """ Corretores serão ordenados pelo número de questões corrigidas"""
         return self.corrigidas - other.corrigidas
     
+    def __lt__(self, other):
+        return self.corrigidas < other.corrigidas
+    
+    def __gt__(self, other):
+        return self.corrigidas > other.corrigidas
+    
+    def __eq__(self, other):
+        return self.corrigidas == other.corrigidas
+    
     def __repr__(self):
         return nome + ' - ' + str(corrigidas)
     
