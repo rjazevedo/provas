@@ -27,7 +27,6 @@ import random
 def DataInvertida(dataStr):
     return dataStr[6:10] + dataStr[3:5] + dataStr[0:2]
 
-
 class LinhaProva:
     def __init__(self, campos):
         self.nomeAluno = campos[0]

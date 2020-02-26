@@ -84,13 +84,13 @@ def RemoveDuplicado(forca):
             for c in apagar:
                 sess.delete(c)
                 quantidade += 1
-                apagar = []
+            apagar = []
             sess.commit()
             
     for c in apagar:
         sess.delete(c)
         quantidade += 1
-        apagar = []
+    apagar = []
     sess.commit()   
     
     print(quantidade, 'tarefas de correção removidas de corretores.')     
