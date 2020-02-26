@@ -71,7 +71,7 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas):
     todosCorretores = {}
     todasDisciplinas = {}
     for [d, e, n] in csv.reader(open(arqCorretores)): # disciplina, email, nome
-        if e not in todosCorretores:
+        if e not in todosCorretores: # email não está cadastrado ainda
             c = Corretor(d, e, n)
             todosCorretores[e] = c
             if d not in todasDisciplinas:
@@ -97,6 +97,7 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas):
         
     for d in todasDisciplinas.keys():
         print(d)
+        print(todasDisciplinas[d].corretores)
         heapq.heapify(todasDisciplinas[d].corretores)
         print(todasDisciplinas[d].corretores)
   
