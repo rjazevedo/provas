@@ -54,7 +54,7 @@ class Corretor:
         return self.corrigidas == other.corrigidas
     
     def __repr__(self):
-        return nome + ' - ' + str(corrigidas)
+        return self.nome + ' - ' + str(self.corrigidas)
     
 class Disciplina:
     def __init__(self, sigla):
