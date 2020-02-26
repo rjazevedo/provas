@@ -92,8 +92,8 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas):
     if os.path.isfile(arqEstatisticas):
         for [e, p, c] in csv.reader(open(arqEstatisticas)):
             if e in todosCorretores:
-                todosCorretores[e].passado = p
-                todosCorretores[e].corrigidas = c
+                todosCorretores[e].passado = int(p)
+                todosCorretores[e].corrigidas = int(c)
         
     for d in todasDisciplinas.keys():
         print(d)
