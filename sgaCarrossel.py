@@ -84,7 +84,7 @@ def associa_grader():
 #                                                    updated_at = func.now()
 #                                                   )
 #        sess.add(submission_corrector)
-
+    pass
 
 def associa( ca ):
     """Associa corretores a provas de uma disciplina de acordo com a carga dos corretos no SGA"""
