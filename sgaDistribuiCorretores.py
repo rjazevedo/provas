@@ -71,6 +71,7 @@ class Disciplina:
         self.indice += 1
         if self.indice >= len(self.corretores):
             self.indice = 0      
+        return corretor
             
     def Verifica(self):
         # Verifica se tem algum corretor apto a corrigir (dentro do limite)
@@ -147,7 +148,7 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas, limite):
             sigla = prova.activity_record.curricular_activity.code
             print('Precisa de um corretor para', sigla)
             if sigla not in todasDisciplinas:
-                print('Ops: não há nenhum corretor alocado para esta disciplina!')
+                print('Ops! não há nenhum corretor alocado para esta disciplina')
                 continue
             
             # Pega a disciplina
