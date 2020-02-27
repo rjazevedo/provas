@@ -21,6 +21,7 @@ import argparse
 import db
 import csv
 import heapq
+import datetime
 
 args = None
 peso = 2 # Número de questões a corrigir por prova. Apesar de fazermos a alocação por prova, a contabilidade é sempre por questões.
@@ -141,7 +142,8 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas, limite):
             c.dbId = corr.id
             
     # Agora percorre todas as provas não corrigidas na base
-    todasProvas = db.session.query(db.ActivityRecordSubmissions).all()
+    inicioDoModelo = datetime.date(year=2019, month=1, day=1)
+    todasProvas = db.session.query(db.ActivityRecordSubmissions).filter(db.ActivityRecordSubmissions.created_at >= inicioDoModelo)
     
     for prova in todasProvas:
         if not db.ProvaCorrigida(prova):
