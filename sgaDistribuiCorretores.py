@@ -39,6 +39,8 @@ class Corretor:
         self.passado = 0
         self.corrigidas = 0
         self.disciplinas = [disciplina]
+        self.dbId = 0
+        self.ativo = True
         
     def __cmp__(self, other):
         """ Corretores serão ordenados pelo número de questões corrigidas"""
@@ -61,9 +63,31 @@ class Disciplina:
         self.sigla = sigla
         self.dbId = 0
         self.corretores = []
-      
+        self.alocacoes = 0
+        self.indice = 0
+        
+    def Proximo(self):
+        corretor = self.corretores[self.indice]
+        self.indice += 1
+        if self.indice >= len(self.corretores):
+            self.indice = 0      
+            
+    def Verifica(self):
+        # Verifica se tem algum corretor apto a corrigir (dentro do limite)
+        resultado = False
+        for c in self.corretores:
+            resultado = resultado or c.ativo
+            
+        # Se não achou ninguém, ativa todos
+        if not resultado:
+            for c in self.corretores:
+                c.ativo = True
+                
+        # Remove os que não serão alocados
+        self.corretores = [x for x in self.corretores if x.ativo]
+        
     
-def AtribuiCorretores(arqCorretores, arqEstatisticas):
+def AtribuiCorretores(arqCorretores, arqEstatisticas, limite):
     if not os.path.isfile(arqCorretores):
         print('Arquivo não encontrado:', arqCorretores)
         return
@@ -89,24 +113,58 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas):
             else:
                 todasDisciplinas[d].corretores.append(todosCorretores[e])
                 
+    # Se existir o arquivo  de estatísticas, lê os dados e completa a listagem.
     if os.path.isfile(arqEstatisticas):
         for [e, p, c] in csv.reader(open(arqEstatisticas)):
             if e in todosCorretores:
                 todosCorretores[e].passado = int(p)
                 todosCorretores[e].corrigidas = int(c)
+                if int(c) >= limite:
+                    todosCorretores[e].ativo = False
         
-    for d in todasDisciplinas.keys():
-        print(d)
-        print(todasDisciplinas[d].corretores)
-        heapq.heapify(todasDisciplinas[d].corretores)
-        print(todasDisciplinas[d].corretores)
+    # Ordena todas as listas no formato de heap. O menor sempre primeiro e coleta o id da disciplina
+    for d in todasDisciplinas.values(): 
+        # Ordena corretores do menor para o maior em número de correções já realizadas
+        # Não faz muita diferença a ordenação exceto para o caso de chegar de prova em prova e não ficar em ordem alfabética
+        heapq.heapify(d.corretores)
+        d.Verifica()
+        # Busca o código da disciplina da tabela da base de dados
+        disc = db.session.query(db.CurricularActivities).filter(db.CurricularActivities.code == d.sigla).first()
+        if disc is not None:
+            d.dbId = disc.id
+            
+    # Busca os ids dos corretores na base para acelerar o processo
+    for c in todosCorretores.values():
+        corr = db.session.query(db.InternalUsers).filter(db.InternalUsers.email == c.email).first()
+        if corr is not None:
+            c.dbId = corr.id
+            
+    # Agora percorre todas as provas não corrigidas na base
+    todasProvas = db.session.query(db.ActivityRecordSubmissions).all()
+    
+    for prova in todasProvas:
+        if not db.ProvaCorrigida(prova):
+            sigla = prova.activity_record.curricular_activity.code
+            print('Precisa de um corretor para', sigla)
+            if sigla not in todasDisciplinas:
+                print('Ops: não há nenhum corretor alocado para esta disciplina!')
+                continue
+            
+            # Pega a disciplina
+            disc = todasDisciplinas[sigla]
+            # Corretor com menor número de correções
+            corretor = disc.Proximo()
+            print(' Corretor selecionado:', corretor)
+            
+            
   
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Associa corretores (internal_users) a provas dos alunos levando em conta a carga de trabalho de correção.')
     parser.add_argument('-c', '--corretores', type=str, required=True, help='Arquivo CSV com os emails dos corretores')
-    parser.add_argument('-e', '--estatisticas', type=str , required=True, help='Arquivo CSV com as estatísticas de correção por corretor)')
+    parser.add_argument('-e', '--estatisticas', type=str , required=True, help='Arquivo CSV com as estatísticas de correção por corretor')
+    parser.add_argument('-l', '--limite', type=int , default=300, required=False, help='Altera o limite de número de questões corrigidas por corretor (default = 300)')
 
     args = parser.parse_args()
     
-    AtribuiCorretores(args.corretores, args.estatisticas)
+    AtribuiCorretores(args.corretores, args.estatisticas, args.limite)
