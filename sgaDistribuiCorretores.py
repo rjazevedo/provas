@@ -146,7 +146,7 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas, limite):
     todasProvas = db.session.query(db.ActivityRecordSubmissions).filter(db.ActivityRecordSubmissions.created_at >= inicioDoModelo)
     
     for prova in todasProvas:
-        if not db.ProvaCorrigida(prova):
+        if db.PrecisaCorretor(prova):
             sigla = prova.activity_record.curricular_activity.code
             if sigla not in todasDisciplinas:
                 print(sigla, ' Ops! não há nenhum corretor alocado para esta disciplina!')

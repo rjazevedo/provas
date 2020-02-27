@@ -33,6 +33,15 @@ def ProvaCorrigida(ars):
         return False
     return len(ars.activity_test.questions) == len(ars.corrections)
 
+def PrecisaCorretor(ars):
+    if ars is None:
+        return False
+    if ars.activity_test is None:
+        return False
+    if ars.activity_test.questions is None:
+        return False
+    return len(ars.activity_test.questions) != len(ars.corrections)
+
 class Students(Base):
     __tablename__ = 'students'
 
