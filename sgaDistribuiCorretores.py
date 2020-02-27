@@ -148,16 +148,15 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas, limite):
     for prova in todasProvas:
         if not db.ProvaCorrigida(prova):
             sigla = prova.activity_record.curricular_activity.code
-            print('Precisa de um corretor para', sigla)
             if sigla not in todasDisciplinas:
-                print('Ops! não há nenhum corretor alocado para esta disciplina')
+                print(sigla, ' Ops! não há nenhum corretor alocado para esta disciplina!')
                 continue
             
             # Pega a disciplina
             disc = todasDisciplinas[sigla]
             # Corretor com menor número de correções
             corretor = disc.Proximo()
-            print(' Corretor selecionado:', corretor)
+            print(sigla, ' Corretor selecionado:', corretor)
             
             
   
