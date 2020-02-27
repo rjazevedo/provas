@@ -34,11 +34,15 @@ def ProvaCorrigida(ars):
     return len(ars.activity_test.questions) == len(ars.corrections)
 
 def PrecisaCorretor(ars):
+    # TODO: Ver se tem folhas
+    # TODO: Verificar se as corrections apontam para o mesmo teste que a submission
     if ars is None:
         return False
     if ars.activity_test is None:
         return False
     if ars.activity_test.questions is None:
+        return False
+    if ars.absent:
         return False
     return len(ars.activity_test.questions) != len(ars.corrections)
 

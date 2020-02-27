@@ -145,11 +145,14 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas, limite):
     inicioDoModelo = datetime.date(year=2019, month=1, day=1)
     todasProvas = db.session.query(db.ActivityRecordSubmissions).filter(db.ActivityRecordSubmissions.created_at >= inicioDoModelo)
     
+    disciplinasSemCorretor = {}
+    alocacoes = 0
     for prova in todasProvas:
         if db.PrecisaCorretor(prova):
             sigla = prova.activity_record.curricular_activity.code
             if sigla not in todasDisciplinas:
                 print(sigla, ' Ops! não há nenhum corretor alocado para esta disciplina!')
+                disciplinasSemCorretor[sigla] = disciplinasSemCorretor.get(sigla, 0) + 1
                 continue
             
             # Pega a disciplina
@@ -157,6 +160,10 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas, limite):
             # Corretor com menor número de correções
             corretor = disc.Proximo()
             print(sigla, ' Corretor selecionado:', corretor)
+            alocacoes += 1
+            
+    print(alocacoes, 'provas com corretores alocados')
+    print('Disciplinas sem nenhum corretor:', disciplinasSemCorretor)
             
             
   

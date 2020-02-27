@@ -164,7 +164,7 @@ def carregaFolha(
 
     # carrega folha caso não exista
     if not has_sheet_n:
-        attach.sheets_data.append( sheet_link )
+        attach.sheets_data.append(sheet_link)
     elif forca:
         attach.sheets_data[sheet_n_i] = sheet_link
         
