@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """Marca aluno como presente em uma prova no SGA a partir de um CSV com as colunas:
-_, _, Cód. da disciplina, Cód. da prova,RA do aluno"""
+_, Polo, Cód. da disciplina, Cód. da prova,RA do aluno"""
 
 ###############################################
 # Uso: sgaPresentes.py -a presentes.csv -c 38
@@ -40,7 +40,8 @@ def marcaAluno(
                 st,      # submission_type
                 cid,     # calendar_id
                 ed,      # forca a habilitacao do status corrigível reverte status de anulada, ausente
-                ae       # não altera status de presença e anulação, apenas torna editavel
+                ae,      # não altera status de presença e anulação, apenas torna editavel
+                polo     # número do polo
               ):
 
     """Marca um aluno como presente em uma prova, no SGA"""
@@ -51,7 +52,8 @@ def marcaAluno(
             tc,  # test_code
             ar,  # academic_register
             st,  # submission_type
-            cid  # calendar_id
+            cid, # calendar_id
+            polo # número do polo
           )
 
     # ####################
@@ -103,10 +105,20 @@ def marcaAluno(
                .filter(db.ActivityTests.code == tc) \
                .filter(db.ActivityTests.curricular_activity_id == activity.id) \
                .first()
+    
+    if not ae:
+        if not test:
+          test = sess.query(db.ActivityTests) \
+                .filter(db.ActivityTests.code == tc + '-'+ polo) \
+                .filter(db.ActivityTests.curricular_activity_id == activity.id) \
+                .first()
+          if not test:
+            erro( "Missing ActivityTests: %s, %d" % (tc, activity.id) )
+            return
+    else:
+        if not test:
+            erro( "Missing ActivityTests: %s, %d" % (tc, activity.id) )
 
-    if not test:
-      erro( "Missing ActivityTests: %s, %d" % (tc, activity.id) )
-      return
 
     # submissão (cria uma caso não exista)
     submission = sess.query(db.ActivityRecordSubmissions) \
@@ -142,7 +154,7 @@ def marcaAluno(
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Marca aluno como presente em uma prova no SGA'
-                                                 ' a partir de um CSV com as colunas: _, _, Cód. da disciplina,'
+                                                 ' a partir de um CSV com as colunas: _, Polo, Cód. da disciplina,'
                                                  'Cód. da prova,RA do aluno')
     parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV de alunos presentes')
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
@@ -179,11 +191,12 @@ if __name__ == '__main__':
         reader = csv.reader(f, delimiter=',')
         for row in reader:
             marcaAluno(
-                        row[2],        # str, Cód. da disciplina
-                        row[3],        # str, Cód. da prova
-                        row[4],        # str, RA do aluno
-                        tipo,          ### str, Tipo da submissão
-                        calendario,    ### int, ID do calendário
-                        editavel,      # bool, faz com que uma prova se torne corrigível e reverte todos os status de ausente e anulada
-                        apenaseditavel # bool, apenas libera a edição
+                        row[2],         # str, Cód. da disciplina
+                        row[3],         # str, Cód. da prova
+                        row[4],         # str, RA do aluno
+                        tipo,           ### str, Tipo da submissão
+                        calendario,     ### int, ID do calendário
+                        editavel,       # bool, faz com que uma prova se torne corrigível e reverte todos os status de ausente e anulada
+                        apenaseditavel, # bool, apenas libera a edição
+                        row[1]          # str, código do polo
                       )
