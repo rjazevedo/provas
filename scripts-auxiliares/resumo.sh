@@ -1,5 +1,5 @@
 #!/bin/bash
-#Descricao: Script que realiza o resumo do segundo Bimestre
+#Descricao: Script que realiza o resumo do segundo Bimestre.
 #Autor: Daniel Consiglieri
 #Data Criacao:Jun 2019
 #Revisao:04-set-2019
