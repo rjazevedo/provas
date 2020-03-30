@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Gera dashboard com status de correcao de provas"""
+""" Gera dashboard com status de correcao de provas e status de facilitadores"""
 
 import argparse
 import csv
@@ -60,7 +60,19 @@ class Corretores:
         return '<tr><td>' + self.email \
                 + '</td><td>' + str(self.aCorrigir) \
                 + '</td><td>' + '{:05.2f}'.format((1.0 - float(self.aCorrigir/self.total))* 100.0) + '% </td></tr>\n'
-
+class Facilitadores:
+    def __init__(self,campos):
+        self.email = campos[0]
+        self.nome = campos[1]
+        self.status = campos[3]
+    def ShowEmail(self):
+        return self.email
+    def ShowStatus(self):
+        return self.status
+    def GeraLinhaHTML(self):
+        return '<tr><td>' + self.email + '</td><td>' + self.status + '</td></tr>\n'
+    def GeraLinhaCSV(self):
+        return self.email + ',' + self.nome + ',' + self.status + '\n'
 def GeraDashboardDisciplinasCorretores(conjuntoCorretor,conjuntoDisciplinas,saida):
     html_disciplinas = {}
     html_arquivo = {}
@@ -85,9 +97,7 @@ def GeraDashboardDisciplinasCorretores(conjuntoCorretor,conjuntoDisciplinas,said
         html_arquivo[d].write('<thead><tr><th>Email</th><th>Falta corrigir</th><th>Percentual Corrigido</th></tr></thead><tbody>\n')
         html_arquivo[d].write(html_disciplinas[d])
         html_arquivo[d].write(footer)
-        html_arquivo[d].close()
-    
-        
+        html_arquivo[d].close()      
 
 class ProvasIlegiveis:
     def __init__(self, campos):
@@ -106,7 +116,7 @@ class ProvasIlegiveis:
                 + '</td><td>' + self.codigoProva \
                 + '</td><td>' + self.ra \
                 + '</td><td>' + self.aluno.title() \
-                + '</td></tr>\n'               
+                + '</td></tr>\n'           
                 
 
 if __name__ == '__main__':
@@ -268,3 +278,27 @@ if __name__ == '__main__':
         
         #Gera cada uma das sub-paginas de disciplinas X corretores
         GeraDashboardDisciplinasCorretores(corretores,disciplinas,args.saida)
+        
+        #Gera a consulta do status dos facilitadores
+        consulta = open(os.path.join(os.path.dirname(sys.argv[0]), 'query_status_facilitador.txt')).read()
+        cursor.execute(consulta)
+        record = cursor.fetchall()
+        
+        facilitadores = {}
+        
+        for r in record:
+            facilitadores[r[0]] = (Facilitadores(r))
+        
+        status_facilitadores_html = open(os.path.join(args.saida,'facilitadores.html'), 'wt')
+        status_facilitadores_csv = open(os.path.join(args.saida,'facilitadores.csv'), 'wt')
+        status_facilitadores_html.write(header)
+        status_facilitadores_html.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')
+        status_facilitadores_html.write('<thead><tr><th>Email</th><th>Status</th></tr></thead><tbody>\n')
+        
+        for f in facilitadores:
+            status_facilitadores_html.write(facilitadores[f].GeraLinhaHTML())
+            status_facilitadores_csv.write(facilitadores[f].GeraLinhaCSV())
+            
+        status_facilitadores_html.write(footer)
+        status_facilitadores_html.close()
+        status_facilitadores_csv.close()
