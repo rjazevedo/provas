@@ -20,7 +20,7 @@ PATH_LOG="/home/provas/dados/gdrive_rclone/Nucleo-Processamento-Provas"
 PATH_DESTINO_PNG="/home/provas/dados/DriveListener/Referencia/Png-Remomeados-COPIA-FORCADA"
 PATH_DESTINO_PDF_PASSIVO="/home/provas/dados/DriveListener/Referencia/Pdf-COPIA-PASSIVA"
 PATH_DESTINO_PDF_FORCADO="/home/provas/dados/DriveListener/Referencia/Pdf-COPIA-FORCADA"
-
+POLOS=400
 
 TEMPO_PAUSA=900
 ###Fim Variáveis globais
@@ -67,7 +67,7 @@ do
 				fi
 				
 				#Move os arquivos dentro das sub-pastas
-				for a in `seq -f "%04.0f" 0 336`
+				for a in `seq -f "%04.0f" 0 $POLOS`
 				do 
 				  mv *-$a-* $a 2> /dev/null
 				done
@@ -128,7 +128,7 @@ do
 			   
 				#Move os arquivos dentro das sub-pastas
 				cd	 ${ESTRUTURA_PROCESSAMENTO}/Saida
-				for a in `seq -f "%04.0f" 0 336`
+				for a in `seq -f "%04.0f" 0 $POLOS`
 				do 
 				  mv *-$a-* $a 2> /dev/null
 				done
@@ -189,7 +189,7 @@ do
 			   
 				#Move os arquivos dentro das sub-pastas
 				cd	 ${ESTRUTURA_PROCESSAMENTO}/Saida
-				for a in `seq -f "%04.0f" 0 336`
+				for a in `seq -f "%04.0f" 0 $POLOS`
 				do 
 				  mv *-$a-* $a 2> /dev/null
 				done
