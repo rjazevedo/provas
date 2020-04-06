@@ -292,7 +292,7 @@ else
 					#Fix para aplicacao de dois tipos de calendarios na mesma data
 					if [[ $lista == *20200303*"ocorrencia"* ]] || [[ $lista == *20200305*"ocorrencia"* ]];then
 						${ACTION} "${lista}" ${PATH_PROVAS_1DP2020}/${2}
-					if
+					fi
 				fi
 				
 				;;
