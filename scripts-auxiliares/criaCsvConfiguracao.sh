@@ -7,6 +7,7 @@
 > ausentes.csv
 > ausentes_manual.csv
 > corretores.csv
+> baseCorrecoes.csv
 > dashboard.csv
 > GabaritoMultiplasEscolhas.csv
 > todasProvasJuntas.csv
