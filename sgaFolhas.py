@@ -37,28 +37,30 @@ def erro( str ):
     print( "Erro: " + str )
 
 def carregaFolha( 
-                  ac,  # activity_code
-                  tc,  # test_code
-                  ar,  # academic_register
-                  n,   # number
-                  ls,  # link_sheet
-                  st,  # submission_type
-                  cid, # calendar_id
-                  forca # forca substituição
+                  ac,         # activity_code
+                  tc,         # test_code
+                  ar,         # academic_register
+                  n,          # number
+                  ls,         # link_sheet
+                  st,         # submission_type
+                  cid,        # calendar_id
+                  forca,      # forca substituição
+                  decrescente # associa a folha usando a segunda ocorrencia de uma mesma disciplina
                 ):
 
     """Carrega o link de uma folha de resposta, de uma prova, de um aluno, no SGA"""
 
     print(  
             "Tenta carregar link de folha de resposta: ",
-            ac,  # activity_code
-            tc,  # test_code
-            ar,  # academic_register
-            n,   # number
-            ls,  # link_sheet
-            st,  # submission_type
-            cid,  # calendar_id
-            forca # forca substituição
+            ac,         # activity_code
+            tc,         # test_code
+            ar,         # academic_register
+            n,          # number
+            ls,         # link_sheet
+            st,         # submission_type
+            cid,        # calendar_id
+            forca,      # forca substituição
+            decrescente # associa a folha usando a segunda ocorrencia de uma mesma disciplina
           )
 
     # ####################
@@ -77,11 +79,20 @@ def carregaFolha(
       return
 
     # oferta
-    offer = sess.query(db.ActivityOffers) \
-                .filter(db.ActivityOffers.curricular_activity_id == activity.id) \
-                .filter(db.ActivityOffers.offer_type == offer_types[st]) \
-                .filter(db.ActivityOffers.calendar_id == cid) \
-                .first()
+    if decrescente:
+        offer = sess.query(db.ActivityOffers) \
+                    .filter(db.ActivityOffers.curricular_activity_id == activity.id) \
+                    .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                    .filter(db.ActivityOffers.calendar_id == cid) \
+                    .order_by(db.ActivityOffers.id.desc()) \
+                    .first()
+    
+    else:
+        offer = sess.query(db.ActivityOffers) \
+                    .filter(db.ActivityOffers.curricular_activity_id == activity.id) \
+                    .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                    .filter(db.ActivityOffers.calendar_id == cid) \
+                    .first()
 
     if not offer: 
       erro( "Missing ActivityOffers: %d, %d" % (cid, offer_types[st]) )
@@ -184,6 +195,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
     parser.add_argument('-f', '--forca', action='store_true', help='Substitui forçosamente o link, caso já exista uma folha de mesmo número')
+    parser.add_argument('-d', '--decrescente', action='store_true', help='Caso exista duas disciplinas com mesmo código, ao invés de inserir na primeira ocorrencia usa a segunda')
 
     args = parser.parse_args()
 
@@ -209,12 +221,13 @@ if __name__ == '__main__':
         reader = csv.reader(f, delimiter=',')
         for row in reader:
             carregaFolha(
-                          row[0],      # str, Cód. da disciplina
-                          row[1],      # str, Cód. da prova
-                          row[2],      # str, RA do aluno
-                          int(row[3]), # int, Número da folha
-                          row[4],      # str, Link do arquivo da folha de resposta
-                          tipo,        ### str, Tipo da submissão
-                          calendario,  ### int, ID do calendário
-                          args.forca   # bool, força substituição do link, caso já exista
+                          row[0],          # str, Cód. da disciplina
+                          row[1],          # str, Cód. da prova
+                          row[2],          # str, RA do aluno
+                          int(row[3]),     # int, Número da folha
+                          row[4],          # str, Link do arquivo da folha de resposta
+                          tipo,            ### str, Tipo da submissão
+                          calendario,      ### int, ID do calendário
+                          args.forca,      # bool, força substituição do link, caso já exista
+                          args.decrescente # associa a folha usando a segunda ocorrencia de uma mesma disciplina
                         )
