@@ -8,7 +8,7 @@ source ~/src/scripts-auxiliares/config/2019b4-conf.sh
 cd ${LOG}
 
 #Correcao de caderno respostas nao correspondente a guia
-for i in $( find ${PATH_PROVAS} -iname '*20200303*STA001*P006*png' );
+for i in $( find ${HOME_NFS}/${PATH_PROVAS} -iname '*20200303*STA001*P006*png' );
 do
 	echo -e "mv ${i} ${i/P006/P010}" >> ${LOG}/log_arquivosRenomeados_${DATA}.log
 	mv ${i} ${i/P006/P010}
