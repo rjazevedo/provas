@@ -2,9 +2,10 @@
 #Objetivo: Processamento de provas 4Bimestre, incluindo a correção para todas as particularidades e ocorrencias
 #Data Criacao:09-abr-2020
 #Autor: Daniel Consiglieri
-#Data Ultima alteracao:09-abr-2020
+#Data Ultima alteracao: 28-abr-2020
 
-source config/2019b4-conf.sh
+source ~/src/scripts-auxiliares/config/2019b4-conf.sh
+cd ${LOG}
 
 #Correcao de caderno respostas nao correspondente a guia
 for i in $( find ${PATH_PROVAS} -iname '*20200303*STA001*P006*png' );
