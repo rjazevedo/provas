@@ -36,13 +36,14 @@ def erro( str ):
     print( "Erro: " + str )
 
 def associaCorretor( 
-                     ac,  # activity_code
-                     tc,  # test_code
-                     ar,  # academic_register
-                     ce,  # corrector_email
-                     st,  # submission_type
-                     cid,  # calendar_id
-                     forca # Só inclui se não houver corretor.
+                     ac,         # activity_code
+                     tc,         # test_code
+                     ar,         # academic_register
+                     ce,         # corrector_email
+                     st,         # submission_type
+                     cid,        # calendar_id
+                     forca,      # Só inclui se não houver corretor.
+                     decrescente # associa corretores usando a segunda ocorrencia de uma mesma disciplina
                    ):
 
     """Associa um corretor a uma prova, de um aluno, no SGA"""
@@ -83,12 +84,20 @@ def associaCorretor(
       return
 
     # oferta
-    offer = sess.query(db.ActivityOffers) \
-                .filter(db.ActivityOffers.curricular_activity_id == activity.id) \
-                .filter(db.ActivityOffers.offer_type == offer_types[st]) \
-                .filter(db.ActivityOffers.calendar_id == cid) \
-                .first()
-
+    if decrescente:
+        offer = sess.query(db.ActivityOffers) \
+                    .filter(db.ActivityOffers.curricular_activity_id == activity.id) \
+                    .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                    .filter(db.ActivityOffers.calendar_id == cid) \
+                    .order_by(db.ActivityOffers.id.desc()) \
+                    .first()    
+    else:
+        offer = sess.query(db.ActivityOffers) \
+                    .filter(db.ActivityOffers.curricular_activity_id == activity.id) \
+                    .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                    .filter(db.ActivityOffers.calendar_id == cid) \
+                    .first()
+                    
     if not offer:
       erro( "Missing ActivityOffers: %d, %d" % (cid, offer_types[st]) )
       return
@@ -170,6 +179,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
     parser.add_argument('-f', '--forca', action='store_true', required=False, default=False, help='Força a inclusão de outros corretores, mesmo que já haja corretor para a prova')
+    parser.add_argument('-d', '--decrescente', action='store_true', help='Caso exista duas disciplinas com mesmo código, ao invés de inserir na primeira ocorrencia usa a segunda')
 
     args = parser.parse_args()
 
@@ -195,11 +205,12 @@ if __name__ == '__main__':
         reader = csv.reader(f, delimiter=',')
         for row in reader:
             associaCorretor(
-                             row[0],      # str, Cód. da disciplina
-                             row[1],      # str, Cód. da prova
-                             row[2],      # str, RA do aluno
-                             row[3],      # str, Email do corretor (internal_user)
-                             tipo,        ### str, Tipo da submissão
-                             calendario,   ### int, ID do calendário
-                             args.forca # Somente adiciona corretores das provas que não tem ainda
+                             row[0],          # str, Cód. da disciplina
+                             row[1],          # str, Cód. da prova
+                             row[2],          # str, RA do aluno
+                             row[3],          # str, Email do corretor (internal_user)
+                             tipo,            ### str, Tipo da submissão
+                             calendario,      ### int, ID do calendário
+                             args.forca,      # Somente adiciona corretores das provas que não tem ainda
+                             args.decrescente # associa corretores usando a segunda ocorrencia de uma mesma disciplina
                            )

@@ -32,12 +32,13 @@ def erro( str ):
     print( "Erro: " + str )
 
 def marcaAluno( 
-                ac,  # activity_code
-                tc,  # test_code
-                ar,  # academic_register
-                st,  # submission_type
-                cid,  # calendar_id
-                polo  # número do polo
+                ac,         # activity_code
+                tc,         # test_code
+                ar,         # academic_register
+                st,         # submission_type
+                cid,        # calendar_id
+                polo,       # número do polo
+                decrescente # associa a ausencia usando a segunda ocorrencia de uma mesma disciplina
               ):
 
     """Marca um aluno como ausente em uma prova, no SGA"""
@@ -68,11 +69,19 @@ def marcaAluno(
       return
 
     # oferta
-    offer = sess.query(db.ActivityOffers) \
-                .filter(db.ActivityOffers.curricular_activity_id == activity.id) \
-                .filter(db.ActivityOffers.offer_type == offer_types[st]) \
-                .filter(db.ActivityOffers.calendar_id == cid) \
-                .first()
+    if decrescente:
+        offer = sess.query(db.ActivityOffers) \
+                    .filter(db.ActivityOffers.curricular_activity_id == activity.id) \
+                    .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                    .filter(db.ActivityOffers.calendar_id == cid) \
+                    .order_by(db.ActivityOffers.id.desc()) \
+                    .first()
+    else:
+        offer = sess.query(db.ActivityOffers) \
+                    .filter(db.ActivityOffers.curricular_activity_id == activity.id) \
+                    .filter(db.ActivityOffers.offer_type == offer_types[st]) \
+                    .filter(db.ActivityOffers.calendar_id == cid) \
+                    .first()
 
     if not offer: 
       erro( "Missing ActivityOffers: %d, %d" % (cid, offer_types[st]) )
@@ -142,6 +151,8 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--arquivo', type=str, required=True, help='Arquivo CSV de alunos ausentes')
     parser.add_argument('-c', '--calendario', type=int , required=True, help='Id do Calendario (calendars.id no BD do SGA)')
     parser.add_argument('-t', '--tipo', required=False, default='regular', help='Tipo de submissão (default: "regular")')
+    parser.add_argument('-d', '--decrescente', action='store_true', help='Caso exista duas disciplinas com mesmo código, ao invés de inserir na primeira ocorrencia usa a segunda')
+
 
     args = parser.parse_args()
 
@@ -170,10 +181,11 @@ if __name__ == '__main__':
         reader = csv.reader(f, delimiter=',')
         for row in reader:
             marcaAluno(
-                        row[2],      # str, Cód. da disciplina
-                        row[3],      # str, Cód. da prova
-                        row[4],      # str, RA do aluno
-                        tipo,        ### str, Tipo da submissão
-                        calendario,  ### int, ID do calendário
-                        row[1]       # str, código do polo
+                        row[2],          # str, Cód. da disciplina
+                        row[3],          # str, Cód. da prova
+                        row[4],          # str, RA do aluno
+                        tipo,            ### str, Tipo da submissão
+                        calendario,      ### int, ID do calendário
+                        row[1],          # str, código do polo
+                        args.decrescente # associa a ausencia usando a segunda ocorrencia de uma mesma disciplina
                       )
