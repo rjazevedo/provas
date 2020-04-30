@@ -15,6 +15,7 @@ import drive
 import re
 #import db
 import yaml
+import shutil
 
 def tex_escape(text):
     """
@@ -141,7 +142,8 @@ def ProcessaProva(DRIVE, prova, cabecalho, resposta, alunos, forca):
     
     os.system('xelatex extrato')
     
-    os.rename('extrato.pdf', provaAluno)
+    
+    shutil.move('extrato.pdf', provaAluno)
     # for key in arquivos:
     #     os.remove(arquivos[key])  
         
