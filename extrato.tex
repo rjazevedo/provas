@@ -1,0 +1,33 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage[hmargin=2cm,headheight=2cm,headsep=.3cm,footskip=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[T2A,T1]{fontenc}
+%\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{unicode-math}
+\usepackage{xfrac}
+%\usepackage{xecyr}
+%\DeclareTextSymbol{\CYRF}{\LastDeclaredEncoding}{212}
+
+%\newcommand{\textfrac}[2]{$\sfrac{#1}{#2}$}
+%\renewcommand{\CYRF}{$\Phi$}
+%\renewcommand{\cyrf}{$\phi$}
+
+\input{config}
+
+\begin{document}
+\begin{tabular}{cl}
+  \multirow{2}{*}{\includegraphics[width=5cm]{univesp}} & \textbf{Extrato de prova online} \\
+  & \textbf{Prova:} \prova \\
+  & \textbf{Data:} \data \\
+  & \textbf{Aluno:} \aluno \\
+
+\end{tabular}
+\vspace{5mm}
+\it
+
+\input{conteudo}
+
+\end{document}

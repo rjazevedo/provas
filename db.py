@@ -31,6 +31,8 @@ def ProvaCorrigida(ars):
         return False
     if ars.activity_test.questions is None:
         return False
+    if ars.absent:
+        return True
     return len(ars.activity_test.questions) == len(ars.corrections)
 
 def PrecisaCorretor(ars):
