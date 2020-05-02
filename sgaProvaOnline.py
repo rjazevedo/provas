@@ -101,17 +101,17 @@ def BuscaMatriculaAlunoDisciplina(alunoDB, disciplinaDB, ofertasDB):
     return None
                       
                       
-def BuscaOuCriaRespostaProva(ofertaDB, provaDB, tipo, folha, fazCommit = True):
+def BuscaOuCriaRespostaProva(matriculaDB, provaDB, tipo, folha, fazCommit = True):
     """ Busca por uma resposta para prova que o aluno realizou (db.ActivityRecordSubmissions). Se não encontrar, cria e coloca as folhas. """
 
     submission = sess.query(db.ActivityRecordSubmissions) \
-                     .filter(db.ActivityRecordSubmissions.activity_record_id == ofertaDB.id) \
+                     .filter(db.ActivityRecordSubmissions.activity_record_id == matriculaDB.id) \
                      .filter(db.ActivityRecordSubmissions.submission_type == tipo) \
-                     .filter(db.AcrivityRecordSubmissions.acrivity_test_id == provaDB.id) \
+                     .filter(db.ActivityRecordSubmissions.acrivity_test_id == provaDB.id) \
                      .first()
 
     if not submission:
-        submission = db.ActivityRecordSubmissions(activity_record_id = ofertaDB.id,
+        submission = db.ActivityRecordSubmissions(activity_record_id = matriculaDB.id,
                                                   submission_type = tipo,
                                                   activity_test_id = provaDB.id,
                                                   created_at = func.now(),
