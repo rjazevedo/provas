@@ -107,7 +107,7 @@ def BuscaOuCriaRespostaProva(matriculaDB, provaDB, tipo, folha, fazCommit = True
     submission = sess.query(db.ActivityRecordSubmissions) \
                      .filter(db.ActivityRecordSubmissions.activity_record_id == matriculaDB.id) \
                      .filter(db.ActivityRecordSubmissions.submission_type == tipo) \
-                     .filter(db.ActivityRecordSubmissions.acrivity_test_id == provaDB.id) \
+                     .filter(db.ActivityRecordSubmissions.activity_test_id == provaDB.id) \
                      .first()
 
     if not submission:
