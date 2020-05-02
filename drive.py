@@ -91,6 +91,7 @@ def GetPlanilhaRespostas(DRIVE, SHEET, prova, verbose = True):
     if prova_escolhida is None:
         print('Planilha de resposta da prova não encontrada', prova)
         return None
+    
     print('Prova', prova_escolhida['name'], 'encontrada. Id:', prova_escolhida['id'])
     
     if verbose:

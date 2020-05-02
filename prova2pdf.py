@@ -169,9 +169,10 @@ def LeTodosAlunos():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Gera as versões das provas online em em PDF')
     parser.add_argument('-p', '--prova', type=str, nargs='+', required=True, help='Indica a prova para converter')
-    parser.add_argument('-v', '--verbose', action='store_true', required=False, help='Mostra as informações de status')
+    parser.add_argument('-v', '--verbose',  action='store_true', required=False, help='Mostra as informações de status')
     parser.add_argument('-n', '--notas', action='store_true', required=False, help='Coleta apenas as notas das provas')
     parser.add_argument('-f', '--forca', action='store_true', required=False, help='Força regerar os arquivos')
+    parser.add_argument('-c', '--cabecalho', action='store_true', required=False, help='Apenas imprime os cabeçalhos das provas')
 
     args = parser.parse_args()
     
@@ -179,12 +180,17 @@ if __name__ == '__main__':
     provas = args.prova
     soNotas = args.notas
     forca = args.forca
+    leCabecalho = args.cabecalho
     
     totalProvas = 0
 
     (DRIVE, SHEET) = drive.GetTokens(verbose)
         
+    if not leCabecalho:
+        alunos = LeTodosAlunos()
+
     for prova in provas:
+        print('\n*** Prova:', prova)
         (id_planilha, planilha) = drive.GetPlanilhaRespostas(DRIVE, SHEET, prova, verbose)
         if planilha is None:
             sys.exit(1)
@@ -198,6 +204,13 @@ if __name__ == '__main__':
 
         faixa="'" + titulo + "'!A1:" + chr(nColunas + 65) + '1'
         cabecalho = SHEET.values().get(spreadsheetId=id_planilha, range=faixa).execute().get('values', [])[0]
+        
+        if leCabecalho:
+            print('** Cabeçalho:')
+            for item in cabecalho:
+                print('*', item)
+            continue
+        
         nColunas = len(cabecalho[0])
         linha = 2
         passo = 100
@@ -205,8 +218,6 @@ if __name__ == '__main__':
         arquivoNotas = open(os.path.join('provas', prova + '-notas.csv'), 'at')
         if not os.path.isdir(os.path.join('provas', prova)):
             os.mkdir(os.path.join('provas', prova))
-            
-        alunos = LeTodosAlunos()
             
         while linha < nLinhas:
             faixa = "'" + titulo + "'!A" + str(linha) + ":" + chr(nColunas + 65) + str(linha + passo)

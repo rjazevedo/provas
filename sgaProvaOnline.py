@@ -1,0 +1,336 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+from sqlalchemy import func
+import db
+from sqlalchemy.orm.attributes import flag_modified
+
+
+sess = db.Session()
+sess.autoflush = True  # default
+TEST_PATH = '/var/data/nfs/provas/' # está no .ENV no SGA
+offer_types = {'regular': 1, 'dp': 2, 'exam': 1} # acrescentado o exam
+offer_number = ['regular', 'regular', 'dp'] # colocado dois regulares para alinhar o índice do vetor ao dicionário acima
+
+
+def QuestionType(t):
+    lt = t.lower()
+    if lt == 'objetiva': 
+        return 'objective'
+    if lt == 'dissertativa': 
+        return 'essay'
+    return ''
+
+
+def BuscaDisciplina(codigo):
+    """ Busca a disciplina (db.CurricularActivities) na base e retorna o objeto dela. Caso contrário retorna None."""
+    
+    activity = sess.query(db.CurricularActivities).filter(db.CurricularActivities.code == codigo).first()
+
+    if not activity: 
+      print('Erro: Faltando Disciplina (CurricularActivities):', codigo)
+      return None
+  
+    return activity
+
+def BuscaOfertasDisciplina(disciplinaDB, calendario):
+    """ Retorna as múltiplas ofertas da disciplina no calendário (db.ActivityOffers). Eu acho que deveria ter apenas uma mas tudo bem. 
+        Retorna None se não encontrar. """
+    
+    ofertasDB = sess.query(db.ActivityOffers) \
+                    .filter(db.ActivityOffers.curricular_activity_id == disciplinaDB.id) \
+                    .filter(db.ActivityOffers.calendar_id == calendario) \
+                    .all()
+               
+    if not ofertasDB:
+        print('Erro: Não há oferta da disciplina cadastrada:', disciplinaDB.code)   
+        return None
+    
+    else:
+        return ofertasDB  
+    
+
+def BuscaOuCriaProva(disciplinaDB, codigo, nfolhas, fazCommit = True):
+    """ Busca ou cria uma prova no sistema dado uma disciplina (db.ActivityTests). Note que a prova não está relacionada com nenhuma oferta."""
+    
+    test = sess.query(db.ActivityTests) \
+               .filter(db.ActivityTests.code == codigo) \
+               .filter(db.ActivityTests.curricular_activity_id == disciplinaDB.id) \
+               .first()
+
+    if not test:
+        test = db.ActivityTests(code = codigo,
+                                curricular_activity_id = disciplinaDB.id,
+                                created_at = func.now(),
+                                updated_at = func.now()
+                               )
+        sess.add(test)
+    
+    test.total_pages = nfolhas
+    if fazCommit:
+        sess.commit()
+    
+    return test
+
+def BuscaAluno(ra):
+    """ Busca um aluno no sistema dado o RA dele (db.Students). Retorna None se não encontrar."""
+    
+    alunoDB = sess.query(db.Students).filter(db.Students.academic_register == ra).first()
+    
+    if not alunoDB:
+        print('Erro: Faltando aluno na base de dados. RA:', ra)
+        return None
+    
+    return alunoDB
+
+
+def BuscaMatriculaAlunoDisciplina(alunoDB, disciplinaDB, ofertasDB):
+    """ Busca por matrícula de um aluno em disciplina (db.AcrivityRecords). Retorna None se não encontrar. """
+    
+    for ofertaDB in ofertasDB:
+        matriculaDB = sess.query(db.ActivityRecords) \
+                    .filter(db.ActivityRecords.student_id == alunoDB.id) \
+                    .filter(db.ActivityRecords.curricular_activity_id == disciplinaDB.id) \
+                    .filter(db.ActivityRecords.activity_offer_id == ofertaDB.id) \
+                    .first()
+        if matriculaDB is not None:
+            return matriculaDB
+        
+    print('Erro: Não encontrei nenhuma matrícula do aluno', alunoDB.academic_register, 'na disciplina', disciplinaDB.code, 'nas ofertas solicitadas.')
+    return None
+                      
+                      
+def BuscaOuCriaRespostaProva(ofertaDB, provaDB, tipo, folha, fazCommit = True):
+    """ Busca por uma resposta para prova que o aluno realizou (db.ActivityRecordSubmissions). Se não encontrar, cria e coloca as folhas. """
+
+    submission = sess.query(db.ActivityRecordSubmissions) \
+                     .filter(db.ActivityRecordSubmissions.activity_record_id == ofertaDB.id) \
+                     .filter(db.ActivityRecordSubmissions.submission_type == tipo) \
+                     .filter(db.AcrivityRecordSubmissions.acrivity_test_id == provaDB.id) \
+                     .first()
+
+    if not submission:
+        submission = db.ActivityRecordSubmissions(activity_record_id = ofertaDB.id,
+                                                  submission_type = tipo,
+                                                  activity_test_id = provaDB.id,
+                                                  created_at = func.now(),
+                                                  updated_at = func.now()
+                                                 )
+        sess.add(submission)
+
+    attach = sess.query(db.Attachments) \
+                 .filter(db.Attachments.attach_reference_id == submission.id) \
+                 .filter(db.Attachments.attach_reference_type == 'ActivityRecordSubmission') \
+                 .filter(db.Attachments.attach_type == 'response_sheets') \
+                 .first()
+
+    if not attach:
+        attach = db.Attachments(attach_reference_id = submission.id,
+                                attach_reference_type = 'ActivityRecordSubmission',
+                                attach_type = 'response_sheets',
+                                created_at = func.now(),
+                                updated_at = func.now()
+                               )
+        sess.add(attach)
+        
+        
+    # Estou considerando apenas um arquivo como anexo. Por isso simplifiquei o código comentado abaixo
+    n = 1
+    sheet_link = {'number': 1, 'path': TEST_PATH + folha}
+    attach.sheets_data = [sheet_link]
+    
+    # if not attach.sheets_data: 
+    #     attach.sheets_data = []
+
+    # has_sheet_n = False
+    # sheet_n_i = 0
+    # for i in range(len(attach.sheets_data)):
+    #     e = attach.sheets_data[i]
+    #     if e['number'] == n:
+    #         has_sheet_n = True
+    #         sheet_n_i = i
+
+    # sheet_link = {'number': n, 'path': TEST_PATH + ls}
+
+    # if not has_sheet_n:
+    #     attach.sheets_data.append(sheet_link)
+    #     #
+    flag_modified(attach, "sheets_data")  # Sqlalchemy JSON é imutável por default
+
+    if fazCommit:
+        sess.commit()
+        
+    return submission
+
+
+    
+def CriaAnexo(provaDB, link, fazCommit = True):
+    """ Cria um anexo para uma prova e coloca o gabarito nele (db.Attachments)."""
+    
+    attach = sess.query(db.Attachments) \
+                 .filter(db.Attachments.attach_reference_id == provaDB.id) \
+                 .filter(db.Attachments.attach_reference_type == 'ActivityTest') \
+                 .filter(db.Attachments.attach_type == 'correction_guide') \
+                 .first()
+
+    if not attach:
+        attach = db.Attachments(attach_reference_id = provaDB.id,
+                                attach_reference_type = 'ActivityTest',
+                                attach_type = 'correction_guide',
+                                created_at = func.now(),
+                                updated_at = func.now()
+                               )
+        sess.add(attach)
+
+    attach.attach_path = TEST_PATH + link
+    
+    if fazCommit:
+        sess.commit()
+    
+
+def CriaQuestao(provaDB, nquestao, tipo, peso, fazCommit = True):
+    """ Cria uma questão para uma prova na base. Se já existir, atualiza os parâmetros dela."""
+    
+    questionDB = sess.query(db.ActivityTestQuestions) \
+                   .filter(db.ActivityTestQuestions.activity_test_id == provaDB.id) \
+                   .filter(db.ActivityTestQuestions.number == nquestao) \
+                   .first()
+                   
+    if not questionDB:
+        questionDB = db.ActivityTestQuestions(
+                                            activity_test_id = provaDB.id, 
+                                            number = nquestao,
+                                            created_at = func.now(),
+                                            updated_at = func.now()
+                                           )
+        sess.add(questionDB)
+
+    questionDB.question_type = QuestionType(tipo)
+    questionDB.weight = peso
+    questionDB.annulled = False
+    
+    if fazCommit:
+        sess.commit()
+        
+
+def CriaNota(respostaProvaDB, questaoDB, nota, comentario, fazCommit = True):
+    """ Cria uma nota para uma questão de uma prova (db.ActivityRecordSubmissionCorrections), ou atualiza o valor."""
+    
+    correction = sess.query(db.ActivityRecordSubmissionCorrections) \
+                     .filter(db.ActivityRecordSubmissionCorrections.activity_record_submission_id == respostaProvaDB.id) \
+                     .filter(db.ActivityRecordSubmissionCorrections.activity_test_question_id == questaoDB.id) \
+                     .first()
+
+    if not correction:
+        correction = db.ActivityRecordSubmissionCorrections(
+                                                    activity_record_submission_id = respostaProvaDB.id,
+                                                    activity_test_question_id = questaoDB.id,
+                                                    created_at = func.now(),
+                                                    updated_at = func.now()
+                                                 )
+        sess.add(correction)
+
+    correction.grade = nota
+    corrector_data = { 'comments': comentario }
+
+    correction.corrector_data = corrector_data
+
+    flag_modified(correction, "corrector_data")  # Sqlalchemy JSON é imutável por default
+
+    if fazCommit:
+        sess.commit()
+
+    
+
+def CarregaGuia(activity_code, test_code, number_of_sheets, link, verbose):
+            #     ac,  # activity_code
+            #     tc,  # test_code
+            #     ns,  # number of sheets
+            #     lk   # link
+            #    ):
+    """Cria registros de provas e guias de correção no SGA"""
+
+    if verbose:
+        print(activity_code, test_code, number_of_sheets, link)
+        
+    disciplinaDB = BuscaDisciplina(activity_code)
+    if disciplinaDB is None:
+        return False
+    
+    provaDB = BuscaOuCriaProva(disciplinaDB, test_code, number_of_sheets)
+    CriaAnexo(provaDB, link)
+    
+    if verbose:
+        print('Incluída guia de correção da disciplina', activity_code, 'prova', test_code)
+
+    # # disciplina
+    # activity = sess.query(db.CurricularActivities) \
+    #                .filter(db.CurricularActivities.code == activity_code) \
+    #                .first()
+
+    # if not activity: 
+    #   print('Erro: Faltando CurricularActivities:', activity_code)
+    #   return
+
+    # # prova (cria uma caso não exista)
+    # test = sess.query(db.ActivityTests) \
+    #            .filter(db.ActivityTests.code == test_code) \
+    #            .filter(db.ActivityTests.curricular_activity_id == activity.id) \
+    #            .first()
+
+    # if not test:
+    #     test = db.ActivityTests(
+    #                               code = test_code,
+    #                               curricular_activity_id = activity.id,
+    #                               created_at = func.now(),
+    #                               updated_at = func.now()
+    #                            )
+    #     sess.add(test)
+
+    # test.total_pages = number_of_sheets
+
+    # # anexo (cria um caso não exista)
+    # attach = sess.query(db.Attachments) \
+    #              .filter(db.Attachments.attach_reference_id == test.id) \
+    #              .filter(db.Attachments.attach_reference_type == 'ActivityTest') \
+    #              .filter(db.Attachments.attach_type == 'correction_guide') \
+    #              .first()
+
+    # if not attach:
+    #     attach = db.Attachments(
+    #                               attach_reference_id = test.id,
+    #                               attach_reference_type = 'ActivityTest',
+    #                               attach_type = 'correction_guide',
+    #                               created_at = func.now(),
+    #                               updated_at = func.now()
+    #                            )
+    #     sess.add(attach)
+
+    # attach.attach_path = TEST_PATH + link
+
+    # sess.commit()
+    # # sess.close()
+
+        
+    
+
+
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Importa as provas online no SGA para correção')
+    parser.add_argument('-p', '--prova', type=str, required=True, help='Indica a prova para converter')
+    parser.add_argument('-g', '--guia', type=str, required=True, help='Guia de correção')
+    parser.add_argument('-v', '--verbose', action='store_true', required=False, help='Mostra as informações de status')
+
+    args = parser.parse_args()
+    
+    prova = args.prova
+    verbose = args.verbose
+    guia = args.guia
+    
+    disciplina = prova[0:6]
+    numeroProva = prova[7:11]
+    
+    
