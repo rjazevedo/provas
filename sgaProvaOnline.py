@@ -165,7 +165,7 @@ def BuscaOuCriaRespostaProva(ofertaDB, provaDB, tipo, folha, fazCommit = True):
 
 
     
-def CriaAnexo(provaDB, link, fazCommit = True):
+def CriaGuiaCorrecao(provaDB, link, fazCommit = True):
     """ Cria um anexo para uma prova e coloca o gabarito nele (db.Attachments)."""
     
     attach = sess.query(db.Attachments) \
@@ -187,6 +187,8 @@ def CriaAnexo(provaDB, link, fazCommit = True):
     
     if fazCommit:
         sess.commit()
+        
+    return attach
     
 
 def CriaQuestao(provaDB, nquestao, tipo, peso, fazCommit = True):
@@ -212,6 +214,8 @@ def CriaQuestao(provaDB, nquestao, tipo, peso, fazCommit = True):
     
     if fazCommit:
         sess.commit()
+        
+    return questionDB
         
 
 def CriaNota(respostaProvaDB, questaoDB, nota, comentario, fazCommit = True):
@@ -240,6 +244,8 @@ def CriaNota(respostaProvaDB, questaoDB, nota, comentario, fazCommit = True):
 
     if fazCommit:
         sess.commit()
+        
+    return correction
 
     
 
@@ -259,7 +265,7 @@ def CarregaGuia(activity_code, test_code, number_of_sheets, link, verbose):
         return False
     
     provaDB = BuscaOuCriaProva(disciplinaDB, test_code, number_of_sheets)
-    CriaAnexo(provaDB, link)
+    guia = CriaGuiaCorrecao(provaDB, link)
     
     if verbose:
         print('Incluída guia de correção da disciplina', activity_code, 'prova', test_code)
