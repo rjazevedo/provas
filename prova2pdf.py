@@ -83,7 +83,10 @@ def BaixaArquivos(DRIVE, linha, id):
 
 def LeNota(linha):
     if linha[2] != '':
-        return int(linha[2].split(' ')[0]) / 10.0
+        quebrada = linha[2].split(' / ')
+        nota = int(quebrada[0])
+        total = int(quebrada[1])
+        return nota * 10.0 / total
     else:
         return 0.0
 
@@ -117,8 +120,8 @@ def ProcessaProva(DRIVE, prova, cabecalho, resposta, alunos, forca):
     conteudo = open('conteudo.tex', 'wt')
     
     pontuacao = LeNota(resposta)
-    conteudo.write('\\section*{Pontuação nas questões objetivas}\n\n')
-    conteudo.write(str(pontuacao) + '\n\n')
+    conteudo.write('\\section*{Pontuação apenas das questões objetivas}\n\n')
+    conteudo.write(str(pontuacao) + ' / 10.0 (Veja o peso de cada questão no guia de correção e a fórmula do cálculo da nota no PDA ou na disciplina no AVA.)\n\n')
     
     #for (titulo, texto) in zip(cabecalho[3:], resposta[3:]):
     for i in range(len(cabecalho) - 3):
