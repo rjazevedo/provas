@@ -61,23 +61,22 @@ def BaixaArquivos(DRIVE, linha, id):
             arquivo = DRIVE.files().get(fileId=id_arquivo).execute()
             extensao = arquivo['mimeType'].split('/')[1]
             nomeArquivo = 'cache/arq-{}-{:02d}.{}'.format(id, contador, extensao)
-            if os.path.isfile(nomeArquivo):
-                continue
             contador += 1
-            
-            try:
-                saida = open(nomeArquivo, 'wb')
-                request = DRIVE.files().get_media(fileId=id_arquivo)
-                downloader = MediaIoBaseDownload(saida, request)
-                done = False
 
-                while not done:
-                    status, done = downloader.next_chunk()
-                            
-            except HttpError as err:
-                continue
-            
-            saida.close()
+            if not os.path.isfile(nomeArquivo):
+                try:
+                    saida = open(nomeArquivo, 'wb')
+                    request = DRIVE.files().get_media(fileId=id_arquivo)
+                    downloader = MediaIoBaseDownload(saida, request)
+                    done = False
+
+                    while not done:
+                        status, done = downloader.next_chunk()
+                                
+                except HttpError as err:
+                    continue
+                
+                saida.close()
             resposta[l] = nomeArquivo
 
     return resposta
