@@ -34,6 +34,21 @@ def Nota6Para10(nota):
     else:
         return nota / 6.0 * 10.0
 
+
+def BuscaCalendario(numero):
+    """ Busca os dados do calendário ou retorna None se não encontrar."""
+    
+    calendarioDB = sess.query(db.Calendar) \
+                       .filter(db.Calendar.id == numero) \
+                       .first()
+                       
+    if not calendarioDB:
+        print('Erro: Calendário', numero, 'não encontrado.')
+        return None
+    
+    return calendarioDB
+
+
 def BuscaDisciplina(codigo):
     """ Busca a disciplina (db.CurricularActivities) na base e retorna o objeto dela. Caso contrário retorna None."""
     
@@ -44,6 +59,7 @@ def BuscaDisciplina(codigo):
       return None
   
     return activity
+
 
 def BuscaOfertasDisciplina(disciplinaDB, calendario):
     """ Retorna as múltiplas ofertas da disciplina no calendário (db.ActivityOffers). Eu acho que deveria ter apenas uma mas tudo bem. 
@@ -173,7 +189,6 @@ def BuscaOuCriaRespostaProva(matriculaDB, provaDB, tipo, folha, fazCommit = True
         sess.commit()
         
     return submission
-
 
     
 def BuscaOuCriaGuiaCorrecao(provaDB, link, fazCommit = True):

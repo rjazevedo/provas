@@ -262,12 +262,12 @@ class ActivityOffers(Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
     status = Column(Integer)
-    calendar_id = Column(Integer, ForeignKey('calendar.id'))
+    calendar_id = Column(Integer, ForeignKey('calendars.id'))
     status_date = Column(DateTime)
 
     curricular_activity = relationship('CurricularActivities', uselist = False)
     activity_records = relationship('ActivityRecords')
-    calendar = relationship('Calendar', uselist = False)
+    calendar = relationship('Calendars', uselist = False)
 
     def __repr__(self):
         return self.offer_date + ' - ' + str(self.curricular_activity)
@@ -517,7 +517,7 @@ class Locations(Base):
     email = Column(String)
 
 
-class Calendar(Base):
+class Calendars(Base):
     __tablename__ = 'calendars'
 
     id = Column(Integer, primary_key = True)
