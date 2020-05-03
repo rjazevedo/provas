@@ -22,6 +22,17 @@ def QuestionType(t):
         return 'essay'
     return ''
 
+def Nota6Para10(nota):
+    if nota == 1.5:
+        return 2.5
+    elif nota == 3.0:
+        return 5.0
+    elif nota == 4.5:
+        return 7.5
+    elif nota == 6.0:
+        return 10.0
+    else:
+        return nota / 6.0 * 10.0
 
 def BuscaDisciplina(codigo):
     """ Busca a disciplina (db.CurricularActivities) na base e retorna o objeto dela. Caso contrário retorna None."""
@@ -165,7 +176,7 @@ def BuscaOuCriaRespostaProva(matriculaDB, provaDB, tipo, folha, fazCommit = True
 
 
     
-def CriaGuiaCorrecao(provaDB, link, fazCommit = True):
+def BuscaOuCriaGuiaCorrecao(provaDB, link, fazCommit = True):
     """ Cria um anexo para uma prova e coloca o gabarito nele (db.Attachments)."""
     
     attach = sess.query(db.Attachments) \
@@ -191,7 +202,7 @@ def CriaGuiaCorrecao(provaDB, link, fazCommit = True):
     return attach
     
 
-def CriaQuestao(provaDB, nquestao, tipo, peso, fazCommit = True):
+def BuscaOuCriaQuestao(provaDB, nquestao, tipo, peso, fazCommit = True):
     """ Cria uma questão para uma prova na base. Se já existir, atualiza os parâmetros dela."""
     
     questionDB = sess.query(db.ActivityTestQuestions) \
@@ -218,7 +229,7 @@ def CriaQuestao(provaDB, nquestao, tipo, peso, fazCommit = True):
     return questionDB
         
 
-def CriaNota(respostaProvaDB, questaoDB, nota, comentario, fazCommit = True):
+def BuscaOuCriaNota(respostaProvaDB, questaoDB, nota, comentario, fazCommit = True):
     """ Cria uma nota para uma questão de uma prova (db.ActivityRecordSubmissionCorrections), ou atualiza o valor."""
     
     correction = sess.query(db.ActivityRecordSubmissionCorrections) \
@@ -269,58 +280,6 @@ def CarregaGuia(activity_code, test_code, number_of_sheets, link, verbose):
     
     if verbose:
         print('Incluída guia de correção da disciplina', activity_code, 'prova', test_code)
-
-    # # disciplina
-    # activity = sess.query(db.CurricularActivities) \
-    #                .filter(db.CurricularActivities.code == activity_code) \
-    #                .first()
-
-    # if not activity: 
-    #   print('Erro: Faltando CurricularActivities:', activity_code)
-    #   return
-
-    # # prova (cria uma caso não exista)
-    # test = sess.query(db.ActivityTests) \
-    #            .filter(db.ActivityTests.code == test_code) \
-    #            .filter(db.ActivityTests.curricular_activity_id == activity.id) \
-    #            .first()
-
-    # if not test:
-    #     test = db.ActivityTests(
-    #                               code = test_code,
-    #                               curricular_activity_id = activity.id,
-    #                               created_at = func.now(),
-    #                               updated_at = func.now()
-    #                            )
-    #     sess.add(test)
-
-    # test.total_pages = number_of_sheets
-
-    # # anexo (cria um caso não exista)
-    # attach = sess.query(db.Attachments) \
-    #              .filter(db.Attachments.attach_reference_id == test.id) \
-    #              .filter(db.Attachments.attach_reference_type == 'ActivityTest') \
-    #              .filter(db.Attachments.attach_type == 'correction_guide') \
-    #              .first()
-
-    # if not attach:
-    #     attach = db.Attachments(
-    #                               attach_reference_id = test.id,
-    #                               attach_reference_type = 'ActivityTest',
-    #                               attach_type = 'correction_guide',
-    #                               created_at = func.now(),
-    #                               updated_at = func.now()
-    #                            )
-    #     sess.add(attach)
-
-    # attach.attach_path = TEST_PATH + link
-
-    # sess.commit()
-    # # sess.close()
-
-        
-    
-
 
 
 
