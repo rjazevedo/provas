@@ -152,7 +152,7 @@ def ProcessaProva(DRIVE, prova, cabecalho, resposta, alunos, forca):
     
     os.system('lualatex --interaction=batchmode extrato')
     if not os.path.isfile('extrato.pdf'):
-        print('*** Erro ao gerar o PDF da prova do aluno', ra)
+        print('\n\n*** Erro ao gerar o PDF da prova do aluno', ra)
         erro = open('erro.txt', 'at')
         erro.write(prova + ',' + ra + '\n')
         erro.close()
@@ -204,7 +204,7 @@ if __name__ == '__main__':
         alunos = LeTodosAlunos()
 
     for prova in provas:
-        print('\n*** Prova:', prova)
+        print('\n\n*** Prova:', prova)
         (id_planilha, planilha) = drive.GetPlanilhaRespostas(DRIVE, SHEET, prova, verbose)
         if planilha is None:
             sys.exit(1)
