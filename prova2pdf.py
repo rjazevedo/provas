@@ -77,6 +77,12 @@ def BaixaArquivos(DRIVE, linha, id):
                     continue
                 
                 saida.close()
+                
+                if nomeArquivo.endswith('.gif'):
+                    novoNome = nomeArquivo[0:-4] + '.png'
+                    os.system('convert ' + nomeArquivo + ' ' + novoNome)
+                    nomeArquivo = novoNome
+                    
             resposta[l] = nomeArquivo
 
     return resposta
