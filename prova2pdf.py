@@ -61,6 +61,8 @@ def BaixaArquivos(DRIVE, linha, id):
             arquivo = DRIVE.files().get(fileId=id_arquivo).execute()
             extensao = arquivo['mimeType'].split('/')[1]
             nomeArquivo = 'cache/arq-{}-{:02d}.{}'.format(id, contador, extensao)
+            if os.path.isfile(nomeArquivo):
+                continue
             contador += 1
             
             try:
