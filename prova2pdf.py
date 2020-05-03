@@ -151,9 +151,13 @@ def ProcessaProva(DRIVE, prova, cabecalho, resposta, alunos, forca):
     conteudo.close()
     
     os.system('lualatex extrato')
-    
-    
-    shutil.move('extrato.pdf', provaAluno)
+    if not os.path.isfile('extrato.pdf'):
+        print('*** Erro ao gerar o PDF da prova do aluno', ra)
+        erro = open('erro.txt', 'at')
+        erro.write(str(ra) + '\n')
+        erro.close()
+    else:
+        shutil.move('extrato.pdf', provaAluno)
     # for key in arquivos:
     #     os.remove(arquivos[key])  
         
