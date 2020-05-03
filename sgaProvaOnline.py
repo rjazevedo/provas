@@ -5,6 +5,7 @@ import argparse
 from sqlalchemy import func
 import db
 from sqlalchemy.orm.attributes import flag_modified
+import csv
 
 
 sess = db.Session()
@@ -291,26 +292,36 @@ def CarregaGuia(activity_code, test_code, number_of_sheets, link, verbose):
         return False
     
     provaDB = BuscaOuCriaProva(disciplinaDB, test_code, number_of_sheets)
-    guia = CriaGuiaCorrecao(provaDB, link)
+    guia = BuscaOuCriaGuiaCorrecao(provaDB, link)
     
     if verbose:
         print('Incluída guia de correção da disciplina', activity_code, 'prova', test_code)
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Importa as provas online no SGA para correção')
-    parser.add_argument('-p', '--prova', type=str, required=True, help='Indica a prova para converter')
-    parser.add_argument('-g', '--guia', type=str, required=True, help='Guia de correção')
+    # parser.add_argument('-p', '--prova', type=str, required=True, help='Indica a prova para converter')
+    parser.add_argument('-c', '--config', type=str, required=True, help='Indica o arquivo de configuração das provas')
+    parser.add_argument('-p', '--periodo', type=int, required=True, help='Número do período de Avaliação')
     parser.add_argument('-v', '--verbose', action='store_true', required=False, help='Mostra as informações de status')
 
     args = parser.parse_args()
     
-    prova = args.prova
+    config = args.config
     verbose = args.verbose
-    guia = args.guia
+    periodo = args.periodo
     
-    disciplina = prova[0:6]
-    numeroProva = prova[7:11]
+    entrada = csv.reader(open(config))
+    entrada.next()
     
-    
+    for linha in entrada:
+        disciplina = linha[0]
+        prova = linha[1]
+        nquestoes = int(linha[2])
+        questoes = []
+        n = 1
+        while n <= nquestoes:
+            questoes.append([n, linha[n * 2 + 1], linha[n * 2 + 2]])
+            n += 1
+            
+        print(disciplina, prova, nquestoes, questoes)
