@@ -143,7 +143,7 @@ def ProcessaProva(DRIVE, prova, cabecalho, resposta, alunos, forca):
 
     conteudo.close()
     
-    os.system('xelatex extrato')
+    os.system('lualatex extrato')
     
     
     shutil.move('extrato.pdf', provaAluno)
