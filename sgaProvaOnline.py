@@ -312,7 +312,7 @@ if __name__ == '__main__':
     periodo = args.periodo
     
     entrada = csv.reader(open(config))
-    entrada.next()
+    next(entrada)
     
     for linha in entrada:
         disciplina = linha[0]
