@@ -150,11 +150,11 @@ def ProcessaProva(DRIVE, prova, cabecalho, resposta, alunos, forca):
 
     conteudo.close()
     
-    os.system('lualatex extrato')
+    os.system('lualatex --interaction=batchmode extrato')
     if not os.path.isfile('extrato.pdf'):
         print('*** Erro ao gerar o PDF da prova do aluno', ra)
         erro = open('erro.txt', 'at')
-        erro.write(str(ra) + '\n')
+        erro.write(prova + ',' + ra + '\n')
         erro.close()
     else:
         shutil.move('extrato.pdf', provaAluno)
