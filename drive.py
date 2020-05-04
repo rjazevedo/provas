@@ -109,7 +109,7 @@ def GetPlanilhaRespostas(DRIVE, SHEET, prova, verbose = True):
     elif len(files) == 1:
         id_planilha = files[0]['id']
     else:
-        print('Não encontrei planilha com respostas')
+        print('Não encontrei planilha com respostas.')
         return ('', None)
 
     return (id_planilha, SHEET.get(spreadsheetId=id_planilha).execute())

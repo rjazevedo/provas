@@ -309,16 +309,67 @@ def ProcessaProvasArquivo(arquivo, periodos, pasta, verbose):
         arquivoAlunosNotas = 'SGA/{}/provas/{}-{}-notas.csv'.format(pasta, disciplina, prova)
         alunos = csv.reader(open(arquivoAlunosNotas))
         
-        print(guia)
-        print(folhaRespostaBase)
-        print(arquivoAlunosNotas)
-        print(alunos)
+        if verbose:
+            print(guia)
+            print(folhaRespostaBase)
+            print(arquivoAlunosNotas)
+            print(alunos)
         
         return
         
         disciplinaDB = BuscaDisciplina(disciplina)
         provaDB = BuscaOuCriaProva(disciplinaDB, prova, 1)
         guiaDB = BuscaOuCriaGuiaCorrecao(provaDB, guia)
+        questao1 = None
+        lancaNota = True
+        
+        for q in questoes:
+            numero = q[0]
+            tipo = q[1]  # Todas são cadastradas como Dissertativas na base por causa da correção pelo Forms ter notas fracionárias
+            peso = float(q[2])
+            questaoDB = BuscaOuCriaQuestao(provaDB, numero, 'Dissertativa', peso)
+            if questao1 is None:
+                questao1 = questaoDB
+                if tipo == 'Dissertativa':
+                    lancaNota = False
+                
+                
+        
+        ofertasDB = []
+        for p in periodos:
+            o = BuscaOfertasDisciplina(disciplinaDB, p)
+            if o is not None:
+                ofertasDB.extend(o)
+                
+        for linha in alunos:
+            if linha[0][0] not in '0123456789':
+                if verbose:
+                    print('Saltando aluno', linha[0])
+                continue
+            ra = int(linha[0])
+            raStr = linha[0]
+            nota = float(linha[1])
+            
+            if verbose:
+                print(ra, nota)
+                
+            alunoDB = BuscaAluno(ra)
+            if alunoDB is None:
+                print('Aluno não encontrado:', ra)
+                continue
+            
+            matriculaDB = BuscaMatriculaAlunoDisciplina(alunoDB, disciplinaDB, ofertasDB)
+            if matriculaDB is None:
+                print('Não encontrada matrícula para aluno', ra, 'na disciplina', disciplina)
+            
+            folhaResposta = folhaRespostaBase + raStr + '.pdf'
+            respostaDB = BuscaOuCriaRespostaProva(matriculaDB, provaDB, matriculaDB.activity_offer.calendar.calendar_type, folhaResposta)
+            
+            if lancaNota:
+                BuscaOuCriaNota(respostaDB, questao1, nota, 'Veja o guia de correção com o peso e as respostas corretas de cada item.')
+            
+
+            
         
             
         # disciplinaDB = sgaProvaOnline.BuscaDisciplina('QFQ002')
