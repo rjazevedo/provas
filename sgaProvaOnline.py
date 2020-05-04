@@ -409,7 +409,7 @@ if __name__ == '__main__':
     
     config = args.config
     verbose = args.verbose
-    periodos = args.periodo
+    periodos = args.periodos
     nome = args.nome
     
     ProcessaProvasArquivo(config, periodos, nome, verbose)
