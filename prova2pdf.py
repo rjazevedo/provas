@@ -207,7 +207,7 @@ if __name__ == '__main__':
         print('\n\n*** Prova:', prova)
         (id_planilha, planilha) = drive.GetPlanilhaRespostas(DRIVE, SHEET, prova, verbose)
         if planilha is None:
-            sys.exit(1)
+            continue
             
         aba = planilha['sheets'][0]
         titulo = aba['properties']['title']

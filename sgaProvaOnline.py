@@ -23,18 +23,6 @@ def QuestionType(t):
         return 'essay'
     return ''
 
-def Nota6Para10(nota):
-    if nota == 1.5:
-        return 2.5
-    elif nota == 3.0:
-        return 5.0
-    elif nota == 4.5:
-        return 7.5
-    elif nota == 6.0:
-        return 10.0
-    else:
-        return nota / 6.0 * 10.0
-
 
 def BuscaCalendario(numero):
     """ Busca os dados do calendário ou retorna None se não encontrar."""
@@ -298,20 +286,8 @@ def CarregaGuia(activity_code, test_code, number_of_sheets, link, verbose):
         print('Incluída guia de correção da disciplina', activity_code, 'prova', test_code)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Importa as provas online no SGA para correção')
-    # parser.add_argument('-p', '--prova', type=str, required=True, help='Indica a prova para converter')
-    parser.add_argument('-c', '--config', type=str, required=True, help='Indica o arquivo de configuração das provas')
-    parser.add_argument('-p', '--periodo', type=int, required=True, help='Número do período de Avaliação')
-    parser.add_argument('-v', '--verbose', action='store_true', required=False, help='Mostra as informações de status')
-
-    args = parser.parse_args()
-    
-    config = args.config
-    verbose = args.verbose
-    periodo = args.periodo
-    
-    entrada = csv.reader(open(config))
+def ProcessaProvasArquivo(arquivo, periodos, verbose):
+    entrada = csv.reader(open(arquivo))
     next(entrada)
     
     for linha in entrada:
@@ -323,5 +299,28 @@ if __name__ == '__main__':
         while n <= nquestoes:
             questoes.append([n, linha[n * 2 + 1], linha[n * 2 + 2]])
             n += 1
+          
+        print(disciplina, prova)
+        if verbose:  
+            print(nquestoes, questoes)
             
-        print(disciplina, prova, nquestoes, questoes)
+        
+    
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Importa as provas online no SGA para correção')
+    # parser.add_argument('-p', '--prova', type=str, required=True, help='Indica a prova para converter')
+    parser.add_argument('-c', '--config', type=str, required=True, help='Indica o arquivo de configuração das provas')
+    parser.add_argument('-n', '--nome', type=str, required=True, help='Indica o nome base da pasta de arquivos (ex.: 2020b1)')
+    parser.add_argument('-p', '--periodos', type=int, nargs='+', required=True, help='Número de períodos de Avaliação')
+    parser.add_argument('-v', '--verbose', action='store_true', required=False, help='Mostra as informações de status')
+
+    args = parser.parse_args()
+    
+    config = args.config
+    verbose = args.verbose
+    periodos = args.periodo
+    nome = args.nome
+    
+    ProcessaProvasArquivo(config, periodos, verbose)

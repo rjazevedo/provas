@@ -90,7 +90,7 @@ def GetPlanilhaRespostas(DRIVE, SHEET, prova, verbose = True):
             
     if prova_escolhida is None:
         print('Planilha de resposta da prova não encontrada', prova)
-        return None
+        return (None, None)
     
     print('Prova', prova_escolhida['name'], 'encontrada. Id:', prova_escolhida['id'])
     
@@ -110,6 +110,6 @@ def GetPlanilhaRespostas(DRIVE, SHEET, prova, verbose = True):
         id_planilha = files[0]['id']
     else:
         print('Não encontrei planilha com respostas')
-        return None
+        return (None, None)
 
     return (id_planilha, SHEET.get(spreadsheetId=id_planilha).execute())
