@@ -286,7 +286,7 @@ def CarregaGuia(activity_code, test_code, number_of_sheets, link, verbose):
         print('Incluída guia de correção da disciplina', activity_code, 'prova', test_code)
 
 
-def ProcessaProvasArquivo(arquivo, periodos, verbose):
+def ProcessaProvasArquivo(arquivo, periodos, pasta, verbose):
     entrada = csv.reader(open(arquivo))
     next(entrada)
     
@@ -300,11 +300,49 @@ def ProcessaProvasArquivo(arquivo, periodos, verbose):
             questoes.append([n, linha[n * 2 + 1], linha[n * 2 + 2]])
             n += 1
           
-        print(disciplina, prova)
+        print('***', disciplina, prova)
         if verbose:  
             print(nquestoes, questoes)
             
+        guia = 'SGA/{}/guias/{}-{}-guia.pdf'.format(pasta, disciplina, prova)
+        folhaRespostaBase = 'SGA/{}/provas/{}-{}/{}-{}-'.format(pasta, disciplina, prova, disciplina, prova)
+        arquivoAlunosNotas = 'SGA/{}/provas/{}-{}-notas.csv'.format(pasta, disciplina, prova)
+        alunos = csv.reader(open(arquivoAlunosNotas))
         
+        print(guia)
+        print(folhaRespostaBase)
+        print(arquivoAlunosNotas)
+        print(alunos)
+        
+        return
+        
+        disciplinaDB = BuscaDisciplina(disciplina)
+        provaDB = BuscaOuCriaProva(disciplinaDB, prova, 1)
+        guiaDB = BuscaOuCriaGuiaCorrecao(provaDB, guia)
+        
+            
+        # disciplinaDB = sgaProvaOnline.BuscaDisciplina('QFQ002')
+        # provaDB = sgaProvaOnline.BuscaOuCriaProva(disciplinaDB, 'P001', 1)
+        # guia = 'SGA/2020dp-online/guias/QFQ002-P001-guia.pdf'
+        # guiaDB = sgaProvaOnline.BuscaOuCriaGuiaCorrecao(provaDB, guia)
+
+        # questao1 = sgaProvaOnline.BuscaOuCriaQuestao(provaDB, 1, 'Dissertativa', 6.0)
+        # questao2 = sgaProvaOnline.BuscaOuCriaQuestao(provaDB, 2, 'Dissertativa', 4.0)
+
+        # ofertasDB = sgaProvaOnline.BuscaOfertasDisciplina(disciplinaDB, 48)
+
+        # alunoDB = sgaProvaOnline.BuscaAluno(1401524)
+
+        # matriculaDB = sgaProvaOnline.BuscaMatriculaAlunoDisciplina(alunoDB, disciplinaDB, ofertasDB)
+
+        # respostaDB = sgaProvaOnline.BuscaOuCriaRespostaProva(matriculaDB, provaDB, 'dp', 'SGA/2020dp-online/provas/QFQ002-P001/QFQ002-P001-1401524.pdf')
+
+        # nota = 6.0
+        # notaAjustada = sgaProvaOnline.Nota6Para10(nota)
+
+        # notaDB = sgaProvaOnline.BuscaOuCriaNota(respostaDB, questao1, notaAjustada, 'Veja o guia de correção com as respostas corretas de cada item.')
+
+
     
 
 
@@ -323,4 +361,4 @@ if __name__ == '__main__':
     periodos = args.periodo
     nome = args.nome
     
-    ProcessaProvasArquivo(config, periodos, verbose)
+    ProcessaProvasArquivo(config, periodos, nome, verbose)
