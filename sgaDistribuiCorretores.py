@@ -164,8 +164,6 @@ def AtribuiCorretores(arqCorretores, arqEstatisticas, limite):
             
     print(alocacoes, 'provas com corretores alocados')
     print('Disciplinas sem nenhum corretor:', disciplinasSemCorretor)
-            
-            
   
 
 if __name__ == '__main__':

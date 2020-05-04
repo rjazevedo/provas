@@ -78,7 +78,7 @@ def carregaQuestao(
 
     if not test:
       erro( "Missing ActivityTests: %s, %d" % (tc, activity.id) )
-      sess.commit
+      sess.commit()
       return
 
     # questão (cria uma caso não exista)

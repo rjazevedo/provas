@@ -31,6 +31,8 @@ def ProvaCorrigida(ars):
         return False
     if ars.activity_test.questions is None:
         return False
+    if ars.absent:
+        return True
     return len(ars.activity_test.questions) == len(ars.corrections)
 
 def PrecisaCorretor(ars):
@@ -260,11 +262,12 @@ class ActivityOffers(Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
     status = Column(Integer)
-    calendar_id = Column(Integer)
+    calendar_id = Column(Integer, ForeignKey('calendars.id'))
     status_date = Column(DateTime)
 
     curricular_activity = relationship('CurricularActivities', uselist = False)
     activity_records = relationship('ActivityRecords')
+    calendar = relationship('Calendars', uselist = False)
 
     def __repr__(self):
         return self.offer_date + ' - ' + str(self.curricular_activity)
@@ -514,7 +517,7 @@ class Locations(Base):
     email = Column(String)
 
 
-class Calendar(Base):
+class Calendars(Base):
     __tablename__ = 'calendars'
 
     id = Column(Integer, primary_key = True)
