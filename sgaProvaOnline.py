@@ -314,9 +314,7 @@ def ProcessaProvasArquivo(arquivo, periodos, pasta, verbose):
             print(folhaRespostaBase)
             print(arquivoAlunosNotas)
             print(alunos)
-        
-        return
-        
+                
         disciplinaDB = BuscaDisciplina(disciplina)
         provaDB = BuscaOuCriaProva(disciplinaDB, prova, 1)
         guiaDB = BuscaOuCriaGuiaCorrecao(provaDB, guia)
