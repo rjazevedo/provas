@@ -214,6 +214,10 @@ else
 						#echo "Atencao! Como os registros de DP e regular estao misturados eh normal que um dos procedimentos falhe e o outro funcione"
 						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 45 -e 2> /dev/null
 						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 47 -t dp -e 2> /dev/null
+						if [[ $temp == *"STA001"* ]];then
+							~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 45 -e -d 2> /dev/null
+							~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 47 -t dp -e -d 2> /dev/null
+						fi
 						rm ${WORKING_FOLDER}/reverte_status.csv
 					fi
 				fi
@@ -264,6 +268,10 @@ else
 						#echo "Atencao! Como os registros de DP e regular estao misturados eh normal que um dos procedimentos falhe e o outro funcione"
 						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 45 -t exam -e 2> /dev/null
 						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 47 -t exam -e 2> /dev/null
+						if [[ $temp == *"STA001"* ]];then
+							~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 45 -t exam -e -d 2> /dev/null
+							~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 47 -t exam -e -d 2> /dev/null
+						fi						
 						rm ${WORKING_FOLDER}/reverte_status.csv
 					fi
 				fi

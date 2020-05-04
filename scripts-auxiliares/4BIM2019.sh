@@ -2,7 +2,7 @@
 #Objetivo: Processamento de provas 4Bimestre, incluindo a correção para todas as particularidades e ocorrencias
 #Data Criacao:09-abr-2020
 #Autor: Daniel Consiglieri
-#Data Ultima alteracao: 29-abr-2020
+#Data Ultima alteracao: 04-mai-2020
 
 source ~/src/scripts-auxiliares/config/2019b4-conf.sh
 cd ${LOG}
@@ -51,7 +51,6 @@ echo "Iniciando insercao no Banco de Dados"
 ${HOME}/src/sgaFolhas.py -a ${SAIDA_CSV}/folhas.csv -c ${CALENDARIO} -t ${TIPO_PROVA} > ${LOG}/log_full-insertion_sgaFolhas_regular_${DATA}.log
 ${HOME}/src/sgaFolhas.py -a ${SAIDA_CSV}/folhas.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} > ${LOG}/log_full-insertion_sgaFolhas_DP_${DATA}.log
 
-
 #Tratamento para o caso de duas disciplinas diferentes que usam a mesma disciplina
 ${HOME}/src/sgaFolhas.py -a ${SAIDA_CSV}/folhas_disciplina_ambigua.csv -c ${CALENDARIO} -t ${TIPO_PROVA} -d > ${LOG}/log_full-insertion_sgaFolhas_regular_ambiguo${DATA}.log
 ${HOME}/src/sgaFolhas.py -a ${SAIDA_CSV}/folhas_disciplina_ambigua.csv -c ${CALENDARIO_DP} -t ${TIPO_PROVA_DP} -d > ${LOG}/log_full-insertion_sgaFolhas_DP_ambiguo${DATA}.log
@@ -74,6 +73,10 @@ echo "Filtrando arquivo de saida de correcao"
 #Esse passo é necessário para não sobrescrever correcoes de Notas manuais --segundo awk é um fix para inibir a re-escrita de provas mal escaneadas
 awk '!/em branco/' ${SAIDA_CSV}/notas.csv | awk '!/respostas/' > ${SAIDA_CSV}/nota_filtrada.csv
 
+#Tratamento para disciplinas diferentes no BD, mas como mesma sigla
+awk '/STA001/' ${SAIDA_CSV}/nota_filtrada.csv > ${SAIDA_CSV}/nota_filtrada_disciplina_ambigua.csv
+awk '/STA001/' ${SAIDA_CSV}/ausentes.csv> ${SAIDA_CSV}/ausentes_disciplina_ambigua.csv
+
 #*************Modulo de backup ************************#
 cp ${SAIDA_CSV}/nota_filtrada.csv ${BACKUP_CSV}/${DATA}_nota_filtrada.csv
 cp ${SAIDA_CSV}/notas.csv ${BACKUP_CSV}/${DATA}_nota_raw.csv
@@ -87,10 +90,6 @@ cp ${SAIDA_CSV}/ausentes.csv ${BACKUP_CSV}/${DATA}_ausentes.csv
 
 cat ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual.csv | sort | uniq > ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual_tmp.csv
 mv ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual_tmp.csv ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual.csv
-
-#Tratamento para disciplinas diferentes no BD, mas como mesma sigla
-awk '/STA001/' ${SAIDA_CSV}/nota_filtrada.csv > ${SAIDA_CSV}/nota_filtrada_disciplina_ambigua.csv
-awk '/STA001/' ${SAIDA_CSV}/ausentes.csv> ${SAIDA_CSV}/ausentes_disciplina_ambigua.csv
 
 #******Modulo de Insercao de Banco de dados*****#
 #Incluindo notas
