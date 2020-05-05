@@ -377,6 +377,8 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
             n += 1
         corretores = corretoresPorDisciplina.get(disciplina, [])
         indiceCorretor = 0
+        if len(corretores) == 0:
+            print('Não há corretores alocados para a discpilina:', disciplina)
           
         print('***', disciplina, prova)
         if verbose:  
