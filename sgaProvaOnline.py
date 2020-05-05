@@ -299,7 +299,7 @@ def AtribuiCorretorTarefaCorrecao(corretorDB, respostaDB, fazCommit = True):
         tarefaDB.internal_user_id = corretorDB.id
     
     if fazCommit:
-        sess.Commit()
+        sess.commit()
 
     return tarefaDB
 
