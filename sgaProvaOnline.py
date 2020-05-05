@@ -6,6 +6,7 @@ from sqlalchemy import func
 import db
 from sqlalchemy.orm.attributes import flag_modified
 import csv
+import os
 
 
 sess = db.Session()
@@ -262,14 +263,77 @@ def BuscaOuCriaNota(respostaProvaDB, questaoDB, nota, comentario, fazCommit = Tr
         
     return correction
 
+
+def BuscaCorretor(email):
+    """ Busca um corretor de provas baseado no email. Retorna None se não encontrar.""" 
     
+    corretorDB = sess.query(db.InternalUsers) \
+                     .filter(db.InternalUsers.email == email) \
+                     .first()
+
+    return corretorDB
+
+
+def AtribuiCorretorTarefaCorrecao(corretorDB, respostaDB, fazCommit = True):
+    tarefaDB = sess.query(db.ActivityRecordSubmissionCorrectors) \
+                    .filter(db.ActivityRecordSubmissionCorrectors.activity_record_submission_id == respostaDB.id) \
+                    .filter(db.ActivityRecordSubmissionCorrectors.internal_user_id == corretorDB.id) \
+                    .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader') \
+                    .first()
+
+    if not tarefaDB:
+        tarefaDB = sess.query(db.ActivityRecordSubmissionCorrectors) \
+                  .filter(db.ActivityRecordSubmissionCorrectors.activity_record_submission_id == respostaDB.id) \
+                  .filter(db.ActivityRecordSubmissionCorrectors.role == 'grader') \
+                  .first()
+
+        if not tarefaDB:
+          tarefaDB = db.ActivityRecordSubmissionCorrectors(
+                            activity_record_submission_id = respostaDB.id,
+                            role = 'grader',
+                            internal_user_id = corretorDB.id,
+                            created_at = func.now(),
+                            updated_at = func.now())
+          sess.add(tarefaDB)
+          
+        tarefaDB.internal_user_id = corretorDB.id
+    
+    if fazCommit:
+        sess.Commit()
+
+    return tarefaDB
+
+
+def LeCorretores(nomeArquivo, verbose):
+    lista = csv.reader(open(nomeArquivo))
+    todosCorretores = {}
+    disciplinas = {}
+    
+    for l in lista:
+        disciplina = l[0]
+        email = l[1]
+        nome = l[2]
+        if email not in todosCorretores:
+            corretorDB = BuscaCorretor(email)
+            if corretorDB == None:
+                print('Corretor não encontrado:', disciplina, email, nome)
+                continue
+            else:
+                if corretorDB.status == 'active':
+                    todosCorretores[email] = corretorDB
+                else:
+                    print('Ignorando corretor inativo:', disciplina, email, nome)
+                    continue
+                
+        if disciplina not in disciplinas:
+            disciplinas[disciplina] = [corretorDB]
+        else:
+            disciplinas[disciplina].append(corretorDB)
+            
+    return disciplinas
+
 
 def CarregaGuia(activity_code, test_code, number_of_sheets, link, verbose):
-            #     ac,  # activity_code
-            #     tc,  # test_code
-            #     ns,  # number of sheets
-            #     lk   # link
-            #    ):
     """Cria registros de provas e guias de correção no SGA"""
 
     if verbose:
@@ -286,9 +350,21 @@ def CarregaGuia(activity_code, test_code, number_of_sheets, link, verbose):
         print('Incluída guia de correção da disciplina', activity_code, 'prova', test_code)
 
 
-def ProcessaProvasArquivo(arquivo, periodos, pasta, verbose):
-    entrada = csv.reader(open(arquivo))
+def ProcessaProvasArquivo(periodos, pasta, verbose):
+    nomeEntrada = 'csv/{}/configuracoes.csv'.format(pasta)
+    if not os.path.isfile(nomeEntrada):
+        print('Arquivo de configurações não existe:', nomeEntrada)
+        return
+    
+    entrada = csv.reader(open(nomeEntrada))
     next(entrada)
+    
+    nomeCorretores = 'csv/{}/corretores.csv'.format(pasta)
+    if not os.path.isfile(nomeCorretores):
+        print('Arquivo de corretores não existe. Continuando sem ele.', nomeCorretores)
+        corretoresPorDisciplina = {}
+    else:
+        corretoresPorDisciplina = LeCorretores(nomeCorretores, verbose)
     
     for linha in entrada:
         disciplina = linha[0]
@@ -299,6 +375,8 @@ def ProcessaProvasArquivo(arquivo, periodos, pasta, verbose):
         while n <= nquestoes:
             questoes.append([n, linha[n * 2 + 1], linha[n * 2 + 2]])
             n += 1
+        corretores = corretoresPorDisciplina.get(disciplina, [])
+        indiceCorretor = 0
           
         print('***', disciplina, prova)
         if verbose:  
@@ -310,10 +388,9 @@ def ProcessaProvasArquivo(arquivo, periodos, pasta, verbose):
         alunos = csv.reader(open(arquivoAlunosNotas))
         
         if verbose:
-            print(guia)
-            print(folhaRespostaBase)
-            print(arquivoAlunosNotas)
-            print(alunos)
+            print('Guia:', guia)
+            print('Folhas resposta começam aqui:', folhaRespostaBase)
+            print('Notas dos alunos aqui:', arquivoAlunosNotas)
                 
         disciplinaDB = BuscaDisciplina(disciplina)
         provaDB = BuscaOuCriaProva(disciplinaDB, prova, 1)
@@ -331,8 +408,6 @@ def ProcessaProvasArquivo(arquivo, periodos, pasta, verbose):
                 if tipo == 'Dissertativa':
                     lancaNota = False
                 
-                
-        
         ofertasDB = []
         for p in periodos:
             o = BuscaOfertasDisciplina(disciplinaDB, p)
@@ -359,55 +434,33 @@ def ProcessaProvasArquivo(arquivo, periodos, pasta, verbose):
             matriculaDB = BuscaMatriculaAlunoDisciplina(alunoDB, disciplinaDB, ofertasDB)
             if matriculaDB is None:
                 print('Não encontrada matrícula para aluno', ra, 'na disciplina', disciplina)
+                continue
             
             folhaResposta = folhaRespostaBase + raStr + '.pdf'
             respostaDB = BuscaOuCriaRespostaProva(matriculaDB, provaDB, matriculaDB.activity_offer.calendar.calendar_type, folhaResposta)
             
             if lancaNota:
-                BuscaOuCriaNota(respostaDB, questao1, nota, 'Veja o guia de correção com o peso e as respostas corretas de cada item.')
-            
-
-            
-        
-            
-        # disciplinaDB = sgaProvaOnline.BuscaDisciplina('QFQ002')
-        # provaDB = sgaProvaOnline.BuscaOuCriaProva(disciplinaDB, 'P001', 1)
-        # guia = 'SGA/2020dp-online/guias/QFQ002-P001-guia.pdf'
-        # guiaDB = sgaProvaOnline.BuscaOuCriaGuiaCorrecao(provaDB, guia)
-
-        # questao1 = sgaProvaOnline.BuscaOuCriaQuestao(provaDB, 1, 'Dissertativa', 6.0)
-        # questao2 = sgaProvaOnline.BuscaOuCriaQuestao(provaDB, 2, 'Dissertativa', 4.0)
-
-        # ofertasDB = sgaProvaOnline.BuscaOfertasDisciplina(disciplinaDB, 48)
-
-        # alunoDB = sgaProvaOnline.BuscaAluno(1401524)
-
-        # matriculaDB = sgaProvaOnline.BuscaMatriculaAlunoDisciplina(alunoDB, disciplinaDB, ofertasDB)
-
-        # respostaDB = sgaProvaOnline.BuscaOuCriaRespostaProva(matriculaDB, provaDB, 'dp', 'SGA/2020dp-online/provas/QFQ002-P001/QFQ002-P001-1401524.pdf')
-
-        # nota = 6.0
-        # notaAjustada = sgaProvaOnline.Nota6Para10(nota)
-
-        # notaDB = sgaProvaOnline.BuscaOuCriaNota(respostaDB, questao1, notaAjustada, 'Veja o guia de correção com as respostas corretas de cada item.')
-
-
-    
+                BuscaOuCriaNota(respostaDB, questao1, nota, 'Veja o guia de correção com o peso e as respostas corretas de cada item.')    
+                
+            if len(corretores) > 0:
+                corretorDB = corretores[indiceCorretor]
+                indiceCorretor = (indiceCorretor + 1) % len(corretores)
+                
+                AtribuiCorretorTarefaCorrecao(corretorDB, respostaDB)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Importa as provas online no SGA para correção')
     # parser.add_argument('-p', '--prova', type=str, required=True, help='Indica a prova para converter')
-    parser.add_argument('-c', '--config', type=str, required=True, help='Indica o arquivo de configuração das provas')
+    # parser.add_argument('-c', '--config', type=str, required=True, help='Indica o arquivo de configuração das provas')
     parser.add_argument('-n', '--nome', type=str, required=True, help='Indica o nome base da pasta de arquivos (ex.: 2020b1)')
     parser.add_argument('-p', '--periodos', type=int, nargs='+', required=True, help='Número de períodos de Avaliação')
     parser.add_argument('-v', '--verbose', action='store_true', required=False, help='Mostra as informações de status')
 
     args = parser.parse_args()
     
-    config = args.config
     verbose = args.verbose
     periodos = args.periodos
     nome = args.nome
     
-    ProcessaProvasArquivo(config, periodos, nome, verbose)
+    ProcessaProvasArquivo(periodos, nome, verbose)
