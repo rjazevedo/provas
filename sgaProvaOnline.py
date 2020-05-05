@@ -330,6 +330,12 @@ def LeCorretores(nomeArquivo, verbose):
         else:
             disciplinas[disciplina].append(corretorDB)
             
+    if verbose:
+        print('Corretores Lidos')
+        for disciplina in disciplinas:
+            print('***', disciplina)
+            for corretorDB in disciplinas[disciplina]:
+                print(corretorDB.name)
     return disciplinas
 
 
@@ -379,10 +385,13 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
         indiceCorretor = 0
         if len(corretores) == 0:
             print('Não há corretores alocados para a discpilina:', disciplina)
-          
+
         print('***', disciplina, prova)
         if verbose:  
             print(nquestoes, questoes)
+            print('Corretores Disponiveis:')
+            for corretorDB in corretores:
+                print(corretorDB.name)
             
         guia = 'SGA/{}/guias/{}-{}-guia.pdf'.format(pasta, disciplina, prova)
         folhaRespostaBase = 'SGA/{}/provas/{}-{}/{}-{}-'.format(pasta, disciplina, prova, disciplina, prova)
