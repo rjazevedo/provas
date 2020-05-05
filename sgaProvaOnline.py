@@ -320,22 +320,22 @@ def LeCorretores(nomeArquivo, verbose):
                 continue
             else:
                 if corretorDB.status == 'active':
-                    todosCorretores[email] = corretorDB
+                    todosCorretores[email] = True
                 else:
                     print('Ignorando corretor inativo:', disciplina, email, nome)
                     continue
                 
         if disciplina not in disciplinas:
-            disciplinas[disciplina] = [corretorDB]
+            disciplinas[disciplina] = [email]
         else:
-            disciplinas[disciplina].append(corretorDB)
+            disciplinas[disciplina].append(email)
             
     if verbose:
         print('Corretores Lidos')
         for disciplina in disciplinas:
             print('***', disciplina)
-            for corretorDB in disciplinas[disciplina]:
-                print(corretorDB.name)
+            for email in disciplinas[disciplina]:
+                print(email)
     return disciplinas
 
 
@@ -390,8 +390,8 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
         if verbose:  
             print(nquestoes, questoes)
             print('Corretores Disponiveis:')
-            for corretorDB in corretores:
-                print(corretorDB.name)
+            for email in corretores:
+                print(email)
             
         guia = 'SGA/{}/guias/{}-{}-guia.pdf'.format(pasta, disciplina, prova)
         folhaRespostaBase = 'SGA/{}/provas/{}-{}/{}-{}-'.format(pasta, disciplina, prova, disciplina, prova)
@@ -454,7 +454,7 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
                 BuscaOuCriaNota(respostaDB, questao1, nota, 'Veja o guia de correção com o peso e as respostas corretas de cada item.')    
                 
             if len(corretores) > 0:
-                corretorDB = corretores[indiceCorretor]
+                corretorDB = BuscaCorretor(corretores[indiceCorretor])
                 indiceCorretor = (indiceCorretor + 1) % len(corretores)
                 
                 AtribuiCorretorTarefaCorrecao(corretorDB, respostaDB)
