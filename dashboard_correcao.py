@@ -60,6 +60,11 @@ class Corretores:
         return '<tr><td>' + self.email \
                 + '</td><td>' + str(self.aCorrigir) \
                 + '</td><td>' + '{:05.2f}'.format((1.0 - float(self.aCorrigir/self.total))* 100.0) + '% </td></tr>\n'
+    def ExportaCorretoresComPendencias(self,facilitadores):
+        if self.aCorrigir != 0:
+            return self.email + "," + str(self.aCorrigir) + "," + facilitadores[self.email].ShowStatus() + "\n"
+        else:
+            return ""
 class Facilitadores:
     def __init__(self,campos):
         self.email = campos[0]
@@ -291,9 +296,15 @@ if __name__ == '__main__':
         
         status_facilitadores_html = open(os.path.join(args.saida,'facilitadores.html'), 'wt')
         status_facilitadores_csv = open(os.path.join(args.saida,'facilitadores.csv'), 'wt')
+        facilitadores_correcao_pendente_csv = open(os.path.join(args.saida,'facilitadores_correcao_pendente_csv.csv'), 'wt')
+        facilitadores_correcao_pendente_csv.write("Email,Pendências,Status\n")
         status_facilitadores_html.write(header)
         status_facilitadores_html.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +'</h4>\n')
         status_facilitadores_html.write('<thead><tr><th>Email</th><th>Status</th></tr></thead><tbody>\n')
+        
+        for c in corretores:
+            facilitadores_correcao_pendente_csv.write(corretores[c].ExportaCorretoresComPendencias(facilitadores))
+        
         
         for f in facilitadores:
             status_facilitadores_html.write(facilitadores[f].GeraLinhaHTML())
@@ -302,3 +313,4 @@ if __name__ == '__main__':
         status_facilitadores_html.write(footer)
         status_facilitadores_html.close()
         status_facilitadores_csv.close()
+        facilitadores_correcao_pendente_csv.close()
