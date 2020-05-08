@@ -102,6 +102,18 @@ def BuscaAluno(ra):
     return alunoDB
 
 
+def BuscaAlunoEmail(email):
+    """ Busca um aluno no sistema dado o email dele (db.Students). Retorna None se não encontrar."""
+    
+    alunoDB = sess.query(db.Students).filter(db.Students.academic_register == email).first()
+    
+    if not alunoDB:
+        print('Erro: Faltando aluno na base de dados. RA:', email)
+        return None
+    
+    return alunoDB
+
+
 def BuscaMatriculaAlunoDisciplina(alunoDB, disciplinaDB, ofertasDB):
     """ Busca por matrícula de um aluno em disciplina (db.AcrivityRecords). Retorna None se não encontrar. """
     
@@ -322,6 +334,7 @@ def LeCorretores(nomeArquivo, verbose):
                 if corretorDB.status == 'active':
                     todosCorretores[email] = True
                 else:
+                    
                     print('Ignorando corretor inativo:', disciplina, email, nome)
                     continue
                 
