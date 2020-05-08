@@ -26,6 +26,7 @@ else
 	sed -i "s/${BASE_STRING}/${BASE_STRING}${SUBSTITUI_STRING}/g" *.html
 
 	cp -f *.html ${HOME_NFS}/${DESTINO_DASHBOARD}
+	cp -f *.csv ${HOME_NFS}/${DESTINO_DASHBOARD}
 	cd ${HOME}/tmp
 	rm -rf ${TRABALHO_TMP}
 fi
