@@ -105,7 +105,7 @@ def BuscaAluno(ra):
 def BuscaAlunoEmail(email):
     """ Busca um aluno no sistema dado o email dele (db.Students). Retorna None se não encontrar."""
     
-    alunoDB = sess.query(db.Students).filter(db.Students.academic_register == email).first()
+    alunoDB = sess.query(db.Students).filter(db.Students.email == email).first()
     
     if not alunoDB:
         print('Erro: Faltando aluno na base de dados. RA:', email)
