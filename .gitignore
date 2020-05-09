@@ -8,3 +8,10 @@ dbpass-prod.txt
 dbpass-readonly.txt
 *.csv
 __pycache__
+*.json
+alunos.yml
+erro.txt
+config.tex
+conteudo.tex
+cache
+provas
