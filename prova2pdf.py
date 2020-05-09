@@ -110,7 +110,7 @@ def LeAluno(linha, alunos):
 def ProcessaProva(DRIVE, prova, cabecalho, resposta, alunos, forca):
     (ra, nome) = LeAluno(resposta, alunos)
     
-    print('***** Prova', prova, 'de:', ra)
+    print('\n*** Prova', prova, 'de', ra, '-', resposta[0])
     provaAluno = os.path.join('provas', prova, prova + '-' + ra + '.pdf')
     if os.path.isfile(provaAluno) and not forca:
         return []

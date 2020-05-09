@@ -330,11 +330,16 @@ def LeCorretores(nomeArquivo, verbose):
             if corretorDB == None:
                 print('Corretor não encontrado:', disciplina, email, nome)
                 continue
-            else:
-                if corretorDB.status == 'active':
+            elif corretorDB.status == 'active':
                     todosCorretores[email] = True
+            else:
+                alunoDB = BuscaAlunoEmail(email)
+                if alunoDB.current_status == 'enrolled':
+                    corretorDB.status = 'active'
+                    sess.commit()
+                    todosCorretores[email] = True
+                    print('Ativado corretor que estava inativo:', disciplina, email, nome)
                 else:
-                    
                     print('Ignorando corretor inativo:', disciplina, email, nome)
                     continue
                 
