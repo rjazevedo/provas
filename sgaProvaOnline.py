@@ -414,6 +414,9 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
         guia = 'SGA/{}/guias/{}-{}-guia.pdf'.format(pasta, disciplina, prova)
         folhaRespostaBase = 'SGA/{}/provas/{}-{}/{}-{}-'.format(pasta, disciplina, prova, disciplina, prova)
         arquivoAlunosNotas = 'SGA/{}/provas/{}-{}-notas.csv'.format(pasta, disciplina, prova)
+        if not os.path.isfile(arquivoAlunosNotas):
+            print('Não encontrado arquivo de notas:', arquivoAlunosNotas)
+            continue
         alunos = csv.reader(open(arquivoAlunosNotas))
         
         if verbose:
