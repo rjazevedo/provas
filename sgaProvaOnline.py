@@ -460,12 +460,10 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
                 
             alunoDB = BuscaAluno(ra)
             if alunoDB is None:
-                print('Aluno não encontrado:', ra)
                 continue
             
             matriculaDB = BuscaMatriculaAlunoDisciplina(alunoDB, disciplinaDB, ofertasDB)
             if matriculaDB is None:
-                print('Não encontrada matrícula para aluno', ra, 'na disciplina', disciplina)
                 continue
             
             folhaResposta = folhaRespostaBase + raStr + '.pdf'
