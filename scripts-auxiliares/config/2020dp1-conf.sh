@@ -40,7 +40,7 @@ MSG_CORRECAO_AUTOMATICO_FIM="Script processaCorrecao - DP 1o Semestre de 2020 fi
 #Mensagem inicial do programa populaDB-Automatico
 MSG_CORRECAO_AUTOMATICO_INICIO="Iniciando o processamento de Correção DP 1o Semestre  2020"
 #Mensagem do programa dashboard"
-MSG_DASH_INICIO="Inicio da geração do DashBoard - DP 1o Semestre  2020"
+MSG_DASH_INICIO="Inicio da geração do DashBoard - DP 1o Semestre 2020"
 #Mensagem de fim do Full Insertion
 MSG_FULLINSERTION_FIM="Fim de PopulaDB: Full Insertion - DP 1o Semestre 2020"
 #Mensagem de inicio do Full Insertion
@@ -48,9 +48,9 @@ MSG_FULLINSERTION_INICIO="Inicio de PopulaDB: Full Insertion - DP 1o Semestre 20
 #Mensagem final do programa populaDB-Automatico
 MSG_POPULADB_AUTOMATICO_FIM="Fim da geração do PopulaDB Automatico - DP 1o Semestre 2020"
 #Mensagem inicial do programa populaDB-Automatico
-MSG_POPULADB_AUTOMATICO_INICIO="Inicio da geração do PopulaDB Automatico - DP 1o Semestre  2020"
+MSG_POPULADB_AUTOMATICO_INICIO="Inicio da geração do PopulaDB Automatico - DP 1o Semestre 2020"
 #Mensagem inicial do programa populaDB
-MSG_POPULADB_INICIO="Inicio da geração do PopulaDB - DP 1o Semestre  2020"
+MSG_POPULADB_INICIO="Inicio da geração do PopulaDB - DP 1o Semestre 2020"
 #Caminho das provas
 PATH_PROVAS="SGA/2020dp1/provas"
 #Agrega dois calendários (regular e dp)? sim ou vazio caso contrario
