@@ -7,8 +7,9 @@ import db
 from sqlalchemy.orm.attributes import flag_modified
 import csv
 import os
+import logging
 
-
+logger = None
 sess = db.Session()
 sess.autoflush = True  # default
 TEST_PATH = '/var/data/nfs/provas/' # está no .ENV no SGA
@@ -33,7 +34,7 @@ def BuscaCalendario(numero):
                        .first()
                        
     if not calendarioDB:
-        print('Erro: Calendário', numero, 'não encontrado.')
+        logger.error(f'Calendário {numero} não encontrado.')
         return None
     
     return calendarioDB
@@ -45,7 +46,7 @@ def BuscaDisciplina(codigo):
     activity = sess.query(db.CurricularActivities).filter(db.CurricularActivities.code == codigo).first()
 
     if not activity: 
-      print('Erro: Faltando Disciplina (CurricularActivities):', codigo)
+      logger.error(f'Faltando Disciplina (CurricularActivities): {codigo}')
       return None
   
     return activity
@@ -61,7 +62,7 @@ def BuscaOfertasDisciplina(disciplinaDB, calendario):
                     .all()
                
     if not ofertasDB:
-        print('Erro: Não há oferta da disciplina cadastrada:', disciplinaDB.code)   
+        logger.error(f'Não há oferta da disciplina cadastrada: {disciplinaDB.code}')   
         return None
     
     else:
@@ -96,7 +97,7 @@ def BuscaAluno(ra):
     alunoDB = sess.query(db.Students).filter(db.Students.academic_register == ra).first()
     
     if not alunoDB:
-        print('Erro: Faltando aluno na base de dados. RA:', ra)
+        logger.error(f'Faltando aluno na base de dados. RA: {ra}')
         return None
     
     return alunoDB
@@ -108,7 +109,7 @@ def BuscaAlunoEmail(email):
     alunoDB = sess.query(db.Students).filter(db.Students.email == email).first()
     
     if not alunoDB:
-        print('Erro: Faltando aluno na base de dados. RA:', email)
+        logger.error(f'Faltando aluno na base de dados. RA: {email}')
         return None
     
     return alunoDB
@@ -126,7 +127,7 @@ def BuscaMatriculaAlunoDisciplina(alunoDB, disciplinaDB, ofertasDB):
         if matriculaDB is not None:
             return matriculaDB
         
-    print('Erro: Não encontrei nenhuma matrícula do aluno', alunoDB.academic_register, 'na disciplina', disciplinaDB.code, 'nas ofertas solicitadas.')
+    logger.error(f'Não encontrei nenhuma matrícula do aluno {alunoDB.academic_register} na disciplina {disciplinaDB.code} nas ofertas solicitadas.')
     return None
                       
                       
@@ -316,7 +317,7 @@ def AtribuiCorretorTarefaCorrecao(corretorDB, respostaDB, fazCommit = True):
     return tarefaDB
 
 
-def LeCorretores(nomeArquivo, verbose):
+def LeCorretores(nomeArquivo):
     lista = csv.reader(open(nomeArquivo))
     todosCorretores = {}
     disciplinas = {}
@@ -328,7 +329,7 @@ def LeCorretores(nomeArquivo, verbose):
         if email not in todosCorretores:
             corretorDB = BuscaCorretor(email)
             if corretorDB == None:
-                print('Corretor não encontrado:', disciplina, email, nome)
+                logger.warning(f'Corretor não encontrado: {disciplina} - {email} - {nome}')
                 continue
             elif corretorDB.status == 'active':
                     todosCorretores[email] = True
@@ -338,9 +339,9 @@ def LeCorretores(nomeArquivo, verbose):
                     corretorDB.status = 'active'
                     sess.commit()
                     todosCorretores[email] = True
-                    print('Ativado corretor que estava inativo:', disciplina, email, nome)
+                    logger.info(f'Ativado corretor que estava inativo: {disciplina} - {email} - {nome}')
                 else:
-                    print('Ignorando corretor inativo:', disciplina, email, nome)
+                    logger.info(f'Ignorando corretor inativo: {disciplina} - {email} - {nome}')
                     continue
                 
         if disciplina not in disciplinas:
@@ -348,20 +349,18 @@ def LeCorretores(nomeArquivo, verbose):
         else:
             disciplinas[disciplina].append(email)
             
-    if verbose:
-        print('Corretores Lidos')
-        for disciplina in disciplinas:
-            print('***', disciplina)
-            for email in disciplinas[disciplina]:
-                print(email)
+    logger.info('Corretores Lidos')
+    for disciplina in disciplinas:
+        logger.info('*** ' + disciplina)
+        for email in disciplinas[disciplina]:
+            logger.info(email)
     return disciplinas
 
 
-def CarregaGuia(activity_code, test_code, number_of_sheets, link, verbose):
+def CarregaGuia(activity_code, test_code, number_of_sheets, link):
     """Cria registros de provas e guias de correção no SGA"""
 
-    if verbose:
-        print(activity_code, test_code, number_of_sheets, link)
+    logger.info('%s %s %d %s', activity_code, test_code, number_of_sheets, link)
         
     disciplinaDB = BuscaDisciplina(activity_code)
     if disciplinaDB is None:
@@ -370,14 +369,13 @@ def CarregaGuia(activity_code, test_code, number_of_sheets, link, verbose):
     provaDB = BuscaOuCriaProva(disciplinaDB, test_code, number_of_sheets)
     guia = BuscaOuCriaGuiaCorrecao(provaDB, link)
     
-    if verbose:
-        print('Incluída guia de correção da disciplina', activity_code, 'prova', test_code)
+    logger.info('Incluída guia de correção da disciplina %s prova %s', activity_code,  test_code)
 
 
-def ProcessaProvasArquivo(periodos, pasta, verbose):
+def ProcessaProvasArquivo(periodos, pasta):
     nomeEntrada = 'csv/{}/configuracoes.csv'.format(pasta)
     if not os.path.isfile(nomeEntrada):
-        print('Arquivo de configurações não existe:', nomeEntrada)
+        logger.error(f'Arquivo de configurações não existe: {nomeEntrada}')
         return
     
     entrada = csv.reader(open(nomeEntrada))
@@ -385,10 +383,10 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
     
     nomeCorretores = 'csv/{}/corretores.csv'.format(pasta)
     if not os.path.isfile(nomeCorretores):
-        print('Arquivo de corretores não existe. Continuando sem ele.', nomeCorretores)
+        logger.error(f'Arquivo de corretores não existe. Continuando sem ele: {nomeCorretores}.')
         corretoresPorDisciplina = {}
     else:
-        corretoresPorDisciplina = LeCorretores(nomeCorretores, verbose)
+        corretoresPorDisciplina = LeCorretores(nomeCorretores)
     
     for linha in entrada:
         disciplina = linha[0]
@@ -402,27 +400,25 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
         corretores = corretoresPorDisciplina.get(disciplina, [])
         indiceCorretor = 0
         if len(corretores) == 0:
-            print('Não há corretores alocados para a discpilina:', disciplina)
+            logger.error(f'Não há corretores alocados para a discpilina: {disciplina}.')
 
-        print('***', disciplina, prova)
-        if verbose:  
-            print(nquestoes, questoes)
-            print('Corretores Disponiveis:')
-            for email in corretores:
-                print(email)
+        logger.info(f'*** {disciplina} - {prova}')
+        logger.info('%s %s', nquestoes, str(questoes))
+        logger.info('Corretores Disponiveis:')
+        for email in corretores:
+            logger.info(email)
             
         guia = 'SGA/{}/guias/{}-{}-guia.pdf'.format(pasta, disciplina, prova)
         folhaRespostaBase = 'SGA/{}/provas/{}-{}/{}-{}-'.format(pasta, disciplina, prova, disciplina, prova)
         arquivoAlunosNotas = 'SGA/{}/provas/{}-{}-notas.csv'.format(pasta, disciplina, prova)
         if not os.path.isfile(arquivoAlunosNotas):
-            print('Não encontrado arquivo de notas:', arquivoAlunosNotas)
+            logger.error('Não encontrado arquivo de notas:', arquivoAlunosNotas)
             continue
         alunos = csv.reader(open(arquivoAlunosNotas))
         
-        if verbose:
-            print('Guia:', guia)
-            print('Folhas resposta começam aqui:', folhaRespostaBase)
-            print('Notas dos alunos aqui:', arquivoAlunosNotas)
+        logger.info('Guia: %s', guia)
+        logger.info('Folhas resposta começam aqui: %s', folhaRespostaBase)
+        logger.info('Notas dos alunos aqui: %s', arquivoAlunosNotas)
                 
         disciplinaDB = BuscaDisciplina(disciplina)
         provaDB = BuscaOuCriaProva(disciplinaDB, prova, 1)
@@ -448,15 +444,13 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
                 
         for linha in alunos:
             if linha[0][0] not in '0123456789':
-                if verbose:
-                    print('Saltando aluno', linha[0])
+                logger.warning('Saltando aluno %s', linha[0])
                 continue
             ra = int(linha[0])
             raStr = linha[0]
             nota = float(linha[1])
             
-            if verbose:
-                print(ra, nota)
+            logger.info(ra, nota)
                 
             alunoDB = BuscaAluno(ra)
             if alunoDB is None:
@@ -495,4 +489,23 @@ if __name__ == '__main__':
     periodos = args.periodos
     nome = args.nome
     
-    ProcessaProvasArquivo(periodos, nome, verbose)
+    logger = logging.getLogger(__name__)
+    telaLogger = logging.StreamHandler()
+    arquivoLogger = logging.FileHandler('provas-online.log')
+    
+    telaLogger.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+    arquivoLogger.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    
+    arquivoLogger.setLevel(logging.DEBUG)
+    
+    
+    if verbose:
+        telaLogger.setLevel(logging.DEBUG)
+    else:
+        telaLogger.setLevel(logging.WARNING)
+
+    logger.addHandler(telaLogger)
+    logger.addHandler(arquivoLogger)
+    logger.info('Iniciando o processo de carga de provas online, corretores e notas no SGA.')
+    ProcessaProvasArquivo(periodos, nome)
+    logger.info('Processo de carga de provas encerrado.')
