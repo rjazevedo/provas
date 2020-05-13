@@ -469,16 +469,18 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
                 continue
             
             folhaResposta = folhaRespostaBase + raStr + '.pdf'
-            respostaDB = BuscaOuCriaRespostaProva(matriculaDB, provaDB, matriculaDB.activity_offer.calendar.calendar_type, folhaResposta)
+            respostaDB = BuscaOuCriaRespostaProva(matriculaDB, provaDB, matriculaDB.activity_offer.calendar.calendar_type, folhaResposta, fazCommit = False)
             
             if lancaNota:
-                BuscaOuCriaNota(respostaDB, questao1, nota, 'Veja o guia de correção com o peso e as respostas corretas de cada item.')    
+                BuscaOuCriaNota(respostaDB, questao1, nota, 'Veja o guia de correção com o peso e as respostas corretas de cada item.', fazCommit = False)    
                 
             if len(corretores) > 0:
                 corretorDB = BuscaCorretor(corretores[indiceCorretor])
                 indiceCorretor = (indiceCorretor + 1) % len(corretores)
                 
-                AtribuiCorretorTarefaCorrecao(corretorDB, respostaDB)
+                AtribuiCorretorTarefaCorrecao(corretorDB, respostaDB, fazCommit = False)
+                
+            sess.commit()
 
 
 if __name__ == '__main__':
