@@ -102,6 +102,18 @@ def BuscaAluno(ra):
     return alunoDB
 
 
+def BuscaAlunoEmail(email):
+    """ Busca um aluno no sistema dado o email dele (db.Students). Retorna None se não encontrar."""
+    
+    alunoDB = sess.query(db.Students).filter(db.Students.email == email).first()
+    
+    if not alunoDB:
+        print('Erro: Faltando aluno na base de dados. RA:', email)
+        return None
+    
+    return alunoDB
+
+
 def BuscaMatriculaAlunoDisciplina(alunoDB, disciplinaDB, ofertasDB):
     """ Busca por matrícula de um aluno em disciplina (db.AcrivityRecords). Retorna None se não encontrar. """
     
@@ -318,9 +330,15 @@ def LeCorretores(nomeArquivo, verbose):
             if corretorDB == None:
                 print('Corretor não encontrado:', disciplina, email, nome)
                 continue
-            else:
-                if corretorDB.status == 'active':
+            elif corretorDB.status == 'active':
                     todosCorretores[email] = True
+            else:
+                alunoDB = BuscaAlunoEmail(email)
+                if alunoDB.current_status == 'enrolled':
+                    corretorDB.status = 'active'
+                    sess.commit()
+                    todosCorretores[email] = True
+                    print('Ativado corretor que estava inativo:', disciplina, email, nome)
                 else:
                     print('Ignorando corretor inativo:', disciplina, email, nome)
                     continue
@@ -396,6 +414,9 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
         guia = 'SGA/{}/guias/{}-{}-guia.pdf'.format(pasta, disciplina, prova)
         folhaRespostaBase = 'SGA/{}/provas/{}-{}/{}-{}-'.format(pasta, disciplina, prova, disciplina, prova)
         arquivoAlunosNotas = 'SGA/{}/provas/{}-{}-notas.csv'.format(pasta, disciplina, prova)
+        if not os.path.isfile(arquivoAlunosNotas):
+            print('Não encontrado arquivo de notas:', arquivoAlunosNotas)
+            continue
         alunos = csv.reader(open(arquivoAlunosNotas))
         
         if verbose:
@@ -439,25 +460,25 @@ def ProcessaProvasArquivo(periodos, pasta, verbose):
                 
             alunoDB = BuscaAluno(ra)
             if alunoDB is None:
-                print('Aluno não encontrado:', ra)
                 continue
             
             matriculaDB = BuscaMatriculaAlunoDisciplina(alunoDB, disciplinaDB, ofertasDB)
             if matriculaDB is None:
-                print('Não encontrada matrícula para aluno', ra, 'na disciplina', disciplina)
                 continue
             
             folhaResposta = folhaRespostaBase + raStr + '.pdf'
-            respostaDB = BuscaOuCriaRespostaProva(matriculaDB, provaDB, matriculaDB.activity_offer.calendar.calendar_type, folhaResposta)
+            respostaDB = BuscaOuCriaRespostaProva(matriculaDB, provaDB, matriculaDB.activity_offer.calendar.calendar_type, folhaResposta, fazCommit = False)
             
             if lancaNota:
-                BuscaOuCriaNota(respostaDB, questao1, nota, 'Veja o guia de correção com o peso e as respostas corretas de cada item.')    
+                BuscaOuCriaNota(respostaDB, questao1, nota, 'Veja o guia de correção com o peso e as respostas corretas de cada item.', fazCommit = False)    
                 
             if len(corretores) > 0:
                 corretorDB = BuscaCorretor(corretores[indiceCorretor])
                 indiceCorretor = (indiceCorretor + 1) % len(corretores)
                 
-                AtribuiCorretorTarefaCorrecao(corretorDB, respostaDB)
+                AtribuiCorretorTarefaCorrecao(corretorDB, respostaDB, fazCommit = False)
+                
+            sess.commit()
 
 
 if __name__ == '__main__':
