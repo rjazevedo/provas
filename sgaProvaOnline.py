@@ -489,12 +489,12 @@ if __name__ == '__main__':
     periodos = args.periodos
     nome = args.nome
     
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger('sgaProvaOnline')
     telaLogger = logging.StreamHandler()
     arquivoLogger = logging.FileHandler('provas-online.log')
     
     telaLogger.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
-    arquivoLogger.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    arquivoLogger.setFormatter(logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s'))
     
     arquivoLogger.setLevel(logging.DEBUG)
     
