@@ -28,22 +28,22 @@ def ColetaDadosCorretores(periodo):
     
     # Coleta correções antigas = número de questões corrigidas antes de período
     tarefas = db.session.query(db.ActivityRecordSubmissionCorrections) \
-                        .filter(db.ActivityRecordSubmissionCorrections.updated_at > d30)
+                        .filter(db.ActivityRecordSubmissionCorrections.updated_at < d30)
     corretores = Consolida(corretores, tarefas, 0)
             
     tarefas = db.session.query(db.ActivityRecordSubmissionCorrections) \
-                        .filter(db.ActivityRecordSubmissionCorrections.updated_at <= d30) \
-                        .filter(db.ActivityRecordSubmissionCorrections.updated_at > d14)
+                        .filter(db.ActivityRecordSubmissionCorrections.updated_at >= d30) \
+                        .filter(db.ActivityRecordSubmissionCorrections.updated_at < d14)
     corretores = Consolida(corretores, tarefas, 1)
                     
                         
     tarefas = db.session.query(db.ActivityRecordSubmissionCorrections) \
-                        .filter(db.ActivityRecordSubmissionCorrections.updated_at <= d14) \
-                        .filter(db.ActivityRecordSubmissionCorrections.updated_at > d7)
+                        .filter(db.ActivityRecordSubmissionCorrections.updated_at >= d14) \
+                        .filter(db.ActivityRecordSubmissionCorrections.updated_at < d7)
     corretores = Consolida(corretores, tarefas, 2)
         
     tarefas = db.session.query(db.ActivityRecordSubmissionCorrections) \
-                        .filter(db.ActivityRecordSubmissionCorrections.updated_at <= d7)
+                        .filter(db.ActivityRecordSubmissionCorrections.updated_at >= d7)
     corretores = Consolida(corretores, tarefas, 3)
                            
     tabela = []
