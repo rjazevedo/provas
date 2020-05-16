@@ -498,7 +498,6 @@ if __name__ == '__main__':
     
     arquivoLogger.setLevel(logging.DEBUG)
     
-    
     if verbose:
         telaLogger.setLevel(logging.DEBUG)
     else:
