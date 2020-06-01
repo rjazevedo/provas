@@ -42,6 +42,8 @@ class Corretores:
         self.total += 1
     def ShowDisciplina(self):
         return self.disciplina
+    def ShowEmail(self):
+        return self.email
     def GeraLinhaCompleta(self):
         if self.email == None:
             self.email = "reverificar"            
@@ -60,9 +62,16 @@ class Corretores:
         return '<tr><td>' + self.email \
                 + '</td><td>' + str(self.aCorrigir) \
                 + '</td><td>' + '{:05.2f}'.format((1.0 - float(self.aCorrigir/self.total))* 100.0) + '% </td></tr>\n'
+    def GeraLinhaCSV(self):
+        if self.email == None:
+            self.email = "reverificar"
+        return self.email + ',' + str(self.aCorrigir)
     def ExportaCorretoresComPendencias(self,facilitadores):
         if self.aCorrigir != 0:
-            return self.email + "," + str(self.aCorrigir) + "," + facilitadores[self.email].ShowStatus() + "\n"
+            if self.email == "reverificar":
+                return "sem corretor" + "," + str(self.aCorrigir) + "," + "-" + "\n"
+            else:                
+                return self.email + "," + str(self.aCorrigir) + "," + facilitadores[self.email].ShowStatus() + "\n"
         else:
             return ""
 class Facilitadores:
@@ -78,12 +87,14 @@ class Facilitadores:
         return '<tr><td>' + self.email + '</td><td>' + self.status + '</td></tr>\n'
     def GeraLinhaCSV(self):
         return self.email + ',' + self.nome + ',' + self.status + '\n'
-def GeraDashboardDisciplinasCorretores(conjuntoCorretor,conjuntoDisciplinas,saida):
+def GeraDashboardDisciplinasCorretores(conjuntoCorretor,conjuntoDisciplinas,conjuntoFacilitador,saida):
     html_disciplinas = {}
     html_arquivo = {}
     
     header = open(os.path.join(os.path.dirname(sys.argv[0]), 'header.html')).read()
     footer = open(os.path.join(os.path.dirname(sys.argv[0]), 'footer.html')).read()
+    resumo_csv = open(os.path.join(saida,'resumo.csv'), 'wt')
+    resumo_csv.write("Disciplina,Email,Pendências,Status\n")
     
     sufixo_arquivos = "-correcoes.html"
         
@@ -93,7 +104,10 @@ def GeraDashboardDisciplinasCorretores(conjuntoCorretor,conjuntoDisciplinas,said
         
     for c in conjuntoCorretor:
         html_disciplinas[conjuntoCorretor[c].ShowDisciplina()] += conjuntoCorretor[c].GeraLinha()
-            
+        if conjuntoCorretor[c].ShowEmail() == "reverificar":
+            resumo_csv.write(conjuntoCorretor[c].ShowDisciplina() + "," + conjuntoCorretor[c].GeraLinhaCSV() + ",-\n" )
+        else:
+            resumo_csv.write(conjuntoCorretor[c].ShowDisciplina() + "," + conjuntoCorretor[c].GeraLinhaCSV() + "," + conjuntoFacilitador[conjuntoCorretor[c].ShowEmail()].ShowStatus() + "\n" )
     for d in conjuntoDisciplinas:
         modificado_header = header.replace("</ul>","<li><li class=\"active\"><a href=\"" + d + sufixo_arquivos +"\">" + d + "-Corre&ccedil;&otilde;es" + "</a></li><li><a href=\"correcao.html\">Voltar</a></li></ul>")
         html_arquivo[d].write(modificado_header)
@@ -102,7 +116,8 @@ def GeraDashboardDisciplinasCorretores(conjuntoCorretor,conjuntoDisciplinas,said
         html_arquivo[d].write('<thead><tr><th>Email</th><th>Falta corrigir</th><th>Percentual Corrigido</th></tr></thead><tbody>\n')
         html_arquivo[d].write(html_disciplinas[d])
         html_arquivo[d].write(footer)
-        html_arquivo[d].close()      
+        html_arquivo[d].close()
+    resumo_csv.close()
 
 class ProvasIlegiveis:
     def __init__(self, campos):
@@ -239,6 +254,15 @@ if __name__ == '__main__':
                 disciplinas_corrigida[x[:6]] += 1
             elif y == "Prova Ilegível":
                 disciplina_ilegiveis[x[:6]] += 1
+        #Gera a consulta do status dos facilitadores
+        consulta = open(os.path.join(os.path.dirname(sys.argv[0]), 'query_status_facilitador.txt')).read()
+        cursor.execute(consulta)
+        record = cursor.fetchall()
+        
+        facilitadores = {}
+        
+        for r in record:
+            facilitadores[r[0]] = (Facilitadores(r))
 
         saida = open(os.path.join(args.saida,'correcao.html'), 'wt')
         header = open(os.path.join(os.path.dirname(sys.argv[0]), 'header.html')).read() 
@@ -282,18 +306,8 @@ if __name__ == '__main__':
         ilegiveis.close()
         
         #Gera cada uma das sub-paginas de disciplinas X corretores
-        GeraDashboardDisciplinasCorretores(corretores,disciplinas,args.saida)
-        
-        #Gera a consulta do status dos facilitadores
-        consulta = open(os.path.join(os.path.dirname(sys.argv[0]), 'query_status_facilitador.txt')).read()
-        cursor.execute(consulta)
-        record = cursor.fetchall()
-        
-        facilitadores = {}
-        
-        for r in record:
-            facilitadores[r[0]] = (Facilitadores(r))
-        
+        GeraDashboardDisciplinasCorretores(corretores,disciplinas,facilitadores,args.saida)
+
         status_facilitadores_html = open(os.path.join(args.saida,'facilitadores.html'), 'wt')
         status_facilitadores_csv = open(os.path.join(args.saida,'facilitadores.csv'), 'wt')
         facilitadores_correcao_pendente_csv = open(os.path.join(args.saida,'facilitadores_correcao_pendente_csv.csv'), 'wt')
