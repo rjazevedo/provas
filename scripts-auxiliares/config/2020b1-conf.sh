@@ -10,7 +10,7 @@ BASE_STRING="Dashboard Provas UNIVESP"
 BIMESTRE_CONSOLIDADO=""
 #Calendario SGA
 CALENDARIO="49"
-CALENDARIO_DP=""
+CALENDARIO_DP="53"
 #Data
 DATA=$(date +%Y%m%d_%H-%M-%S)
 #Destino de Dashboad
@@ -56,7 +56,7 @@ MSG_POPULADB_INICIO="Inicio da geração do PopulaDB - 1o Bimestre 2020"
 #Caminho das provas
 PATH_PROVAS="SGA/$PERIODO/provas"
 #Agrega dois calendários (regular e dp)? sim ou vazio caso contrario
-REGULAR_E_DP=""
+REGULAR_E_DP="sim"
 #Path Completo de Saida (caminho completo)
 SAIDA_CSV="/home/provas/dados/SGA/$PERIODO/provas/Saida"
 #Personaliza com informações relativas ao periodo de referencia
