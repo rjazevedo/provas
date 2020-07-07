@@ -2,7 +2,7 @@
 #Objetivo: Esse script move os arquivos para o local adequado, ainda existem melhorias a serem implementadas
 #Autor: Daniel Consiglieri
 #Data Criacao:Set 2019
-#Revisao:06-fev-2020
+#Revisao:06-jul-2020
 
 <<DATAS_CORINGAS
 Regulares:
@@ -23,6 +23,7 @@ PATH_PROVAS_2BIM2019="/home/provas/dados/SGA/2019b2/provas"
 PATH_PROVAS_3BIM2019="/home/provas/dados/SGA/2019b3/provas"
 PATH_PROVAS_4BIM2019="/home/provas/dados/SGA/2019b4/provas"
 PATH_PROVAS_1DP2019="/home/provas/dados/SGA/2019dp1/provas"
+PATH_PROVAS_ANISTIA2019="/home/provas/dados/SGA/2019-anistia/provas"
 PATH_PROVAS_1DP2020="/home/provas/dados/SGA/2020dp1/provas"
 PATH_PROVAS_EXAME_1BIM2019="/home/provas/dados/SGA/2019e1/provas"
 PATH_PROVAS_EXAME_2BIM2019="/home/provas/dados/SGA/2019e2/provas"
@@ -109,7 +110,7 @@ else
 
 				${ACTION} "${lista}" ${PATH_PROVAS_1DP2019}/${2}
 				
-				#Limpa os arquivos do servidor para que seja novamente corrigido
+				#Limpa os arquivos do servidor para que seja novamente corrigido.
 				if [[ "$3" == "-f" ]]; then
 					temp="${lista##*/}"
 					temp="${temp%.*}"
@@ -193,6 +194,24 @@ else
 					fi
 				fi
 				
+				;;
+			*20191125*)
+				echo "Detectei prova de Anistia 2019 - ${ACTION} ${lista} ${PATH_PROVAS_ANISTIA2019}/${2}"
+				#Limpa os arquivos do servidor para que seja novamente corrigido
+				if [[ "$3" == "-f" ]]; then
+					temp="${lista##*/}"
+					temp="${temp%.*}"
+					rm ${PATH_PROVAS_ANISTIA2019}/${2}/result/${temp}.txt 2> /dev/null
+					rm ${PATH_PROVAS_ANISTIA2019}/${2}/${temp}.csv 2> /dev/null
+					
+					if [[ $temp != *"ocorrencia"* ]] && [[ $temp != *"presenca"* ]] && [[ $temp != *"oficio"* ]];then
+						#reverte o status de ausente, anulada e ilegível
+						echo -e "${temp:0:8},${temp:9:4},${temp:14:6},${temp:21:4}-${temp:9:4},${temp:26:7}" > ${WORKING_FOLDER}/reverte_status.csv
+						~/src/sgaPresentes.py -a ${WORKING_FOLDER}/reverte_status.csv -c 72 -t dp -e 2> /dev/null
+						rm ${WORKING_FOLDER}/reverte_status.csv
+					fi
+				fi
+			
 				;;
 			*20191204*|*20191205*|*20191207*|*20191209*|*20191210*|*20191211*|*20191212*|*20191213*|*20191214*|*20191218*|*20191219*|*20191220*|*20191222*|*20200303*"STA001"*|*20200305*"EMA002"*)
 				
