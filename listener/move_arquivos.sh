@@ -197,6 +197,7 @@ else
 				;;
 			*20191125*)
 				echo "Detectei prova de Anistia 2019 - ${ACTION} ${lista} ${PATH_PROVAS_ANISTIA2019}/${2}"
+				${ACTION} "${lista}" ${PATH_PROVAS_ANISTIA2019}/${2}
 				#Limpa os arquivos do servidor para que seja novamente corrigido
 				if [[ "$3" == "-f" ]]; then
 					temp="${lista##*/}"
