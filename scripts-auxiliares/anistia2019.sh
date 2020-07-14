@@ -7,16 +7,16 @@
 source /home/provas/src/scripts-auxiliares/config/2019anistia-conf.sh
 
 #Correcao de caderno respostas nao correspondente a guia
-for i in $( find ${HOME_NFS}/${PATH_PROVAS} -iname '*P0*.png' );
+for i in $( find ${HOME_NFS}/${PATH_PROVAS} -iname '*-P0*.png' );
 do
-	echo -e "mv ${i} ${i/P0/A0}" >> ${LOG}/log_arquivosRenomeados_${DATA}.log
-	mv ${i} ${i/P0/A0}
+	echo -e "mv ${i} ${i/-P0/-A0}" >> ${LOG}/log_arquivosRenomeados_${DATA}.log
+	mv ${i} ${i/-P0/-A0}
 done
 
-for i in $( find ${HOME_NFS}/${PATH_PROVAS} -iname '*E0*.png' );
+for i in $( find ${HOME_NFS}/${PATH_PROVAS} -iname '*-E00*.png' );
 do
-	echo -e "mv ${i} ${i/E0/A0}" >> ${LOG}/log_arquivosRenomeados_${DATA}.log
-	mv ${i} ${i/E0/A0}
+	echo -e "mv ${i} ${i/-E0/-A0}" >> ${LOG}/log_arquivosRenomeados_${DATA}.log
+	mv ${i} ${i/-E0/-A0}
 done
 
 #Chama as rotinas de processamento de provas
