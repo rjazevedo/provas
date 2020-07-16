@@ -276,7 +276,7 @@ if __name__ == '__main__':
         
         
         saida.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") +"  -- Faltam corrigir : " + str(total_pendencia) + ' provas.</h4>\n')
-        saida.write('<thead><tr><th>C&oacute;digo</th><th>Disciplina</th><th>Ausentes</th><th>Anuladas</th><th>Ileg&iacute;vel</th><th>Ausente &amp; anulada</th><th>Falta corrigir</th><th>Corrigido</th><th>Total</th><th>Percentual</th></tr></thead><tbody>\n')
+        saida.write('<thead><tr><th>C&oacute;digo</th><th>Disciplina</th><th>Ausentes</th><th>Anuladas</th><th>Ileg&iacute;vel</th><th>Ausente &amp; anulada</th><th>Falta corrigir</th><th>Corrigido</th><th>Total</th><th>Progresso</th></tr></thead><tbody>\n')
         
         for x, y in disciplinas.items():
             saida.write('<tr><td><a href="' + x + "-correcoes.html" + '">' + x  \
