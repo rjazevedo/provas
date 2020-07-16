@@ -2,20 +2,20 @@
 #Objetivo: Processamento de provas 4Bimestre, incluindo a correção para todas as particularidades e ocorrencias
 #Data Criacao:09-abr-2020
 #Autor: Daniel Consiglieri
-#Data Ultima alteracao: 04-mai-2020
+#Data Ultima alteracao: 16-jun-2020
 
 source ~/src/scripts-auxiliares/config/2019b4-conf.sh
+
+#Direcionamento do logbest.txt
 cd ${LOG}
 
 #Correcao de caderno respostas nao correspondente a guia
 for i in $( find ${HOME_NFS}/${PATH_PROVAS} -iname '*20200303*STA001*P006*png' );
 do
-	echo -e "mv ${i} ${i/P006/P010}" >> ${LOG}/log_arquivosRenomeados_${DATA}.log
-	mv ${i} ${i/P006/P010}
+	echo -e "mv ${i} ${i/-P006/-P010}" >> ${LOG}/log_arquivosRenomeados_${DATA}.log
+	mv ${i} ${i/-P006/-P010}
 done
 
-#Direcionamento do logbest.txt
-cd ${LOG}
 #**********Modulo de geracao de csv*************#
 echo ${MSG_POPULADB_AUTOMATICO_INICIO}
 ${HOME}/src/populaDB-embaralhado.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${LOG}/log_populaDB_${DATA}.log
@@ -81,6 +81,10 @@ awk '/STA001/' ${SAIDA_CSV}/ausentes.csv> ${SAIDA_CSV}/ausentes_disciplina_ambig
 cp ${SAIDA_CSV}/nota_filtrada.csv ${BACKUP_CSV}/${DATA}_nota_filtrada.csv
 cp ${SAIDA_CSV}/notas.csv ${BACKUP_CSV}/${DATA}_nota_raw.csv
 cp ${SAIDA_CSV}/nota_filtrada_disciplina_ambigua.csv ${BACKUP_CSV}/${DATA}_nota_filtrada_disciplina_ambigua.csv
+
+#Retira de ausentes as disciplinas que tiveram reaplicação (resolução de conflito presença de duas provas)
+awk '!/STA001/' ${SAIDA_CSV}/ausentes.csv | awk '!/EMA002/' > ${SAIDA_CSV}/ausentes_filtrado.csv
+mv  ${SAIDA_CSV}/ausentes_filtrado.csv ${SAIDA_CSV}/ausentes.csv
 
 #Concatena o ausentes manual e automatico
 cat ${SAIDA_CSV}/ausentes.csv ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual.csv | sort | uniq > ${SAIDA_CSV}/ausentes_tmp.csv
