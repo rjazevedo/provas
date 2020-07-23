@@ -19,11 +19,6 @@ do
 	mv ${i} ${i/-E0/-A0}
 done
 
-#Deve ser passado por parametro o arquivo de configuracao
-if [ "$#" -ne 1 ]; then
-	echo ${0} " Necessita que exatamente um parametro com as configuracoes seja passado por argumento"
-else
-	source ${1}
 	#Direcionamento do logbest.txt
 	cd ${LOG}
 
