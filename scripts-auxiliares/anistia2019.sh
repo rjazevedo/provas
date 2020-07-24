@@ -135,4 +135,3 @@ done
 	mv ${SAIDA_CSV}/correcoes_tmp.csv ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES}
 
 	echo ${MSG_CORRECAO_AUTOMATICO_FIM}
-fi

@@ -65,7 +65,7 @@ class Corretores:
     def GeraLinhaCSV(self):
         if self.email == None:
             self.email = "reverificar"
-        return self.email + ',' + str(self.aCorrigir)
+        return self.email + ',' + str(self.aCorrigir) + ',' + str(self.corrigida) + ',' + str(self.ausente)
     def ExportaCorretoresComPendencias(self,facilitadores):
         if self.aCorrigir != 0:
             if self.email == "reverificar":
@@ -94,7 +94,7 @@ def GeraDashboardDisciplinasCorretores(conjuntoCorretor,conjuntoDisciplinas,conj
     header = open(os.path.join(os.path.dirname(sys.argv[0]), 'header.html')).read()
     footer = open(os.path.join(os.path.dirname(sys.argv[0]), 'footer.html')).read()
     resumo_csv = open(os.path.join(saida,'resumo.csv'), 'wt')
-    resumo_csv.write("Disciplina,Email,Pendências,Status\n")
+    resumo_csv.write("Disciplina,Email,Pendências,Corrigidas,Ausentes,Status\n")
     
     sufixo_arquivos = "-correcoes.html"
         
