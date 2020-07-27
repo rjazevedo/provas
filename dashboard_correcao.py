@@ -92,21 +92,26 @@ class ProvasCorrigidas:
         self.email = campos[0]
         self.disciplina = campos[3]
         self.numero_correcoes = 1
-    def SomaCorrecao(self):
-        self.numero_correcoes += 1
+        self.dados_computados = 0
     def ShowEmail(self):
         return self.email
     def ShowDisciplina(self):
         return self.disciplina
     def ShowCorrecao(self):
-        return self.numero_correcoes    
+        return self.numero_correcoes
+    def ShowDadosComputados(self):
+        return self.dados_computados
+    def SomaCorrecao(self):
+        self.numero_correcoes += 1
+    def AtualizaDadosComputados(self):
+        self.dados_computados += 1
 def GeraDashboardDisciplinasCorretores(conjuntoCorrecoes_provas,conjuntoCorretor,conjuntoDisciplinas,conjuntoFacilitador,saida):
     html_disciplinas = {}
     html_arquivo = {}
     
     header = open(os.path.join(os.path.dirname(sys.argv[0]), 'header.html')).read()
     footer = open(os.path.join(os.path.dirname(sys.argv[0]), 'footer.html')).read()
-    resumo_csv = open(os.path.join(saida,'resumo.csv'), 'wt')
+    resumo_csv = open(os.path.join(saida,'relatorio_correcoes.csv'), 'wt')
     resumo_csv.write("Disciplina,Email,Pendências,Ausentes,Corrigidas,Status\n")
     
     sufixo_arquivos = "-correcoes.html"
@@ -114,7 +119,7 @@ def GeraDashboardDisciplinasCorretores(conjuntoCorrecoes_provas,conjuntoCorretor
     for d in conjuntoDisciplinas:
         html_disciplinas[d] = ""
         html_arquivo[d] = open(os.path.join(saida, d + sufixo_arquivos), 'wt')
-        
+    #Mostra o join    
     for c in conjuntoCorretor:
         html_disciplinas[conjuntoCorretor[c].ShowDisciplina()] += conjuntoCorretor[c].GeraLinha()
         if conjuntoCorretor[c].ShowEmail() == "reverificar":
@@ -122,8 +127,14 @@ def GeraDashboardDisciplinasCorretores(conjuntoCorrecoes_provas,conjuntoCorretor
         else:
             if (c in conjuntoCorrecoes_provas):
                 resumo_csv.write(conjuntoCorretor[c].ShowDisciplina() + "," + conjuntoCorretor[c].GeraLinhaCSV() + "," + str(conjuntoCorrecoes_provas[c].ShowCorrecao()) + "," + conjuntoFacilitador[conjuntoCorretor[c].ShowEmail()].ShowStatus() + "\n" )
+                conjuntoCorrecoes_provas[c].AtualizaDadosComputados()
             else:
                 resumo_csv.write(conjuntoCorretor[c].ShowDisciplina() + "," + conjuntoCorretor[c].GeraLinhaCSV() + ",0," + conjuntoFacilitador[conjuntoCorretor[c].ShowEmail()].ShowStatus() + "\n" )
+    #Mostra o left join das correções
+    for c in conjuntoCorrecoes_provas:
+        if ((conjuntoCorrecoes_provas[c].ShowDadosComputados() == 0) and (conjuntoCorrecoes_provas[c].ShowEmail() in conjuntoFacilitador)):
+            resumo_csv.write(conjuntoCorrecoes_provas[c].ShowDisciplina() + "," + conjuntoCorrecoes_provas[c].ShowEmail() + ",0,0," + str(conjuntoCorrecoes_provas[c].ShowCorrecao()) + "," + conjuntoFacilitador[conjuntoCorrecoes_provas[c].ShowEmail()].ShowStatus() + "\n" )
+
     for d in conjuntoDisciplinas:
         modificado_header = header.replace("</ul>","<li><li class=\"active\"><a href=\"" + d + sufixo_arquivos +"\">" + d + "-Corre&ccedil;&otilde;es" + "</a></li><li><a href=\"correcao.html\">Voltar</a></li></ul>")
         html_arquivo[d].write(modificado_header)
