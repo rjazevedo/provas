@@ -84,7 +84,7 @@ cp ${SAIDA_CSV}/nota_filtrada_disciplina_ambigua.csv ${BACKUP_CSV}/${DATA}_nota_
 
 #Retira de ausentes as disciplinas que tiveram reaplicação (resolução de conflito presença de duas provas)
 awk '!/STA001/' ${SAIDA_CSV}/ausentes.csv | awk '!/EMA002/' > ${SAIDA_CSV}/ausentes_filtrado.csv
-mv  ${SAIDA_CSV}/ausentes_filtrado.csv ${SAIDA_CSV}/ausentes.csv
+mv ${SAIDA_CSV}/ausentes_filtrado.csv ${SAIDA_CSV}/ausentes.csv
 
 #Concatena o ausentes manual e automatico
 cat ${SAIDA_CSV}/ausentes.csv ${HOME_NFS}/${ESTRUTURA_CSV}/ausentes_manual.csv | sort | uniq > ${SAIDA_CSV}/ausentes_tmp.csv
