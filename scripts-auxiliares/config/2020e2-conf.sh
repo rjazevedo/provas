@@ -1,7 +1,7 @@
 #!/bin/bash
 #Arquivos de cofiguração
 
-PERIODO="2020e1"
+PERIODO="2020e2"
 #Backup de csv anteriores (Caminho Completo)
 BACKUP_CSV="/home/provas/dados/backup/$PERIODO"
 #Isso é invariavel, é uma base de busca de string
