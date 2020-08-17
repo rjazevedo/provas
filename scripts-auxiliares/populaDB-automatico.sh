@@ -11,10 +11,23 @@ else
 	source ${1}
 #Inicio das rotinas
 
-	#**********Modulo de geracao de csv*************#
-	echo ${MSG_POPULADB_AUTOMATICO_INICIO}
-	${HOME}/src/populaDB.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${LOG}/log_populaDB_${DATA}.log
-	#Correcao de path
+	echo ${MSG_POPULADB_INICIO}
+	
+	if [ "${PESO_PROVAS}" == "sim" ]; then
+		${HOME}/src/populaDB.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} -d ${HOME_NFS}/${ESTRUTURA_CSV}/distribuicaoPontos.csv > ${SAIDA_CSV}/log.txt
+	else
+		${HOME}/src/populaDB.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${SAIDA_CSV}/log.txt
+	fi	
+	echo "Tratando dos arquivos csv gerados"
+	
+	#Remove duplicados
+	cat ${SAIDA_CSV}/guias.csv | sort | uniq > ${SAIDA_CSV}/guias_tmp.csv
+	cat ${SAIDA_CSV}/questoes.csv | sort | uniq > ${SAIDA_CSV}/questoes_tmp.csv
+
+	mv ${SAIDA_CSV}/questoes_tmp.csv ${SAIDA_CSV}/questoes.csv
+	mv ${SAIDA_CSV}/guias_tmp.csv ${SAIDA_CSV}/guias.csv	
+
+	
 	sed -i "s#${HOME_NFS}/##g" ${SAIDA_CSV}/*.csv
 
 	#*************Modulo de backup ************************#
