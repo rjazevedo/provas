@@ -90,7 +90,20 @@ class CorretorDisciplina:
 
     def __str__(self):
         return self.nome + ': ' + str(self.lista)
-
+class NumeroQuestoes:
+    def __init__(self,campos):
+        self.disciplina = campos[0]
+        self.codigoProva = campos[1]
+        self.questoesObjetivas = int(campos[2])
+        self.questoesDissertativas = int(campos[3])
+    def MostraDisciplina(self):
+        return self.disciplina
+    def MostraCodigoProva(self):
+        return self.codigoProva    
+    def MostraNumeroObjetivas(self):
+        return self.questoesObjetivas
+    def MostraNumeroDissertativas(self):
+        return self.questoesDissertativas
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Le arquivo de provas para popular o DB')
@@ -100,6 +113,7 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--arquivos', type=str, required=True, help='Pasta dos arquivos de provas (comece com SGA)')
     parser.add_argument('-g', '--guias', type=str, required=True, help='Pasta dos arquivos dos guias de correção')
     parser.add_argument('-s', '--saida', type=str, required=True, help='Pasta de saida')
+    parser.add_argument('-d', '--distribuicao', type=str, required=False, default="", help='Arquivo extra csv/utf-8 com informações para distribuicao de pontos diferente sem cabecalho:disciplina,codigoProva,numero_objetivas,numero_dissetativas')
 
     args = parser.parse_args()
 
@@ -129,22 +143,49 @@ if __name__ == '__main__':
     for prova in sorted(provas.keys()):
         p = provas[prova]
         saida.append([p.disciplina, p.prova, p.folhasDissertativas + 1])
-
-        for q in range(1, p.questoesObjetivas + 1):
-            if q < 5:
-                questoes.append([p.disciplina, p.prova, q, 'Objetiva', 1.5])
-            else:
-                questoes.append([p.disciplina, p.prova, q, 'Objetiva', 2.0])
-        if p.folhasDissertativas != 0:
-            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 1, 'Dissertativa', 2.0])
-            questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 2, 'Dissertativa', 2.0])
+        
+        if args.distribuicao == "":
+            for q in range(1, p.questoesObjetivas + 1):
+                if q < 5:
+                    questoes.append([p.disciplina, p.prova, q, 'Objetiva', 1.5])
+                else:
+                    questoes.append([p.disciplina, p.prova, q, 'Objetiva', 2.0])
+            if p.folhasDissertativas != 0:
+                questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 1, 'Dissertativa', 2.0])
+                questoes.append([p.disciplina, p.prova, p.questoesObjetivas + 2, 'Dissertativa', 2.0])         
 
         guia = os.path.join(args.guias, p.idProva() + '.pdf')
         if os.path.isfile(guia):
             guias.append([p.disciplina, p.prova, p.folhasDissertativas + 1, guia])
         else:
             print('Arquivo não encontrado:', guia)
-
+            
+    if args.distribuicao != "":
+        distribuicao = list(csv.reader(open(args.distribuicao)))
+        distribuicao_pontos = {}
+        for d in distribuicao:
+           distribuicao_pontos[d[0]+d[1]] = NumeroQuestoes(d)
+           
+        for d in distribuicao_pontos:
+            if distribuicao_pontos[d].MostraNumeroDissertativas() == 0:
+                #Manutenção pontuação legada
+                if distribuicao_pontos[d].MostraNumeroObjetivas() == 6:
+                    for q in range(1, distribuicao_pontos[d].MostraNumeroObjetivas() + 1):
+                        if q < 5:
+                            questoes.append([distribuicao_pontos[d].MostraDisciplina(),distribuicao_pontos[d].MostraCodigoProva(), q, 'Objetiva', 1.5])
+                        else:
+                            questoes.append([distribuicao_pontos[d].MostraDisciplina(), distribuicao_pontos[d].MostraCodigoProva(), q, 'Objetiva', 2.0])
+                else:
+                    for q in range(1, distribuicao_pontos[d].MostraNumeroObjetivas() + 1):
+                        questoes.append([distribuicao_pontos[d].MostraDisciplina(), distribuicao_pontos[d].MostraCodigoProva(), q, 'Objetiva', float(10.0 / distribuicao_pontos[d].MostraNumeroObjetivas())])
+            elif distribuicao_pontos[d].MostraNumeroObjetivas() == 0:
+                for q in range(1, distribuicao_pontos[d].MostraNumeroDissertativas() + 1):
+                    questoes.append([distribuicao_pontos[d].MostraDisciplina(), distribuicao_pontos[d].MostraCodigoProva(), q, 'Dissertativa', float(10.0 / distribuicao_pontos[d].MostraNumeroDissertativas())]) 
+            else:
+                for q in range(1, distribuicao_pontos[d].MostraNumeroObjetivas() + 1):
+                    questoes.append([distribuicao_pontos[d].MostraDisciplina(), distribuicao_pontos[d].MostraCodigoProva(), q, 'Objetiva', 1.5])
+                for q in range(1 + distribuicao_pontos[d].MostraNumeroObjetivas(), distribuicao_pontos[d].MostraNumeroDissertativas() + distribuicao_pontos[d].MostraNumeroObjetivas() + 1):
+                    questoes.append([distribuicao_pontos[d].MostraDisciplina(), distribuicao_pontos[d].MostraCodigoProva(), q, 'Dissertativa', float((10.0 - (1.5 * distribuicao_pontos[d].MostraNumeroObjetivas())) / distribuicao_pontos[d].MostraNumeroDissertativas())])
     disciplinas = {}
     for c in corretores:
         if c[0] in disciplinas:

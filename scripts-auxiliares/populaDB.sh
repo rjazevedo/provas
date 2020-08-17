@@ -2,7 +2,7 @@
 #Objetivo: Esse script gera as saídas necessárias para os arquivos de csv para subir no Banco de dados os corretores-2BIM-2019
 #Autor: Daniel Consiglieri
 #Data Criacao:Jun 2019
-#Revisao:06-abr-2020
+#Revisao:17-ago-2020
 
 #Deve ser passado por parametro o arquivo de configuracao
 if [ "$#" -ne 1 ]; then
@@ -12,7 +12,12 @@ else
 #Inicio das rotinas
 
 	echo ${MSG_POPULADB_INICIO}
-	${HOME}/src/populaDB.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${SAIDA_CSV}/log.txt
+	
+	if [ "${PESO_PROVAS}" == "sim" ]; then
+		${HOME}/src/populaDB.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} -d ${HOME_NFS}/${ESTRUTURA_CSV}/distribuicaoPontos.csv > ${SAIDA_CSV}/log.txt
+	else
+		${HOME}/src/populaDB.py -e ${HOME_NFS}/${ESTRUTURA_PROVAS} -b ${HOME_NFS}/${ESTRUTURA_BASE_CORRECOES} -c ${HOME_NFS}/${ESTRUTURA_CORRETORES} -a ${HOME_NFS}/${PATH_PROVAS}/ -g ${HOME_NFS}/${ESTRUTURA_GUIAS} -s ${SAIDA_CSV} > ${SAIDA_CSV}/log.txt
+	fi	
 	echo "Tratando dos arquivos csv gerados"
 	
 	#Remove duplicados

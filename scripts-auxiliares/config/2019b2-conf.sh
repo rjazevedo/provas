@@ -53,6 +53,8 @@ MSG_POPULADB_AUTOMATICO_INICIO="Inicio da geração do PopulaDB Automatico - 2 B
 MSG_POPULADB_INICIO="Inicio da geração do PopulaDB - 2 Bimestre 2019"
 #Caminho das provas 2 Bimestre
 PATH_PROVAS="SGA/provas_2_bimestre"
+#Peso diferente do padrão (4 questões objetivas e 2 dissertativas), colocar "sim" ou deixar vazio em caso negativo
+PESO_PROVAS=""
 #Agrega dois calendários (regular e dp)? sim ou vazio
 REGULAR_E_DP=""
 #Path Completo de Saida (caminho completo)
