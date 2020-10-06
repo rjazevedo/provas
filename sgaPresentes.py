@@ -22,7 +22,7 @@ import csv
 
 args = None
 
-offer_types = { 'regular': 1, 'dp': 2, 'exam': 1 } #acrescentado o exam
+offer_types = { 'regular': 1, 'dp': 2, 'exam': 1, 'dpexam': 2 } #acrescentado o exam
 
 ####################
 # Inicia Sessão 
@@ -127,7 +127,9 @@ def marcaAluno(
     else:
         if not test:
             erro( "Missing ActivityTests: %s, %d" % (tc, activity.id) )
-
+            
+    if st == 'dpexam':
+        st = 'exam'
 
     # submissão (cria uma caso não exista)
     submission = sess.query(db.ActivityRecordSubmissions) \
@@ -181,7 +183,7 @@ if __name__ == '__main__':
     apenaseditavel = args.apenaseditavel
 
     if args.tipo is not None:
-        if args.tipo not in ['regular','dp','exam']:#acrescimo de exam
+        if args.tipo not in ['regular','dp','exam','dpexam']:#acrescimo de exam
             print( 'Tipo de submissão deve ser regular, exam ou dp' )
             sys.exit(1)
         tipo = args.tipo

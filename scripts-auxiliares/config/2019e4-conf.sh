@@ -65,6 +65,6 @@ SAIDA_CSV="/home/provas/dados/SGA/$PERIODO/provas/Saida"
 SUBSTITUI_STRING=" - Exame 4o Bimestre"
 #Indicacao do tipo de prova (regular,dp)
 TIPO_PROVA="exam"
-TIPO_PROVA_DP="exam"
+TIPO_PROVA_DP="dpexam"
 #Nome da pasta temporaria de trabalho
 TRABALHO_TMP="dE4BIM2019"
