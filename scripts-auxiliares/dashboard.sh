@@ -18,7 +18,7 @@ else
 	
 	if [ "$REGULAR_E_DP" == "sim" ]; then	
 		if [ "$TIPO_PROVA_DP" == "dpexam" ];then
-			${HOME}/src/dashboard_correcao.py -c "${CALENDARIO},${CALENDARIO_DP}" -t "${TIPO_PROVA},dp" -s ${HOME}/tmp/${TRABALHO_TMP}
+			${HOME}/src/dashboard_correcao.py -c "${CALENDARIO},${CALENDARIO_DP}" -t "${TIPO_PROVA},exam" -s ${HOME}/tmp/${TRABALHO_TMP}
 		else
 			${HOME}/src/dashboard_correcao.py -c "${CALENDARIO},${CALENDARIO_DP}" -t "${TIPO_PROVA},${TIPO_PROVA_DP}" -s ${HOME}/tmp/${TRABALHO_TMP}
 		fi
