@@ -10,7 +10,7 @@ BASE_STRING="Dashboard Provas UNIVESP"
 BIMESTRE_CONSOLIDADO=""
 #Calendario SGA
 CALENDARIO="52"
-CALENDARIO_DP=""
+CALENDARIO_DP="56"
 #Data
 DATA=$(date +%Y%m%d_%H-%M-%S)
 #Destino de Dashboad
@@ -58,7 +58,7 @@ PATH_PROVAS="SGA/$PERIODO/provas"
 #Peso diferente do padrão (4 questões objetivas e 2 dissertativas), colocar "sim" ou deixar vazio em caso negativo
 PESO_PROVAS=""
 #Agrega dois calendários (regular e dp)? sim ou vazio caso contrario
-REGULAR_E_DP=""
+REGULAR_E_DP="sim"
 #Path Completo de Saida (caminho completo)
 SAIDA_CSV="/home/provas/dados/SGA/$PERIODO/provas/Saida"
 #Personaliza com informações relativas ao periodo de referencia
