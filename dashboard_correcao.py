@@ -15,6 +15,9 @@ def MostraPolo(codStr):
     return codStr[5:9]
 def MostraCodigoProva(codStr):
     return codStr[0:4]
+def TransfomaCsvHtml(entrada):
+    saida = entrada.replace(',','</td><td>')
+    return '<tr><td>' + saida.replace('\n','</td>\n')    
 class Corretores:
     def __init__(self, campos):
         self.email = campos[15]
@@ -66,6 +69,10 @@ class Corretores:
         if self.email == None:
             self.email = "reverificar"
         return self.email + ',' + str(self.aCorrigir) + ',' + str(self.ausente)
+    def GeraLinhaHTML(self):
+        if self.email == None:
+            self.email = "reverificar"
+        return self.email + '</td><td>' + str(self.aCorrigir) + '</td><td>' + str(self.ausente)      
     def ExportaCorretoresComPendencias(self,facilitadores):
         if self.aCorrigir != 0:
             if self.email == "reverificar":
@@ -108,13 +115,17 @@ class ProvasCorrigidas:
 def GeraDashboardDisciplinasCorretores(conjuntoCorrecoes_provas,conjuntoCorretor,conjuntoDisciplinas,conjuntoFacilitador,saida):
     html_disciplinas = {}
     html_arquivo = {}
+    escrita = ""
+    sufixo_arquivos = "-correcoes.html"
     
     header = open(os.path.join(os.path.dirname(sys.argv[0]), 'header.html')).read()
     footer = open(os.path.join(os.path.dirname(sys.argv[0]), 'footer.html')).read()
     resumo_csv = open(os.path.join(saida,'relatorio_correcoes.csv'), 'wt')
+    resumo_html = open(os.path.join(saida,'relatorio_correcoes.html'), 'wt')
+    resumo_html.write(header)
+    resumo_html.write('<br><br><br><h4>Gerado em: ' + datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '</h4>\n')
+    resumo_html.write('<thead><tr><th>Disciplina</th><th>Email</th><th>Pendências</th><th>Ausentes</th><th>Corrigidas</th><th>Status</th></thead><tbody>\n')
     resumo_csv.write("Disciplina,Email,Pendências,Ausentes,Corrigidas,Status\n")
-    
-    sufixo_arquivos = "-correcoes.html"
         
     for d in conjuntoDisciplinas:
         html_disciplinas[d] = ""
@@ -123,17 +134,25 @@ def GeraDashboardDisciplinasCorretores(conjuntoCorrecoes_provas,conjuntoCorretor
     for c in conjuntoCorretor:
         html_disciplinas[conjuntoCorretor[c].ShowDisciplina()] += conjuntoCorretor[c].GeraLinha()
         if conjuntoCorretor[c].ShowEmail() == "reverificar":
-            resumo_csv.write(conjuntoCorretor[c].ShowDisciplina() + "," + conjuntoCorretor[c].GeraLinhaCSV() + ",-\n" )
+            escrita = conjuntoCorretor[c].ShowDisciplina() + "," + conjuntoCorretor[c].GeraLinhaCSV() + ",-\n"
+            resumo_csv.write(escrita)            
+            resumo_html.write(TransfomaCsvHtml(escrita))            
         else:
             if (c in conjuntoCorrecoes_provas):
-                resumo_csv.write(conjuntoCorretor[c].ShowDisciplina() + "," + conjuntoCorretor[c].GeraLinhaCSV() + "," + str(conjuntoCorrecoes_provas[c].ShowCorrecao()) + "," + conjuntoFacilitador[conjuntoCorretor[c].ShowEmail()].ShowStatus() + "\n" )
+                escrita = conjuntoCorretor[c].ShowDisciplina() + "," + conjuntoCorretor[c].GeraLinhaCSV() + "," + str(conjuntoCorrecoes_provas[c].ShowCorrecao()) + "," + conjuntoFacilitador[conjuntoCorretor[c].ShowEmail()].ShowStatus() + "\n"
+                resumo_csv.write(escrita)
+                resumo_html.write(TransfomaCsvHtml(escrita))                
                 conjuntoCorrecoes_provas[c].AtualizaDadosComputados()
             else:
-                resumo_csv.write(conjuntoCorretor[c].ShowDisciplina() + "," + conjuntoCorretor[c].GeraLinhaCSV() + ",0," + conjuntoFacilitador[conjuntoCorretor[c].ShowEmail()].ShowStatus() + "\n" )
+                escrita = conjuntoCorretor[c].ShowDisciplina() + "," + conjuntoCorretor[c].GeraLinhaCSV() + ",0," + conjuntoFacilitador[conjuntoCorretor[c].ShowEmail()].ShowStatus() + "\n" 
+                resumo_csv.write(escrita)
+                resumo_html.write(TransfomaCsvHtml(escrita))                
     #Mostra o left join das correções
     for c in conjuntoCorrecoes_provas:
         if ((conjuntoCorrecoes_provas[c].ShowDadosComputados() == 0) and (conjuntoCorrecoes_provas[c].ShowEmail() in conjuntoFacilitador)):
-            resumo_csv.write(conjuntoCorrecoes_provas[c].ShowDisciplina() + "," + conjuntoCorrecoes_provas[c].ShowEmail() + ",0,0," + str(conjuntoCorrecoes_provas[c].ShowCorrecao()) + "," + conjuntoFacilitador[conjuntoCorrecoes_provas[c].ShowEmail()].ShowStatus() + "\n" )
+            escrita = conjuntoCorrecoes_provas[c].ShowDisciplina() + "," + conjuntoCorrecoes_provas[c].ShowEmail() + ",0,0," + str(conjuntoCorrecoes_provas[c].ShowCorrecao()) + "," + conjuntoFacilitador[conjuntoCorrecoes_provas[c].ShowEmail()].ShowStatus() + "\n"
+            resumo_csv.write(escrita)
+            resumo_html.write(TransfomaCsvHtml(escrita))
 
     for d in conjuntoDisciplinas:
         modificado_header = header.replace("</ul>","<li><li class=\"active\"><a href=\"" + d + sufixo_arquivos +"\">" + d + "-Corre&ccedil;&otilde;es" + "</a></li><li><a href=\"correcao.html\">Voltar</a></li></ul>")
@@ -145,6 +164,8 @@ def GeraDashboardDisciplinasCorretores(conjuntoCorrecoes_provas,conjuntoCorretor
         html_arquivo[d].write(footer)
         html_arquivo[d].close()
     resumo_csv.close()
+    resumo_html.write(footer)
+    resumo_html.close()
 
 class ProvasIlegiveis:
     def __init__(self, campos):
