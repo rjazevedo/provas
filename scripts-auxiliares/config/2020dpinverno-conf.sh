@@ -9,7 +9,7 @@ BASE_STRING="Dashboard Provas UNIVESP"
 #Caso o bimestre tenha sido consolidado preencher "sim", caso contrario deixar em branco
 BIMESTRE_CONSOLIDADO=""
 #Calendario SGA
-CALENDARIO="51"
+CALENDARIO="71"
 CALENDARIO_DP=""
 #Data
 DATA=$(date +%Y%m%d_%H-%M-%S)
