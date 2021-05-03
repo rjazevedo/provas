@@ -336,7 +336,6 @@ if __name__ == '__main__':
                     temp.append(base)
                     temp.append(0)
                     temp.append("Ativo")
-                    print(temp)
                     facilitadores[base]= (Facilitadores(temp))
           
         saida = open(os.path.join(args.saida,'correcao.html'), 'wt')
