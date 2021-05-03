@@ -318,10 +318,27 @@ if __name__ == '__main__':
         record = cursor.fetchall()
         
         facilitadores = {}
+        #Guarda os emails de facilitadores para confrontar com o um corretor não facilitador
+        verificacao_facilitadores = []
         
         for r in record:
             facilitadores[r[0]] = (Facilitadores(r))
-
+            verificacao_facilitadores.append(r[0])
+        #hotfix para corretores que não são facilitadores (03 Maio 2021)
+        for c in corretores:    
+            if(corretores[c].ShowEmail() != None):
+                if(corretores[c].ShowEmail() not in verificacao_facilitadores):
+                    temp = []
+                    #otimizar hotfix
+                    base = corretores[c].ShowEmail()
+                    nome = base.split("@")
+                    temp.append(nome[0].replace('.', ' ').capitalize())
+                    temp.append(base)
+                    temp.append(0)
+                    temp.append("Ativo")
+                    print(temp)
+                    facilitadores[base]= (Facilitadores(temp))
+          
         saida = open(os.path.join(args.saida,'correcao.html'), 'wt')
         header = open(os.path.join(os.path.dirname(sys.argv[0]), 'header.html')).read() 
         footer = open(os.path.join(os.path.dirname(sys.argv[0]), 'footer.html')).read()
